@@ -1,0 +1,141 @@
+================================================================================
+    CÓMO VER TU REFERENCIA ALFANUMÉRICA PARA OEPM
+================================================================================
+
+Hay varias formas de ver tu referencia alfanumérica para registrar
+tu aplicación en OEPM:
+
+================================================================================
+MÉTODO 1: EJECUTAR SCRIPT (MÁS RÁPIDO)
+================================================================================
+
+1. Abre una terminal en la carpeta del proyecto
+2. Ejecuta este comando:
+
+   node obtener-referencia-oepm.js
+
+3. Verás la referencia en la consola
+
+La referencia se guardará en el archivo .app_reference_storage.json
+
+================================================================================
+MÉTODO 2: DESDE LA APLICACIÓN
+================================================================================
+
+1. Abre la aplicación en tu dispositivo o emulador
+2. Inicia sesión con tu cuenta de administrador:
+   Email: admin@academiadeinmigrantes.es
+3. Ve a la pantalla "Información de Usuario"
+4. Verás la sección "Referencia de la Aplicación"
+5. Toca el botón "Ver Referencia Completa"
+
+NOTA: Si no eres administrador, verás "Acceso Restringido"
+
+================================================================================
+MÉTODO 3: DESDE EL CÓDIGO (CONSOLA DE DESARROLLO)
+================================================================================
+
+Si estás ejecutando la aplicación en modo desarrollo:
+
+1. Abre la consola de desarrollo (Metro bundler)
+2. Ejecuta este código en la consola:
+
+```javascript
+import { getAppReferenceForOEPM } from './utils/getAppReferenceForOEPM';
+
+getAppReferenceForOEPM().then(ref => {
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('REFERENCIA PARA OEPM:');
+  console.log(ref);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+});
+```
+
+================================================================================
+MÉTODO 4: DESDE ASYNCSTORAGE (SI TIENES ACCESO)
+================================================================================
+
+Si tienes acceso a AsyncStorage del dispositivo:
+
+```typescript
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const referencia = await AsyncStorage.getItem('app_reference_oepm');
+console.log('Referencia OEPM:', referencia);
+```
+
+================================================================================
+FORMATO DE LA REFERENCIA
+================================================================================
+
+Formato: ACAD-XXXX-XXXX-XXXX-XXXX
+
+Ejemplo: ACAD-A3B7-9F2C-4D8E-1G5H
+
+Donde:
+- ACAD = Prefijo de la aplicación
+- XXXX = Segmentos alfanuméricos (A-Z, 0-9)
+
+================================================================================
+IMPORTANTE
+================================================================================
+
+✅ La referencia es ÚNICA para tu aplicación
+✅ Solo TÚ (administrador) puedes verla
+✅ Se genera automáticamente la primera vez
+✅ Se guarda permanentemente
+✅ Los usuarios finales NO la ven
+
+================================================================================
+FIN
+================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

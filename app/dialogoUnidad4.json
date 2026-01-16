@@ -1,0 +1,32 @@
+[
+  {
+    "autor": "Garcilaso",
+    "texto": "Confieso que Petrarca me enseñó a cantar al amor con música suave. Vosotros, ¿a quiénes leísteis con fervor?",
+    "arabe": "أعترف أن بيتراكا علمني أن أغني للحب بنغمة رقيقة. وأنتم، من قرأتم بشغف؟",
+    "video": "garcilaso_01.mp4"
+  },
+  {
+    "autor": "Cervantes",
+    "texto": "A los clásicos. Séneca, Lucano… pero también a los libros de caballería que luego tuve que corregir con sátira. Amadís de Gaula, por ejemplo, me dio materia para soñar y luego para desarmar.",
+    "arabe": "إلى الكلاسيكيين. سينيكا، لوكانو... ولكن أيضًا إلى كتب الفروسية التي اضطررت لاحقًا إلى تصحيحها بالسخرية. على سبيل المثال، أعطاني أماديس دي غاولا مادة للحلم ثم للهدم.",
+    "video": "cervantes_01.mp4"
+  },
+  {
+    "autor": "Lorca",
+    "texto": "Yo bebí de la tradición oral, del cante jondo, de Góngora —aunque lo adorné de luna y cuchillo. ¿Y sabéis? Creo que si nos leyéramos más entre nosotros, nuestras obras serían aún más vivas. ¿Os habéis leído?",
+    "arabe": "أنا استقيت من التقليد الشفهي، من الغناء العميق، ومن غونغورا—رغم أنني زينته بالقمر والسكين. وتعلمون؟ أظن أنه لو قرأنا لبعضنا أكثر، لأصبحت أعمالنا أكثر حياة. هل قرأتم لبعضكم البعض؟",
+    "video": "lorca_01.mp4"
+  },
+  {
+    "autor": "Garcilaso",
+    "texto": "Leí fragmentos de ese loco hidalgo... y me vi reflejado en su melancolía.",
+    "arabe": "قرأت مقاطع من ذلك النبيل المجنون... ورأيت نفسي في حزنه.",
+    "video": "garcilaso_02.mp4"
+  },
+  {
+    "autor": "Cervantes",
+    "texto": "Y yo encontré en vuestros versos, don Garcilaso, una nobleza que don Alonso habría admirado. A vos, Federico, aún no os he leído... pero en este café no hay excusa.",
+    "arabe": "ووجدت في أبياتك يا دون غارسيلاسو نُبلاً كان دون ألونسو سيعجب به. أما أنت يا فيديريكو، فلم أقرأ لك بعد... لكن في هذا المقهى لا يوجد عذر.",
+    "video": "cervantes_02.mp4"
+  }
+]

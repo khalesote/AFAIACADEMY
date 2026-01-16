@@ -1,0 +1,468 @@
+{
+  "api": {
+    "nombre": "Academia de Inmigrantes - API de Sincronización con Odoo",
+    "version": "1.0.0",
+    "descripcion": "API para sincronizar usuarios de Firebase con Odoo automáticamente",
+    "baseUrl": "https://academia-backend-s9np.onrender.com",
+    "ultimaActualizacion": "2024-01-15"
+  },
+  "endpoint": {
+    "url": "https://academia-backend-s9np.onrender.com/api/odoo/sync-user",
+    "metodo": "POST",
+    "descripcion": "Endpoint para sincronizar un usuario de Firebase con Odoo. Se llama automáticamente cuando un usuario se registra en la aplicación móvil.",
+    "autenticacion": {
+      "tipo": "ninguna",
+      "descripcion": "El endpoint es público y no requiere autenticación. La seguridad se maneja internamente."
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    }
+  },
+  "request": {
+    "descripcion": "Datos del usuario que se envían desde la aplicación móvil",
+    "formato": "JSON",
+    "campos": {
+      "uid": {
+        "tipo": "string",
+        "requerido": false,
+        "descripcion": "ID único del usuario en Firebase Authentication",
+        "ejemplo": "user_1234567890_abc123"
+      },
+      "email": {
+        "tipo": "string",
+        "requerido": true,
+        "descripcion": "Email del usuario (debe ser válido)",
+        "ejemplo": "juan.perez@example.com",
+        "validacion": "Formato de email válido"
+      },
+      "firstName": {
+        "tipo": "string",
+        "requerido": true,
+        "descripcion": "Nombre del usuario",
+        "ejemplo": "Juan"
+      },
+      "lastName": {
+        "tipo": "string",
+        "requerido": true,
+        "descripcion": "Apellido del usuario",
+        "ejemplo": "Pérez"
+      },
+      "phone": {
+        "tipo": "string",
+        "requerido": false,
+        "descripcion": "Teléfono del usuario (puede incluir código de país)",
+        "ejemplo": "+34612345678"
+      },
+      "country": {
+        "tipo": "string",
+        "requerido": false,
+        "descripcion": "País del usuario (nombre del país)",
+        "ejemplo": "España",
+        "nota": "Actualmente se envía como string. Si Odoo necesita un ID de país, se puede modificar."
+      },
+      "city": {
+        "tipo": "string",
+        "requerido": false,
+        "descripcion": "Ciudad del usuario",
+        "ejemplo": "Madrid"
+      },
+      "userReference": {
+        "tipo": "string",
+        "requerido": false,
+        "descripcion": "Referencia alfanumérica única del usuario en la aplicación",
+        "ejemplo": "ACAD-A3B7-9F2C-4D8E"
+      },
+      "createdAt": {
+        "tipo": "string",
+        "requerido": false,
+        "descripcion": "Fecha de creación del usuario en formato ISO 8601",
+        "ejemplo": "2024-01-15T10:30:00.000Z",
+        "formato": "ISO 8601 (UTC)"
+      }
+    },
+    "ejemplo": {
+      "uid": "user_1234567890_abc123",
+      "email": "juan.perez@example.com",
+      "firstName": "Juan",
+      "lastName": "Pérez",
+      "phone": "+34612345678",
+      "country": "España",
+      "city": "Madrid",
+      "userReference": "ACAD-A3B7-9F2C-4D8E",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    },
+    "ejemploMinimo": {
+      "email": "juan.perez@example.com",
+      "firstName": "Juan",
+      "lastName": "Pérez"
+    }
+  },
+  "response": {
+    "exito": {
+      "codigoHttp": 200,
+      "descripcion": "Usuario sincronizado exitosamente con Odoo",
+      "formato": "JSON",
+      "estructura": {
+        "success": {
+          "tipo": "boolean",
+          "valor": true,
+          "descripcion": "Indica que la operación fue exitosa"
+        },
+        "message": {
+          "tipo": "string",
+          "descripcion": "Mensaje descriptivo del resultado",
+          "ejemplo": "Usuario sincronizado con Odoo"
+        },
+        "odooId": {
+          "tipo": "integer",
+          "descripcion": "ID del contacto creado en Odoo (modelo res.partner)",
+          "ejemplo": 123
+        },
+        "data": {
+          "tipo": "object",
+          "descripcion": "Datos que se enviaron a Odoo",
+          "estructura": {
+            "name": "string (firstName + lastName)",
+            "email": "string",
+            "phone": "string",
+            "mobile": "string",
+            "street": "string (city)",
+            "city": "string",
+            "country_id": "mixed (country o false)",
+            "comment": "string (notas con UID, referencia, fecha)",
+            "is_company": "boolean (false)",
+            "customer_rank": "integer (1)"
+          }
+        }
+      },
+      "ejemplo": {
+        "success": true,
+        "message": "Usuario sincronizado con Odoo",
+        "odooId": 123,
+        "data": {
+          "name": "Juan Pérez",
+          "email": "juan.perez@example.com",
+          "phone": "+34612345678",
+          "mobile": "+34612345678",
+          "street": "Madrid",
+          "city": "Madrid",
+          "country_id": false,
+          "comment": "Usuario sincronizado desde Firebase App\nUID: user_1234567890_abc123\nReferencia: ACAD-A3B7-9F2C-4D8E\nFecha creación: 2024-01-15T10:30:00.000Z",
+          "is_company": false,
+          "customer_rank": 1
+        }
+      }
+    },
+    "errorValidacion": {
+      "codigoHttp": 400,
+      "descripcion": "Error de validación - faltan campos requeridos",
+      "ejemplo": {
+        "success": false,
+        "error": "Faltan campos requeridos: email, firstName, lastName"
+      }
+    },
+    "errorOdoo": {
+      "codigoHttp": 200,
+      "descripcion": "Error al sincronizar con Odoo (pero el usuario se registró en Firebase)",
+      "ejemplo": {
+        "success": false,
+        "error": "Error sincronizando con Odoo: [mensaje del error]",
+        "warning": "El usuario se registró en Firebase pero no se pudo sincronizar con Odoo"
+      }
+    },
+    "errorServidor": {
+      "codigoHttp": 500,
+      "descripcion": "Error interno del servidor",
+      "ejemplo": {
+        "success": false,
+        "error": "Error desconocido"
+      }
+    },
+    "odooNoConfigurado": {
+      "codigoHttp": 200,
+      "descripcion": "Odoo no está configurado en el servidor",
+      "ejemplo": {
+        "success": false,
+        "error": "Odoo no está configurado",
+        "skipped": true
+      }
+    }
+  },
+  "mapeoOdoo": {
+    "modelo": "res.partner",
+    "descripcion": "Los datos se mapean al modelo res.partner de Odoo",
+    "campos": {
+      "name": {
+        "origen": "firstName + lastName",
+        "tipo": "string",
+        "descripcion": "Nombre completo del contacto"
+      },
+      "email": {
+        "origen": "email",
+        "tipo": "string",
+        "descripcion": "Email del contacto"
+      },
+      "phone": {
+        "origen": "phone",
+        "tipo": "string",
+        "descripcion": "Teléfono del contacto"
+      },
+      "mobile": {
+        "origen": "phone",
+        "tipo": "string",
+        "descripcion": "Móvil del contacto (mismo valor que phone)"
+      },
+      "street": {
+        "origen": "city",
+        "tipo": "string",
+        "descripcion": "Dirección (actualmente se usa la ciudad)"
+      },
+      "city": {
+        "origen": "city",
+        "tipo": "string",
+        "descripcion": "Ciudad del contacto"
+      },
+      "country_id": {
+        "origen": "country",
+        "tipo": "integer o false",
+        "descripcion": "ID del país en Odoo (actualmente se envía false si no hay país)",
+        "nota": "Si Odoo necesita el ID del país, se puede modificar para buscar el ID basado en el nombre del país"
+      },
+      "comment": {
+        "origen": "uid + userReference + createdAt",
+        "tipo": "text",
+        "descripcion": "Notas con información adicional del usuario",
+        "formato": "Usuario sincronizado desde Firebase App\nUID: [uid]\nReferencia: [userReference]\nFecha creación: [createdAt]"
+      },
+      "is_company": {
+        "origen": "fijo",
+        "tipo": "boolean",
+        "valor": false,
+        "descripcion": "Indica que es un contacto individual, no una empresa"
+      },
+      "customer_rank": {
+        "origen": "fijo",
+        "tipo": "integer",
+        "valor": 1,
+        "descripcion": "Marca el contacto como cliente"
+      }
+    }
+  },
+  "flujo": {
+    "descripcion": "Flujo completo de sincronización",
+    "pasos": [
+      {
+        "numero": 1,
+        "accion": "Usuario se registra en la aplicación móvil",
+        "sistema": "Firebase Authentication"
+      },
+      {
+        "numero": 2,
+        "accion": "Se crea el perfil del usuario en Firestore",
+        "sistema": "Firebase Firestore"
+      },
+      {
+        "numero": 3,
+        "accion": "Automáticamente se envía POST a /api/odoo/sync-user",
+        "sistema": "Aplicación móvil → Backend"
+      },
+      {
+        "numero": 4,
+        "accion": "Backend valida los datos recibidos",
+        "sistema": "Backend"
+      },
+      {
+        "numero": 5,
+        "accion": "Backend se conecta a Odoo usando credenciales configuradas",
+        "sistema": "Backend → Odoo"
+      },
+      {
+        "numero": 6,
+        "accion": "Odoo crea un nuevo contacto en res.partner",
+        "sistema": "Odoo"
+      },
+      {
+        "numero": 7,
+        "accion": "Backend retorna respuesta con el ID del contacto creado",
+        "sistema": "Backend → Aplicación móvil"
+      }
+    ],
+    "notas": [
+      "La sincronización es automática y no requiere intervención manual",
+      "La sincronización es asíncrona y no bloquea el registro del usuario",
+      "Si Odoo falla, el registro en Firebase sigue siendo exitoso",
+      "Los errores se registran en logs pero no afectan al usuario"
+    ]
+  },
+  "configuracionOdoo": {
+    "descripcion": "Credenciales que necesitamos de Odoo para configurar en nuestro servidor",
+    "opcionA": {
+      "nombre": "Autenticación por Usuario/Contraseña",
+      "recomendada": true,
+      "variables": {
+        "ODOO_URL": {
+          "tipo": "string",
+          "descripcion": "URL completa de la instancia de Odoo",
+          "ejemplo": "https://tu-empresa.odoo.com",
+          "requerido": true
+        },
+        "ODOO_DATABASE": {
+          "tipo": "string",
+          "descripcion": "Nombre de la base de datos",
+          "ejemplo": "tu_base_de_datos",
+          "requerido": true
+        },
+        "ODOO_USERNAME": {
+          "tipo": "string",
+          "descripcion": "Usuario con permisos para crear contactos en res.partner",
+          "ejemplo": "usuario_api",
+          "requerido": true
+        },
+        "ODOO_PASSWORD": {
+          "tipo": "string",
+          "descripcion": "Contraseña del usuario",
+          "ejemplo": "contraseña_segura",
+          "requerido": true
+        }
+      }
+    },
+    "opcionB": {
+      "nombre": "Autenticación por API Key",
+      "recomendada": false,
+      "variables": {
+        "ODOO_URL": {
+          "tipo": "string",
+          "descripcion": "URL completa de la instancia de Odoo",
+          "ejemplo": "https://tu-empresa.odoo.com",
+          "requerido": true
+        },
+        "ODOO_DATABASE": {
+          "tipo": "string",
+          "descripcion": "Nombre de la base de datos",
+          "ejemplo": "tu_base_de_datos",
+          "requerido": false
+        },
+        "ODOO_API_KEY": {
+          "tipo": "string",
+          "descripcion": "Token de autenticación API",
+          "ejemplo": "token_api_123456",
+          "requerido": true
+        }
+      }
+    },
+    "nota": "Solo necesitamos una de las dos opciones (A o B), no ambas"
+  },
+  "autenticacionOdoo": {
+    "opcionA": {
+      "metodo": "Web Session Authentication",
+      "endpoint": "{ODOO_URL}/web/session/authenticate",
+      "metodoHttp": "POST",
+      "descripcion": "Primero se autentica usando usuario/contraseña, luego se usa la sesión para crear el contacto"
+    },
+    "opcionB": {
+      "metodo": "API Key Authentication",
+      "endpoint": "{ODOO_URL}/api/res.partner",
+      "metodoHttp": "POST",
+      "header": "Authorization: Bearer {ODOO_API_KEY}",
+      "descripcion": "Se usa directamente la API Key en el header de autorización"
+    }
+  },
+  "camposPersonalizados": {
+    "descripcion": "Si Odoo quiere almacenar información adicional, pueden crear campos personalizados",
+    "sugerencias": [
+      {
+        "nombre": "x_firebase_uid",
+        "tipo": "Char",
+        "descripcion": "Almacena el UID de Firebase",
+        "ejemplo": "user_1234567890_abc123"
+      },
+      {
+        "nombre": "x_user_reference",
+        "tipo": "Char",
+        "descripcion": "Almacena la referencia alfanumérica del usuario",
+        "ejemplo": "ACAD-A3B7-9F2C-4D8E"
+      },
+      {
+        "nombre": "x_firebase_created_at",
+        "tipo": "Datetime",
+        "descripcion": "Almacena la fecha de creación en Firebase",
+        "ejemplo": "2024-01-15T10:30:00.000Z"
+      }
+    ],
+    "nota": "Si crean estos campos, podemos modificar el código para incluirlos automáticamente"
+  },
+  "ejemplos": {
+    "curl": {
+      "descripcion": "Ejemplo de petición usando cURL",
+      "comando": "curl -X POST https://academia-backend-s9np.onrender.com/api/odoo/sync-user -H \"Content-Type: application/json\" -d '{\"email\":\"juan.perez@example.com\",\"firstName\":\"Juan\",\"lastName\":\"Pérez\",\"phone\":\"+34612345678\",\"country\":\"España\",\"city\":\"Madrid\"}'"
+    },
+    "javascript": {
+      "descripcion": "Ejemplo de petición usando JavaScript/Fetch",
+      "codigo": "const response = await fetch('https://academia-backend-s9np.onrender.com/api/odoo/sync-user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: 'juan.perez@example.com', firstName: 'Juan', lastName: 'Pérez', phone: '+34612345678', country: 'España', city: 'Madrid' }) }); const result = await response.json(); console.log(result);"
+    },
+    "python": {
+      "descripcion": "Ejemplo de petición usando Python",
+      "codigo": "import requests\n\nurl = 'https://academia-backend-s9np.onrender.com/api/odoo/sync-user'\ndata = {\n    'email': 'juan.perez@example.com',\n    'firstName': 'Juan',\n    'lastName': 'Pérez',\n    'phone': '+34612345678',\n    'country': 'España',\n    'city': 'Madrid'\n}\nresponse = requests.post(url, json=data)\nprint(response.json())"
+    }
+  },
+  "preguntasFrecuentes": [
+    {
+      "pregunta": "¿Qué pasa si un usuario ya existe en Odoo?",
+      "respuesta": "Actualmente, el endpoint crea un nuevo contacto cada vez. Si necesitan evitar duplicados, pueden crear un campo personalizado x_firebase_uid y modificar el código para buscar contactos existentes antes de crear uno nuevo."
+    },
+    {
+      "pregunta": "¿Se actualizan los contactos existentes?",
+      "respuesta": "No, actualmente solo creamos nuevos contactos. Si necesitan actualización automática, podemos implementarla."
+    },
+    {
+      "pregunta": "¿Qué permisos necesita el usuario de Odoo?",
+      "respuesta": "El usuario debe tener permisos de crear y escribir en el modelo res.partner."
+    },
+    {
+      "pregunta": "¿Hay límite de peticiones?",
+      "respuesta": "No hay límite técnico, pero recomendamos que Odoo esté preparado para recibir múltiples peticiones simultáneas durante picos de registro."
+    },
+    {
+      "pregunta": "¿Cómo sabemos si la sincronización funcionó?",
+      "respuesta": "Pueden verificar en Odoo si aparece el nuevo contacto, o revisar los logs de nuestro servidor."
+    }
+  ],
+  "contacto": {
+    "descripcion": "Para más información o soporte técnico",
+    "urlBackend": "https://academia-backend-s9np.onrender.com",
+    "endpoint": "POST /api/odoo/sync-user"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

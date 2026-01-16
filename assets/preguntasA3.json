@@ -1,0 +1,4 @@
+[
+  {"preguntaES": "¿Qué idiomas hablas?", "preguntaAR": "ما اللغات التي تتحدثها؟", "tipo": "seleccion", "opciones": ["Hablo ...", "Vivo en ...", "Soy de ...", "Me llamo ..."], "respuesta": "Hablo ..."},
+  {"preguntaES": "¿Trabajas o estudias?", "preguntaAR": "هل تعمل أم تدرس؟", "respuesta": "Trabajo / Estudio", "tipo": "seleccion", "opciones": ["Trabajo", "Estudio"]}
+]

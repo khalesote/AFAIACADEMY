@@ -1,0 +1,32 @@
+[
+  {
+    "autor": "Cervantes",
+    "texto": "Decidme, compañeros... ¿no es acaso la escritura un oficio lleno de heridas? Yo perdí más con la pluma que con la espada.",
+    "arabe": "قولوا لي يا أصدقائي... أليس الكتابة مهنة مليئة بالجراح؟ لقد خسرت أكثر بالقلم مما خسرت بالسيف.",
+    "video": "cervantes_1.mp4"
+  },
+  {
+    "autor": "Lorca",
+    "texto": "Y aun así, don Miguel, vuestra pluma cambió el rumbo de las letras. Yo sentí el filo de la censura y del odio... pero también el calor de la voz popular. ¿Vos, Garcilaso, sufriste por escribir?",
+    "arabe": "ومع ذلك، يا دون ميغيل، غيّر قلمكم مسار الأدب. لقد شعرت بحد الرقابة والكراهية... ولكن أيضًا بحرارة صوت الشعب. وأنت يا غارسيلاسو، هل عانيت من الكتابة؟",
+    "video": "lorca_1.mp4"
+  },
+  {
+    "autor": "Garcilaso",
+    "texto": "Más de lo que parece. La poesía me expuso... me hizo vulnerable. En la corte era guerrero, pero en el verso fui siempre prisionero de la emoción. Aquí, en este café literario, me siento libre al fin de hablar de ello.",
+    "arabe": "أكثر مما يبدو. لقد كشفتني الشعر... وجعلتني ضعيفًا. في البلاط كنت محاربًا، لكن في الشعر كنت دائمًا أسير العاطفة. هنا، في هذا المقهى الأدبي، أشعر أخيرًا بالحرية للحديث عن ذلك.",
+    "video": "garcilaso_1.mp4"
+  },
+  {
+    "autor": "Lorca",
+    "texto": "¡Eso es lo hermoso de este lugar! La eternidad aquí no pesa.",
+    "arabe": "هذا هو جمال هذا المكان! الخلود هنا لا يُثقل الروح.",
+    "video": "lorca_2.mp4"
+  },
+  {
+    "autor": "Cervantes",
+    "texto": "Ni las heridas duelen.",
+    "arabe": "ولا حتى الجراح تؤلم.",
+    "video": "cervantes_2.mp4"
+  }
+]

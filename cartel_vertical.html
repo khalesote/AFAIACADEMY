@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartel Vertical AFAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1976D2, #1565C0);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .cartel-vertical {
+            width: 600px;
+            height: 800px;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header-vertical {
+            background: linear-gradient(135deg, #1976D2, #1565C0);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .logo-vertical {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .titulo-vertical {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitulo-vertical {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .titulo-arabe {
+            font-size: 20px;
+            margin-top: 8px;
+            direction: rtl;
+            font-family: 'Arial';
+        }
+
+        .contenido-vertical {
+            padding: 25px 20px;
+        }
+
+        .servicios-vertical {
+            margin-bottom: 20px;
+        }
+
+        .servicio-vertical {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #1976D2;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .servicio-titulo-vertical {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .servicio-titulo-vertical:before {
+            content: "✅";
+            margin-right: 6px;
+        }
+
+        .servicio-descripcion-vertical {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.3;
+        }
+
+        .cta-vertical {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            margin: 20px 0;
+        }
+
+        .cta-titulo-vertical {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .cta-texto-vertical {
+            font-size: 14px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .boton-vertical {
+            background: #FF9800;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-block;
+            margin: 5px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+
+        .contacto-vertical {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .contacto-titulo-vertical {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 12px;
+        }
+
+        .contacto-info-vertical {
+            font-size: 14px;
+            color: #555;
+            margin: 6px 0;
+        }
+
+        .whatsapp-link-vertical {
+            color: #25D366;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .footer-vertical {
+            background: #1976D2;
+            padding: 15px;
+            text-align: center;
+            color: white;
+        }
+
+        .footer-texto-vertical {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .decoracion-v1 {
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .decoracion-v2 {
+            position: absolute;
+            bottom: -25px;
+            left: -25px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .beneficios {
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #FF9800;
+        }
+
+        .beneficios-titulo {
+            font-size: 16px;
+            font-weight: bold;
+            color: #E65100;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .beneficio-item {
+            font-size: 13px;
+            color: #BF360C;
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .beneficio-item:before {
+            content: "⭐";
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cartel-vertical">
+        <div class="decoracion-v1"></div>
+        <div class="decoracion-v2"></div>
+
+        <div class="header-vertical">
+            <div class="logo-vertical">AFAI</div>
+            <h1 class="titulo-vertical">Academia de Inmigrantes</h1>
+            <p class="subtitulo-vertical">Aprende Español • Desarrolla tu Carrera</p>
+            <p class="titulo-arabe">أكاديمية المهاجرين</p>
+        </div>
+
+        <div class="contenido-vertical">
+            <div class="beneficios">
+                <h3 class="beneficios-titulo">🎓 ¿Por qué elegirnos?</h3>
+                <div class="beneficio-item">Aprendizaje personalizado para inmigrantes árabes</div>
+                <div class="beneficio-item">Contenido bilingüe español-árabe</div>
+                <div class="beneficio-item">Profesiones demandadas en España</div>
+                <div class="beneficio-item">Certificaciones oficiales reconocidas</div>
+                <div class="beneficio-item">Soporte 24/7 vía WhatsApp</div>
+            </div>
+
+            <div class="servicios-vertical">
+                <div class="servicio-vertical">
+                    <h4 class="servicio-titulo-vertical">Español A1-A4</h4>
+                    <p class="servicio-descripcion-vertical">Cursos completos con traducción árabe y vocabulario específico para inmigrantes.</p>
+                </div>
+
+                <div class="servicio-vertical">
+                    <h4 class="servicio-titulo-vertical">Formación Profesional</h4>
+                    <p class="servicio-descripcion-vertical">17 cursos: Electricidad, Fontanería, Cocina, Jardinería, Cuidado de Mayores, etc.</p>
+                </div>
+
+                <div class="servicio-vertical">
+                    <h4 class="servicio-titulo-vertical">Juegos Interactivos</h4>
+                    <p class="servicio-descripcion-vertical">Aprende divirtiéndote con juegos educativos y actividades dinámicas.</p>
+                </div>
+
+                <div class="servicio-vertical">
+                    <h4 class="servicio-titulo-vertical">Asesoría Integral</h4>
+                    <p class="servicio-descripcion-vertical">Orientación laboral, trámites administrativos y soporte personalizado.</p>
+                </div>
+            </div>
+
+            <div class="cta-vertical">
+                <h3 class="cta-titulo-vertical">¡Tu futuro en España comienza aquí!</h3>
+                <p class="cta-texto-vertical">Únete a miles de inmigrantes que ya han transformado sus vidas</p>
+                <a href="#" class="boton-vertical">📱 Descargar App</a>
+                <a href="#" class="boton-vertical">🎓 Matricularse</a>
+            </div>
+
+            <div class="contacto-vertical">
+                <h4 class="contacto-titulo-vertical">📞 Contacta con nosotros</h4>
+                <p class="contacto-info-vertical">🌐 afaiacademiadeinmigrantes.com</p>
+                <p class="contacto-info-vertical">📱 <a href="https://wa.me/34665666288" class="whatsapp-link-vertical">+34 665 666 288</a></p>
+            </div>
+        </div>
+
+        <div class="footer-vertical">
+            <p class="footer-texto-vertical">© 2025 Academia de Inmigrantes - Transformando vidas</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,152 @@
+# Node
+node_modules/
+
+# Expo/React Native
+.expo/
+.expo-shared/
+web-build/
+dist/
+build/
+
+# Android
+android/.gradle/
+android/.idea/
+android/local.properties
+android/app/build/
+android/build/
+*.iml
+
+# iOS
+ios/
+
+# VSCode
+.vscode/
+
+# System
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
+
+# Cache
+caches/
+
+# Others
+.tmp/
+.env
+*.bak
+
+# JetBrains
+.idea/
+
+# Test/coverage
+coverage/
+
+# Misc
+master)
+
+# Ignora dependencias y builds
+node_modules/
+android/build/
+ios/build/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Archivos nativos y llaves
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro y debug
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# Archivos de entorno
+.env*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo
+
+# Gradle files
+.gradle/
+/build/
+/android/build/
+
+# Expo cache
+.expo/
+
+# Ignorar caches locales generadas
+ndks/
+
+kotlin-profile/
+
+native/
+
+wrapper/
+
+manager/
+
+rm
+
+npm
+
+nodejs
+
+.gradle-user/
+
+android/.gradle-user/
+
+daemon/
+
+
+# No usar en repo
+*.zip
+*.apk
+*.aab
+build/
+caches/
+daemon/
+jdks/
+kotlin-profile/
+native/
+wrapper/
+npm
+.gradle-user/
+android/.gradle-user/
+android/build/
+android/.gradle/
+android/.cxx/
+
+
+node_modules/
+android/app/build/
+android/build/
+android/.gradle/
+android/.cxx/
+academia-backend/.git/
+app/*.zip
+
+
+android/app/.cxx/
+academia-backend/node_modules/
+firebase/functions/node_modules/
+
+
+app/assets/
+

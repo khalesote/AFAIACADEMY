@@ -1,0 +1,78 @@
+================================================================================
+                    REGISTRO DE PROPIEDAD INTELECTUAL
+                    MINISTERIO DE CULTURA Y DEPORTE
+================================================================================
+
+TÍTULO DE LA OBRA:
+Academia de Inmigrantes - Aplicación Móvil Completa
+
+AUTOR/ES:
+KHALED MERSAOUI
+
+DESCRIPCIÓN:
+Este archivo contiene el código fuente completo de la aplicación móvil 
+"Academia de Inmigrantes", una plataforma educativa integral para el 
+aprendizaje de español dirigida a inmigrantes.
+
+La aplicación incluye los siguientes módulos y funcionalidades:
+
+1. ESCUELA VIRTUAL
+   - Sistema de aprendizaje de español (niveles A1, A2, B1, B2 según MCER)
+   - Profesor Virtual con tutoría automatizada
+   - Sistema de ejercicios interactivos
+   - Sistema de evaluación y seguimiento de progreso
+   - Componentes de clases de español
+   - Sistema de diplomas y certificaciones
+
+2. PREFORMACIÓN PROFESIONAL
+   - Sistema de formación profesional para inmigrantes
+   - Generador de CVs y plantillas profesionales
+   - Sistema de pagos integrado
+   - Agenda y gestión de cursos profesionales
+   - Café Literario y recursos educativos
+   - Libros descargables
+
+3. CORE E INFRAESTRUCTURA
+   - Arquitectura base de la aplicación
+   - Sistema de autenticación y registro de usuarios
+   - Sistema de pagos (Stripe y Cecabank)
+   - Reconocimiento facial y seguridad
+   - Configuración de la aplicación (Firebase, Expo, etc.)
+   - Backend API y servicios
+
+TECNOLOGÍAS UTILIZADAS:
+- React Native / Expo
+- TypeScript / JavaScript
+- Node.js (Backend)
+- Firebase
+- Stripe (Pagos)
+- Cecabank (Pagos)
+
+PLATAFORMAS:
+- Android
+- iOS
+
+CONTENIDO DEL ARCHIVO:
+- Código fuente completo (TypeScript, JavaScript, React Native)
+- Componentes de interfaz de usuario
+- Lógica de negocio y servicios
+- Configuración de proyecto
+- Backend y APIs
+- Assets y recursos multimedia
+- Documentación técnica
+- Scripts de configuración
+
+FECHA: 02 de diciembre de 2025
+
+ARCHIVO: CodigoFuente_Completo_AcademiaInmigrantes_20251202.zip
+TAMAÑO: [Se calculará automáticamente]
+ARCHIVOS INCLUIDOS: [Se calculará automáticamente]
+
+NOTA: Este archivo contiene el código fuente completo de la aplicación,
+excluyendo únicamente dependencias de terceros (node_modules), archivos
+compilados y archivos temporales, tal como se requiere para el registro
+de propiedad intelectual de software.
+
+================================================================================
+
+

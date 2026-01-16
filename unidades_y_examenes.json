@@ -1,0 +1,621 @@
+{
+  "A1": {
+    "unidades": [
+      {
+        "unidad": 1,
+        "titulo": "Saludar y presentarse",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 2,
+        "titulo": "Países y nacionalidades",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 3,
+        "titulo": "La familia y los amigos",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 4,
+        "titulo": "La casa y la ciudad",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 5,
+        "titulo": "La vida cotidiana",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 6,
+        "titulo": "El tiempo libre",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 7,
+        "titulo": "Ir de compras",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 8,
+        "titulo": "Comidas y bebidas",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 9,
+        "titulo": "La salud",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 10,
+        "titulo": "El tiempo y el clima",
+        "avatar": null,
+        "duracion_video": null
+      }
+    ],
+    "examen": [
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Saludar y presentarse'?",
+        "opciones": [
+          "Saludar, presentarse, despedirse.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Saludar, presentarse, despedirse.",
+        "unidad": 1
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Países y nacionalidades'?",
+        "opciones": [
+          "Hablar del origen y nacionalidad.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar del origen y nacionalidad.",
+        "unidad": 2
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La familia y los amigos'?",
+        "opciones": [
+          "Hablar de la familia y describir personas.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de la familia y describir personas.",
+        "unidad": 3
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La casa y la ciudad'?",
+        "opciones": [
+          "Describir la casa, el barrio y dar direcciones.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Describir la casa, el barrio y dar direcciones.",
+        "unidad": 4
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La vida cotidiana'?",
+        "opciones": [
+          "Hablar de rutinas y actividades diarias.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de rutinas y actividades diarias.",
+        "unidad": 5
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'El tiempo libre'?",
+        "opciones": [
+          "Hablar de aficiones y planes.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de aficiones y planes.",
+        "unidad": 6
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Ir de compras'?",
+        "opciones": [
+          "Comprar en tiendas y pedir precios.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Comprar en tiendas y pedir precios.",
+        "unidad": 7
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Comidas y bebidas'?",
+        "opciones": [
+          "Hablar de alimentos y pedir en restaurantes.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de alimentos y pedir en restaurantes.",
+        "unidad": 8
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La salud'?",
+        "opciones": [
+          "Hablar de síntomas y partes del cuerpo.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de síntomas y partes del cuerpo.",
+        "unidad": 9
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'El tiempo y el clima'?",
+        "opciones": [
+          "Hablar del clima y las estaciones.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar del clima y las estaciones.",
+        "unidad": 10
+      }
+    ]
+  },
+  "A2": {
+    "unidades": [
+      {
+        "unidad": 1,
+        "titulo": "La biografía y experiencias personales",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 2,
+        "titulo": "La salud y el bienestar",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 3,
+        "titulo": "El trabajo y la vida profesional",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 4,
+        "titulo": "Viajes y turismo",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 5,
+        "titulo": "La tecnología y los medios de comunicación",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 6,
+        "titulo": "La vida en sociedad",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 7,
+        "titulo": "La naturaleza y el medio ambiente",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 8,
+        "titulo": "La cultura y el ocio",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 9,
+        "titulo": "La educación y el aprendizaje",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 10,
+        "titulo": "La vida futura y los sueños",
+        "avatar": null,
+        "duracion_video": null
+      }
+    ],
+    "examen": [
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La biografía y experiencias personales'?",
+        "opciones": [
+          "Hablar de la vida, experiencias pasadas y biografía.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de la vida, experiencias pasadas y biografía.",
+        "unidad": 1
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La salud y el bienestar'?",
+        "opciones": [
+          "Dar consejos y hablar de hábitos saludables.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Dar consejos y hablar de hábitos saludables.",
+        "unidad": 2
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'El trabajo y la vida profesional'?",
+        "opciones": [
+          "Hablar de profesiones, buscar empleo y describir el trabajo.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de profesiones, buscar empleo y describir el trabajo.",
+        "unidad": 3
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Viajes y turismo'?",
+        "opciones": [
+          "Hablar de viajes, reservar alojamiento y describir lugares.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de viajes, reservar alojamiento y describir lugares.",
+        "unidad": 4
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La tecnología y los medios de comunicación'?",
+        "opciones": [
+          "Hablar de tecnología, internet y redes sociales.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de tecnología, internet y redes sociales.",
+        "unidad": 5
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La vida en sociedad'?",
+        "opciones": [
+          "Hablar de normas, costumbres y expresar opiniones.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de normas, costumbres y expresar opiniones.",
+        "unidad": 6
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La naturaleza y el medio ambiente'?",
+        "opciones": [
+          "Hablar de la naturaleza, problemas ambientales y soluciones.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de la naturaleza, problemas ambientales y soluciones.",
+        "unidad": 7
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La cultura y el ocio'?",
+        "opciones": [
+          "Hablar de actividades culturales, cine, música y literatura.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de actividades culturales, cine, música y literatura.",
+        "unidad": 8
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La educación y el aprendizaje'?",
+        "opciones": [
+          "Hablar de estudios, cursos y métodos de aprendizaje.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de estudios, cursos y métodos de aprendizaje.",
+        "unidad": 9
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'La vida futura y los sueños'?",
+        "opciones": [
+          "Hablar de planes, deseos y predicciones para el futuro.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de planes, deseos y predicciones para el futuro.",
+        "unidad": 10
+      }
+    ]
+  },
+  "B1": {
+    "unidades": [
+      {
+        "unidad": 1,
+        "titulo": "Relaciones personales y sociales",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 2,
+        "titulo": "Trabajo y vida profesional",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 3,
+        "titulo": "Educación y formación",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 4,
+        "titulo": "Cultura, tradiciones y sociedad",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 5,
+        "titulo": "Medios de comunicación y actualidad",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 6,
+        "titulo": "Salud, bienestar y consumo",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 7,
+        "titulo": "Medio ambiente y sostenibilidad",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 8,
+        "titulo": "Ciencia, tecnología e innovación",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 9,
+        "titulo": "Viajes, ocio y tiempo libre",
+        "avatar": null,
+        "duracion_video": null
+      },
+      {
+        "unidad": 10,
+        "titulo": "Vida futura y proyectos personales",
+        "avatar": null,
+        "duracion_video": null
+      }
+    ],
+    "examen": [
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Relaciones personales y sociales'?",
+        "opciones": [
+          "Hablar de relaciones, sentimientos y emociones.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de relaciones, sentimientos y emociones.",
+        "unidad": 1
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Trabajo y vida profesional'?",
+        "opciones": [
+          "Hablar de condiciones laborales, entrevistas y aspiraciones.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de condiciones laborales, entrevistas y aspiraciones.",
+        "unidad": 2
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Educación y formación'?",
+        "opciones": [
+          "Hablar de estudios, formación continua y experiencias educativas.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de estudios, formación continua y experiencias educativas.",
+        "unidad": 3
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Cultura, tradiciones y sociedad'?",
+        "opciones": [
+          "Hablar de costumbres, tradiciones, festividades y diferencias culturales.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de costumbres, tradiciones, festividades y diferencias culturales.",
+        "unidad": 4
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Medios de comunicación y actualidad'?",
+        "opciones": [
+          "Hablar de noticias, medios, prensa y opinión pública.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de noticias, medios, prensa y opinión pública.",
+        "unidad": 5
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Salud, bienestar y consumo'?",
+        "opciones": [
+          "Hablar de salud física y mental, consumo responsable y hábitos de vida.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de salud física y mental, consumo responsable y hábitos de vida.",
+        "unidad": 6
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Medio ambiente y sostenibilidad'?",
+        "opciones": [
+          "Hablar de problemas ambientales, energías renovables y sostenibilidad.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de problemas ambientales, energías renovables y sostenibilidad.",
+        "unidad": 7
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Ciencia, tecnología e innovación'?",
+        "opciones": [
+          "Hablar de avances científicos, tecnología y futuro.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de avances científicos, tecnología y futuro.",
+        "unidad": 8
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Viajes, ocio y tiempo libre'?",
+        "opciones": [
+          "Hablar de viajes, experiencias turísticas y actividades de ocio.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de viajes, experiencias turísticas y actividades de ocio.",
+        "unidad": 9
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Vida futura y proyectos personales'?",
+        "opciones": [
+          "Hablar de planes, sueños, proyectos y toma de decisiones.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de planes, sueños, proyectos y toma de decisiones.",
+        "unidad": 10
+      }
+    ]
+  },
+  "B2": {
+    "unidades": [
+      {
+        "unidad": 1,
+        "titulo": "Sociedad y ciudadanía",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 2,
+        "titulo": "Política y economía",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 3,
+        "titulo": "Ciencia, tecnología y sociedad",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 4,
+        "titulo": "Arte, literatura y cultura",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      },
+      {
+        "unidad": 5,
+        "titulo": "Medios de comunicación y globalización",
+        "avatar": "https://studio.d-id.com/share?id=78273e102878eaf5a66f74ccee64b5cb&utm_source=copy",
+        "duracion_video": 45
+      }
+    ],
+    "examen": [
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Sociedad y ciudadanía'?",
+        "opciones": [
+          "Debatir sobre derechos, deberes y convivencia social.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Debatir sobre derechos, deberes y convivencia social.",
+        "unidad": 1
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Política y economía'?",
+        "opciones": [
+          "Hablar de política, economía y actualidad internacional.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de política, economía y actualidad internacional.",
+        "unidad": 2
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Ciencia, tecnología y sociedad'?",
+        "opciones": [
+          "Debatir sobre avances científicos, ética y sociedad digital.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Debatir sobre avances científicos, ética y sociedad digital.",
+        "unidad": 3
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Arte, literatura y cultura'?",
+        "opciones": [
+          "Hablar de arte, literatura, cine y música avanzada.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de arte, literatura, cine y música avanzada.",
+        "unidad": 4
+      },
+      {
+        "pregunta": "¿Cuál es el tema principal de la unidad 'Medios de comunicación y globalización'?",
+        "opciones": [
+          "Hablar de medios, globalización y manipulación mediática.",
+          "Otro tema",
+          "Tema inventado",
+          "No sé"
+        ],
+        "respuesta_correcta": "Hablar de medios, globalización y manipulación mediática.",
+        "unidad": 5
+      }
+    ]
+  }
+}

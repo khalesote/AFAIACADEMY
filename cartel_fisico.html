@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartel Fisico Academia de Inmigrantes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @media print {
+            body { margin: 0; }
+            .cartel-fisico { box-shadow: none; }
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .cartel-fisico {
+            width: 700px;
+            height: 1000px;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+            border: 3px solid #1976D2;
+        }
+
+        .header-fisico {
+            background: linear-gradient(135deg, #1976D2, #1565C0);
+            padding: 50px 30px 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .logo-fisico {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .titulo-fisico {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        }
+
+        .subtitulo-fisico {
+            font-size: 20px;
+            opacity: 0.95;
+            margin-bottom: 15px;
+        }
+
+        .titulo-arabe {
+            font-size: 32px;
+            margin-top: 15px;
+            direction: rtl;
+            font-family: 'Arial';
+            font-weight: bold;
+        }
+
+        .contenido-fisico {
+            padding: 40px 30px;
+        }
+
+        .seccion-fisico {
+            margin-bottom: 35px;
+        }
+
+        .seccion-titulo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .seccion-titulo:before {
+            content: "🌟";
+            margin-right: 10px;
+        }
+
+        .servicios-grid-fisico {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .servicio-fisico {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid #1976D2;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-height: 120px;
+        }
+
+        .servicio-titulo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .servicio-titulo:before {
+            content: "✅";
+            margin-right: 8px;
+        }
+
+        .servicio-descripcion {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .servicio-arabe {
+            font-size: 16px;
+            color: #1976D2;
+            margin-top: 8px;
+            text-align: right;
+            direction: rtl;
+            font-family: 'Arial';
+            font-weight: bold;
+        }
+
+        .cta-fisico {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            padding: 35px 30px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            margin: 30px 0;
+        }
+
+        .cta-titulo {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .cta-texto {
+            font-size: 18px;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .boton-fisico {
+            background: #FF9800;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            display: inline-block;
+            margin: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+        }
+
+        .contacto-fisico {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            border: 2px solid #1976D2;
+        }
+
+        .contacto-titulo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 20px;
+        }
+
+        .contacto-info {
+            font-size: 18px;
+            color: #333;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .contacto-arabe {
+            font-size: 16px;
+            color: #1976D2;
+            margin-top: 10px;
+            direction: rtl;
+            font-family: 'Arial';
+            font-weight: bold;
+        }
+
+        .footer-fisico {
+            background: #1976D2;
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+
+        .footer-texto {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .decoracion-f1 {
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .decoracion-f2 {
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .beneficios-fisico {
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 2px solid #FF9800;
+        }
+
+        .beneficios-titulo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #E65100;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .beneficio-item {
+            font-size: 16px;
+            color: #BF360C;
+            margin: 6px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .beneficio-item:before {
+            content: "⭐";
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cartel-fisico">
+        <div class="decoracion-f1"></div>
+        <div class="decoracion-f2"></div>
+
+        <div class="header-fisico">
+            <div class="logo-fisico">
+                <img src="./assets/logo.png.png" alt="AFAI Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div style="color: #1976D2; font-size: 48px; font-weight: bold;">AFAI</div>
+            </div>
+            <h1 class="titulo-fisico">Academia de Inmigrantes</h1>
+            <p class="subtitulo-fisico">Aprende Español • Desarrolla tu Carrera • Integra en España</p>
+            <p class="titulo-arabe">أكاديمية المهاجرين</p>
+        </div>
+
+        <div class="contenido-fisico">
+            <div class="beneficios-fisico">
+                <h3 class="beneficios-titulo">🎓 ¿Por qué elegirnos?</h3>
+                <div class="beneficio-item">Aprendizaje personalizado para inmigrantes árabes</div>
+                <div class="beneficio-item">Contenido bilingüe español-árabe completo</div>
+                <div class="beneficio-item">Profesiones demandadas en el mercado español</div>
+                <div class="beneficio-item">Certificaciones oficiales reconocidas</div>
+                <div class="beneficio-item">Soporte 24/7 vía WhatsApp</div>
+                <div class="beneficio-item">Comunidad de estudiantes inmigrantes</div>
+            </div>
+
+            <div class="seccion-fisico">
+                <h2 class="seccion-titulo">Nuestros Servicios / خدماتنا</h2>
+
+                <div class="servicios-grid-fisico">
+                    <div class="servicio-fisico">
+                        <h4 class="servicio-titulo">Español A1-A4</h4>
+                        <p class="servicio-descripcion">Cursos completos con traducción árabe y vocabulario específico para inmigrantes.</p>
+                        <p class="servicio-arabe">الإسبانية من المستوى A1 إلى A4</p>
+                    </div>
+
+                    <div class="servicio-fisico">
+                        <h4 class="servicio-titulo">Formación Profesional</h4>
+                        <p class="servicio-descripcion">17 cursos especializados: Electricidad, Fontanería, Cocina, Jardinería, Cuidado de Mayores, Informática, Comercio.</p>
+                        <p class="servicio-arabe">التدريب المهني</p>
+                    </div>
+
+                    <div class="servicio-fisico">
+                        <h4 class="servicio-titulo">Juegos Interactivos</h4>
+                        <p class="servicio-descripcion">Aprende divirtiéndote con juegos educativos y actividades dinámicas adaptadas a tu nivel.</p>
+                        <p class="servicio-arabe">الألعاب التفاعلية</p>
+                    </div>
+
+                    <div class="servicio-fisico">
+                        <h4 class="servicio-titulo">Asesoría Personalizada</h4>
+                        <p class="servicio-descripcion">Orientación laboral, ayuda con trámites administrativos y soporte continuo para tu integración.</p>
+                        <p class="servicio-arabe">الاستشارة الشخصية</p>
+                    </div>
+
+                    <div class="servicio-fisico">
+                        <h4 class="servicio-titulo">Contenido Cultural</h4>
+                        <p class="servicio-descripcion">Café Literario, encuentros culturales, videos didácticos sobre literatura y cultura española.</p>
+                        <p class="servicio-arabe">المحتوى الثقافي</p>
+                    </div>
+
+                    <div class="servicio-fisico">
+                        <h4 class="servicio-titulo">Certificaciones</h4>
+                        <p class="servicio-descripcion">Diplomas oficiales A1-A4, certificados de formación profesional y reconocimiento de competencias.</p>
+                        <p class="servicio-arabe">الشهادات</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-fisico">
+                <h3 class="cta-titulo">¡Únete a Nuestra Comunidad!</h3>
+                <p class="cta-texto">Miles de inmigrantes árabes ya han transformado su futuro con nosotros</p>
+                <div style="margin-top: 20px;">
+                    <button class="boton-fisico">📱 Descargar App</button>
+                    <button class="boton-fisico">🎓 Matricularse</button>
+                </div>
+            </div>
+
+            <div class="contacto-fisico">
+                <h4 class="contacto-titulo">📞 Contacta con Nosotros / تواصل معنا</h4>
+                <p class="contacto-info">🌐 Web: https://afaiacademiadeinmigrantes.com/</p>
+                <p class="contacto-info">📱 WhatsApp: +34 665 666 288</p>
+                <p class="contacto-info">✉️ Email: info@afaiacademiadeinmigrantes.com</p>
+                <p class="contacto-arabe">اتصل بنا</p>
+            </div>
+        </div>
+
+        <div class="footer-fisico">
+            <p class="footer-texto">© 2025 Academia de Inmigrantes - Transformando vidas a través del aprendizaje</p>
+            <p style="font-size: 14px; margin-top: 10px; direction: rtl;">أكاديمية المهاجرين - تحويل الحياة من خلال التعلم</p>
+        </div>
+    </div>
+</body>
+</html>

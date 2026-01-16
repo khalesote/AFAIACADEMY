@@ -1,0 +1,32 @@
+[
+  {
+    "autor": "Garcilaso de la Vega",
+    "texto": "Es curioso hallarme en este lugar tan moderno… ¿Cómo llaman a esto? ¿Un café literario? Jamás lo habría imaginado entre las columnas de Toledo.",
+    "arabe": "من الغريب أن أجد نفسي في هذا المكان الحديث... ماذا يسمونه؟ مقهى أدبي؟ لم أكن لأتخيله أبدًا بين أعمدة طليطلة.",
+    "video": "garcilaso1.mp4"
+  },
+  {
+    "autor": "Federico García Lorca",
+    "texto": "¡Es maravilloso, Garcilaso! Aquí las épocas se disuelven en el aroma del café. He leído vuestros sonetos... ¡Qué dulzura melancólica! ¿Fue la amada vuestra mayor inspiración?",
+    "arabe": "إنه لأمر رائع يا غارسيلاسو! هنا تذوب الأزمنة في عبير القهوة. لقد قرأت سوناتاتك... يا لها من عذوبة حزينة! هل كانت الحبيبة أكبر مصدر إلهام لك؟",
+    "video": "lorca1.mp4"
+  },
+  {
+    "autor": "Garcilaso de la Vega",
+    "texto": "Sin duda. Isabel, aunque inalcanzable, fue la llama que templó mi pluma. ¿Y vos, Federico? ¿Cómo nace ese lamento tan hondo que hay en 'Bodas de sangre'?",
+    "arabe": "بلا شك. إيزابيل، رغم كونها بعيدة المنال، كانت الشعلة التي صقلت قلمي. وأنت يا فيديريكو؟ كيف يولد ذلك النواح العميق في 'عرس الدم'؟",
+    "video": "garcilaso2.mp4"
+  },
+  {
+    "autor": "Federico García Lorca",
+    "texto": "Del alma andaluza. De la tierra y la tragedia. Escribo desde lo oscuro y lo popular, como si cada verso bailara con el duende. ¿Don Miguel? Usted ha sabido mezclar humor, crítica y fantasía como nadie.",
+    "arabe": "من الروح الأندلسية. من الأرض والمأساة. أكتب من العتمة ومن الشعب، وكأن كل بيت يرقص مع الدويندي. ودون ميغيل؟ لقد عرفتم كيف تمزجون بين الفكاهة والنقد والخيال كما لم يفعل أحد.",
+    "video": "lorca2.mp4"
+  },
+  {
+    "autor": "Miguel de Cervantes",
+    "texto": "Vuestra lírica es fuego, don Federico, y vos, Garcilaso, fuiste la armonía del Renacimiento. Yo, en cambio, sólo intenté reflejar al hombre con todas sus contradicciones. Don Quijote no es más que el espejo de lo que todos tememos y anhelamos ser.",
+    "arabe": "شعركم نار يا فيديريكو، وأنت يا غارسيلاسو كنت موسيقى النهضة. أما أنا، فقد سعيت فقط إلى عكس الإنسان بكل تناقضاته. دون كيخوتي ليس إلا مرآة لما نخشاه ونتمناه جميعاً.",
+    "video": "cervantes1.mp4"
+  }
+]

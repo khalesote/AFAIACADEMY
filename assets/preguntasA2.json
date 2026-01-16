@@ -1,0 +1,4 @@
+[
+  {"preguntaES": "¿Dónde vives?", "preguntaAR": "أين تسكن؟", "tipo": "seleccion", "opciones": ["Vivo en ...", "Soy de ...", "Me llamo ...", "Tengo ... años"], "respuesta": "Vivo en ..."},
+  {"preguntaES": "¿Cuántos años tienes?", "preguntaAR": "كم عمرك؟", "tipo": "seleccion", "opciones": ["Tengo ... años", "Vivo en ...", "Soy de ...", "Me llamo ..."], "respuesta": "Tengo ... años"}
+]

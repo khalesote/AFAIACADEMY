@@ -1,0 +1,50 @@
+# EAS Build Ignore File - exclude unnecessary files to reduce archive size
+
+# Node modules (will be installed automatically by EAS)
+**/node_modules/*
+node_modules/
+
+# Dependency lock files (not needed for build)
+**/package-lock.json
+**/yarn.lock
+
+# Build artifacts and output
+**/build/*
+**/dist/*
+**/out/*
+
+# Expo specific folders
+**/.expo/*
+**/.expo-shared/*
+
+# Version control and OS files
+**/.git/*
+**/.DS_Store
+**/Thumbs.db
+
+# IDE/editor folders
+**/.vscode/*
+**/.idea/*
+
+# Large media files (add/remove as needed for your project)
+# **/*.mp4
+**/*.mov
+**/*.avi
+**/*.zip
+**/*.tar
+**/*.rar
+
+
+# Android/iOS build folders (if present)
+**/android/app/build/*
+android/build/
+**/ios/build/*
+ios/Pods/
+
+# Miscellaneous
+**/tmp/*
+**/temp/*
+**/logs/*
+**/cache/*
+**/.cache/*
+**/caches/*

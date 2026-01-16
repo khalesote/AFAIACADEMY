@@ -1,0 +1,198 @@
+================================================================================
+    CÓMO OBTENER LA REFERENCIA ALFANUMÉRICA PARA REGISTRO EN OEPM
+================================================================================
+
+La referencia alfanumérica es un identificador único de tu aplicación
+"Academia de Inmigrantes" que necesitas para registrarla en la Oficina
+Española de Patentes y Marcas (OEPM).
+
+================================================================================
+MÉTODO 1: DESDE LA APLICACIÓN (RECOMENDADO)
+================================================================================
+
+1. Abre la aplicación en tu dispositivo o emulador
+2. Navega a la pantalla de "Información de Usuario"
+3. Busca la sección "Referencia de la Aplicación"
+4. Verás la referencia en formato: ACAD-XXXX-XXXX-XXXX-XXXX
+5. Toca el botón "Copiar Referencia" para copiarla al portapapeles
+
+La referencia se genera automáticamente la primera vez que se ejecuta
+la aplicación y se guarda permanentemente.
+
+================================================================================
+MÉTODO 2: DESDE EL CÓDIGO
+================================================================================
+
+Ejecuta este código en tu aplicación:
+
+```typescript
+import { getAppReferenceForOEPM } from './utils/getAppReferenceForOEPM';
+
+// Obtener la referencia
+const referencia = await getAppReferenceForOEPM();
+console.log('Referencia para OEPM:', referencia);
+```
+
+================================================================================
+MÉTODO 3: DESDE ASYNCSTORAGE
+================================================================================
+
+La referencia se guarda en AsyncStorage con la clave: 'app_reference_oepm'
+
+Puedes obtenerla ejecutando:
+
+```typescript
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const referencia = await AsyncStorage.getItem('app_reference_oepm');
+console.log('Referencia OEPM:', referencia);
+```
+
+================================================================================
+FORMATO DE LA REFERENCIA
+================================================================================
+
+Formato: ACAD-XXXX-XXXX-XXXX-XXXX
+
+Donde:
+- ACAD = Prefijo de la aplicación (Academia)
+- XXXX = Segmentos alfanuméricos (letras mayúsculas A-Z y números 0-9)
+
+Ejemplo: ACAD-A3B7-9F2C-4D8E-1G5H
+
+================================================================================
+INFORMACIÓN PARA EL REGISTRO EN OEPM
+================================================================================
+
+Cuando registres tu aplicación en OEPM, necesitarás proporcionar:
+
+1. REFERENCIA ALFANUMÉRICA:
+   Formato: ACAD-XXXX-XXXX-XXXX-XXXX
+   (La referencia generada automáticamente)
+
+2. NOMBRE DE LA APLICACIÓN:
+   Academia de Inmigrantes
+
+3. VERSIÓN:
+   1.0.0
+
+4. PLATAFORMAS:
+   Android e iOS
+
+5. DESCRIPCIÓN:
+   Aplicación educativa móvil desarrollada con React Native y Expo
+   para facilitar el aprendizaje del español y la integración de
+   personas migrantes en España. Incluye niveles educativos (A1-B2),
+   recursos culturales, herramientas profesionales y asesoría.
+
+6. TECNOLOGÍAS:
+   - React Native
+   - Expo
+   - TypeScript
+   - Firebase (autenticación)
+   - AsyncStorage (almacenamiento local)
+
+================================================================================
+CARACTERÍSTICAS DE LA REFERENCIA
+================================================================================
+
+✅ ÚNICA: Cada instalación tiene su propia referencia
+✅ PERMANENTE: No cambia durante la vida útil de la aplicación
+✅ ALFANUMÉRICA: Contiene letras mayúsculas (A-Z) y números (0-9)
+✅ VALIDABLE: Formato estándar fácil de verificar
+✅ COPIABLE: Se puede copiar fácilmente desde la aplicación
+
+================================================================================
+ARCHIVOS RELACIONADOS
+================================================================================
+
+- utils/appReference.ts
+  Funciones para generar y gestionar la referencia de la aplicación
+
+- utils/getAppReferenceForOEPM.ts
+  Funciones específicas para obtener la referencia para OEPM
+
+- app/UserInfoScreen.tsx
+  Pantalla donde se muestra la referencia al usuario
+
+- scripts/getOEPMReference.js
+  Script para generar una referencia (desarrollo)
+
+================================================================================
+NOTAS IMPORTANTES
+================================================================================
+
+⚠️ IMPORTANTE:
+- La referencia se genera automáticamente la primera vez que se ejecuta
+  la aplicación
+- Una vez generada, permanece igual para esa instalación
+- Guarda esta referencia de forma segura para usarla en OEPM
+- La referencia es específica de la aplicación, no del usuario
+
+📝 PARA DESARROLLO:
+- Si necesitas generar una nueva referencia, puedes eliminar la clave
+  'app_reference_oepm' de AsyncStorage
+- La próxima vez que se ejecute la app, se generará una nueva
+
+================================================================================
+SOPORTE
+================================================================================
+
+Si tienes problemas para obtener la referencia:
+1. Verifica que AsyncStorage esté funcionando correctamente
+2. Revisa los logs de la consola para mensajes de error
+3. Consulta la documentación técnica en OBTENER_REFERENCIA_OEPM.md
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

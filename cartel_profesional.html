@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartel Academia de Inmigrantes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1976D2, #1565C0);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cartel {
+            width: 800px;
+            height: 1100px;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1976D2, #1565C0);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .logo-placeholder {
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .titulo {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitulo {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .contenido {
+            padding: 40px 30px;
+        }
+
+        .seccion {
+            margin-bottom: 30px;
+        }
+
+        .seccion-titulo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .seccion-titulo:before {
+            content: "🎓";
+            margin-right: 10px;
+        }
+
+        .servicios-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .servicio {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #1976D2;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .servicio-titulo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .servicio-titulo:before {
+            content: "✅";
+            margin-right: 8px;
+        }
+
+        .servicio-descripcion {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            margin: 30px 0;
+        }
+
+        .cta-titulo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .cta-texto {
+            font-size: 16px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .boton-descargar {
+            background: #FF9800;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            display: inline-block;
+            margin: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .contacto {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .contacto-titulo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 15px;
+        }
+
+        .contacto-info {
+            font-size: 16px;
+            color: #555;
+            margin: 8px 0;
+        }
+
+        .whatsapp-link {
+            color: #25D366;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .footer {
+            background: #1976D2;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .footer-texto {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .decoracion {
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .decoracion2 {
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="cartel">
+        <div class="decoracion"></div>
+        <div class="decoracion2"></div>
+
+        <div class="header">
+            <div class="logo-placeholder">AFAI</div>
+            <h1 class="titulo">Academia de Inmigrantes</h1>
+            <p class="subtitulo">Aprende Español • Desarrolla tu Carrera • Integra en España</p>
+        </div>
+
+        <div class="contenido">
+            <div class="seccion">
+                <h2 class="seccion-titulo">🌟 Nuestros Servicios para Inmigrantes Árabes</h2>
+
+                <div class="servicios-grid">
+                    <div class="servicio">
+                        <h3 class="servicio-titulo">Aprendizaje del Español</h3>
+                        <p class="servicio-descripcion">Cursos completos desde nivel A1 hasta A4 con contenido adaptado para inmigrantes árabes, incluyendo vocabulario específico y traducción al árabe.</p>
+                    </div>
+
+                    <div class="servicio">
+                        <h3 class="servicio-titulo">Formación Profesional</h3>
+                        <p class="servicio-descripcion">17 cursos especializados: Electricidad, Fontanería, Cocina, Jardinería, Cuidado de Mayores, Informática, Comercio y más profesiones demandadas en España.</p>
+                    </div>
+
+                    <div class="servicio">
+                        <h3 class="servicio-titulo">Juegos Educativos</h3>
+                        <p class="servicio-descripcion">Actividades interactivas como "Comedor de Letras" y juegos de vocabulario para aprender divirtiéndose mientras practicas el español.</p>
+                    </div>
+
+                    <div class="servicio">
+                        <h3 class="servicio-titulo">Contenido Cultural</h3>
+                        <p class="servicio-descripcion">Café Literario, encuentros culturales, videos didácticos sobre literatura española y conocimientos esenciales para la integración.</p>
+                    </div>
+
+                    <div class="servicio">
+                        <h3 class="servicio-titulo">Asesoría Personalizada</h3>
+                        <p class="servicio-descripcion">Orientación profesional, ayuda con trámites administrativos y soporte continuo para tu proceso de integración en España.</p>
+                    </div>
+
+                    <div class="servicio">
+                        <h3 class="servicio-titulo">Certificaciones</h3>
+                        <p class="servicio-descripcion">Diplomas oficiales A1-A4, certificados de formación profesional y reconocimiento de competencias laborales.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h2 class="cta-titulo">¡Únete a Nuestra Comunidad!</h2>
+                <p class="cta-texto">Miles de inmigrantes árabes ya han transformado su futuro con nosotros. Tú puedes ser el siguiente.</p>
+                <a href="#" class="boton-descargar">📱 Descargar App</a>
+                <a href="#" class="boton-descargar">🎓 Matricularse Ahora</a>
+            </div>
+
+            <div class="contacto">
+                <h3 class="contacto-titulo">📞 Contacta con Nosotros</h3>
+                <p class="contacto-info">🌐 <strong>Web:</strong> https://afaiacademiadeinmigrantes.com/</p>
+                <p class="contacto-info">📱 <strong>WhatsApp:</strong> <a href="https://wa.me/34665666288" class="whatsapp-link">+34 665 666 288</a></p>
+                <p class="contacto-info">✉️ <strong>Email:</strong> info@afaiacademiadeinmigrantes.com</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="footer-texto">© 2025 Academia de Inmigrantes - Transformando vidas a través del aprendizaje</p>
+        </div>
+    </div>
+</body>
+</html>

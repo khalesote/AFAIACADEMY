@@ -1,0 +1,383 @@
+{
+  "A1": {
+    "unidades": [
+      { 
+        "unidad": 1, 
+        "titulo": "Saludos y presentaciones", 
+        "avatar": "https://www.ejemplo.com/video1", 
+        "duracion_video": 120,
+        "gramatica": [
+          "El verbo 'llamarse' en presente",
+          "Saludos formales e informales",
+          "Artículos definidos e indefinidos"
+        ],
+        "gramatica_ar": [
+          "الفعل 'يُسَمَّى' في المضارع",
+          "التحيات الرسمية وغير الرسمية",
+          "أدوات التعريف والتنكير"
+        ],
+        "vocabulario": [
+          "Hola, adiós, buenos días, buenas tardes, buenas noches, ¿cómo te llamas?, me llamo, ¿y tú?",
+          "señor, señora, usted, ¿cómo está?, ¿qué tal?",
+          "hasta luego, hasta mañana, que tengas buen día, por favor, gracias, de nada"
+        ],
+        "vocabulario_ar": [
+          "مرحباً، وداعاً، صباح الخير، مساء الخير، تصبح على خير، ما اسمك؟، اسمي، وأنت؟",
+          "سيد، سيدة، حضرتك، كيف حالك؟ (رسمي)، كيف الحال؟ (غير رسمي)",
+          "إلى اللقاء، أراك غداً، أتمنى لك يوماً سعيداً، من فضلك، شكراً، على الرحب والسعة"
+        ],
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Selecciona la respuesta correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Cómo te llamas?",
+            "opciones": ["Me llamo Ana", "Tengo 25 años", "Soy de España"],
+            "respuesta_correcta": "Me llamo Ana"
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la opción correcta para completar el diálogo (اختر الإجابة الصحيحة)",
+            "pregunta": "Completa: - Hola, ¿cómo te ____? - Me ____ Juan, ¿y tú?",
+            "opciones": [
+              "- Hola, ¿cómo te llamas? - Me llamo Juan, ¿y tú?",
+              "- Hola, ¿cómo te llamo? - Me llama Juan, ¿y tú?",
+              "- Hola, ¿cómo te llama? - Me llamas Juan, ¿y tú?",
+              "- Hola, ¿cómo te llamo? - Me llamo Juan, ¿y tú?"
+            ],
+            "respuesta_correcta": "- Hola, ¿cómo te llamas? - Me llamo Juan, ¿y tú?"
+          }
+        ]
+      },
+      { 
+        "unidad": 2, 
+        "titulo": "La familia", 
+        "avatar": "https://www.ejemplo.com/video2", 
+        "duracion_video": 110,
+        "gramatica": [
+          "Los posesivos (mi, tu, su, nuestro, vuestro, su)",
+          "Los números del 1 al 100",
+          "Verbo 'tener' en presente"
+        ],
+        "gramatica_ar": [
+          "ضمائر الملكية (لي، لك، له، إلخ)",
+          "الأرقام من 1 إلى 100",
+          "الفعل 'يملك' في المضارع"
+        ],
+        "vocabulario": [
+          "familia, padre, madre, hermano, hermana, abuelo, abuela, hijo, hija, tío, tía, primo, prima",
+          "números del 1 al 100, edad, años, cumpleaños",
+          "alto, bajo, joven, mayor, simpático, amable"
+        ],
+        "vocabulario_ar": [
+          "عائلة، أب، أم، أخ، أخت، جد، جدة، ابن، ابنة، عم/خال، عمة/خالة، ابن العم/الخال، ابنة العم/الخال",
+          "أرقام من 1 إلى 100، عمر، سنوات، عيد ميلاد",
+          "طويل، قصير، شاب، كبير في السن، لطيف، ودود"
+        ],
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Selecciona la respuesta correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Cuántos años tienes?",
+            "opciones": ["Tengo 25 años", "Me llamo Ana", "Soy de España"],
+            "respuesta_correcta": "Tengo 25 años"
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Completa con el posesivo correcto (أكمل بضمير الملكية الصحيح)",
+            "pregunta": "María es ____ hermana. (yo)",
+            "opciones": ["mi", "mis", "tu", "su"],
+            "respuesta_correcta": "mi"
+          }
+        ]
+      }
+    ]
+  },
+  "A2": {
+    "unidades": [
+      { 
+        "unidad": 1, 
+        "titulo": "En el supermercado", 
+        "avatar": "https://images.unsplash.com/photo-1578916178228-19bb218a754f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80", 
+        "duracion_video": 130,
+        "gramatica": [
+          "Expresiones de cantidad (algo de, un poco de, mucho, bastante, etc.)",
+          "Verbo 'hacer' en presente para compras",
+          "Expresiones de precio y cantidad"
+        ],
+        "gramatica_ar": [
+          "عبارات الكمية (شيء من، قليلاً من، كثير، كافٍ، إلخ)",
+          "فعل 'يفعل' في المضارع للتسوق",
+          "عبارات السعر والكمية"
+        ],
+        "vocabulario": [
+          "productos de alimentación, frutas, verduras, carnes, lácteos, panadería, envasados, peso, precio, oferta",
+          "carrito, cesta, caja, cajero, ticket, bolsa, estantería, pasillo, oferta, descuento",
+          "comprar, vender, pesar, pagar, costar, necesitar, buscar, encontrar, elegir, probar"
+        ],
+        "vocabulario_ar": [
+          "منتجات غذائية، فواكه، خضروات، لحوم، ألبان، مخبوزات، معلبات، وزن، سعر، عرض",
+          "عربة تسوق، سلة، صندوق الدفع، كاشير، فاتورة، كيس، رف، ممر، عرض، خصم",
+          "يشتري، يبيع، يزن، يدفع، يكلف، يحتاج، يبحث، يجد، يختار، يجرب"
+        ],
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la opción correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Qué necesitas para llevar la compra a casa?",
+            "opciones": ["Un carrito", "Un cuchillo", "Un libro", "Un lápiz"],
+            "respuesta_correcta": "Un carrito",
+            "explicacion": "El carrito se usa para transportar los productos mientras haces la compra."
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Completa el diálogo (أكمل الحوار)",
+            "pregunta": "Completa: ¿Dónde están los productos lácteos? — Los ____ en la sección de refrigerados, al ____ del supermercado.",
+            "opciones": [
+              "encuentra / fondo",
+              "encuentro / frente",
+              "encuentra / inicio",
+              "encuentras / medio"
+            ],
+            "respuesta_correcta": "encuentra / fondo"
+          }
+        ]
+      },
+      { 
+        "unidad": 2, 
+        "titulo": "En el médico", 
+        "avatar": "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", 
+        "duracion_video": 140,
+        "gramatica": [
+          "Verbos de dolor y síntomas (doler, tener, estar)",
+          "Expresiones de tiempo con 'hace' y 'desde hace'",
+          "Consejos y recomendaciones con 'deber' y 'tener que'"
+        ],
+        "gramatica_ar": [
+          "أفعال الألم والأعراض (يؤلم، لديه، يكون)",
+          "عبارات الوقت مع 'منذ' و'منذ متى'",
+          "النصائح والتوصيات مع 'يجب' و'عليه أن'"
+        ],
+        "vocabulario": [
+          "síntomas, dolor, fiebre, tos, gripe, resfriado, alergia, herida, operación, receta",
+          "médico, enfermero, paciente, consulta, urgencias, pastillas, jarabe, inyección, análisis, radiografía",
+          "doler, estornudar, respirar, toser, sangrar, doler, recetar, operar, curar, mejorar"
+        ],
+        "vocabulario_ar": [
+          "أعراض، ألم، حرارة، سعال، إنفلونزا، نزلة برد، حساسية، جرح، عملية، وصفة طبية",
+          "طبيب، ممرض، مريض، استشارة، طوارئ، حبوب، شراب، حقنة، تحاليل، أشعة",
+          "يؤلم، يعطس، يتنفس، يسعل، ينزف، يوصي، يجري عملية، يعالج، يتحسن"
+        ],
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la opción correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Qué haces cuando tienes fiebre alta?",
+            "opciones": ["Tomar un antibiótico sin receta", "Ir al médico", "Hacer ejercicio", "Comer helado"],
+            "respuesta_correcta": "Ir al médico",
+            "explicacion": "Ante fiebre alta, lo más recomendable es acudir al médico para una valoración profesional."
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Completa la frase (أكمل الجملة)",
+            "pregunta": "Completa: \"Me ____ la cabeza desde ayer. Creo que tengo ____.\"",
+            "opciones": [
+              "duele / fiebre",
+              "duelo / gripe",
+              "duele / tos",
+              "duele / resfriado"
+            ],
+            "respuesta_correcta": "duele / fiebre"
+          }
+        ]
+      },
+      { 
+        "unidad": 3, 
+        "titulo": "En la ciudad", 
+        "avatar": "https://images.unsplash.com/photo-1449824913935-59a10b8b200c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", 
+        "duracion_video": 125,
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la opción correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Cómo preguntas por una dirección en la calle?",
+            "opciones": ["¿Dónde está...?", "¿Cuánto cuesta?", "¿Qué tal?", "¿Qué hora es?"],
+            "respuesta_correcta": "¿Dónde está...?"
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Completa la frase (أكمل الجملة)",
+            "pregunta": "Para ir al parque, ____ todo recto y luego gire a la derecha.",
+            "opciones": ["siga", "sigo", "sigan", "seguir"],
+            "respuesta_correcta": "siga"
+          }
+        ]
+      },
+      { 
+        "unidad": 4, 
+        "titulo": "El transporte público", 
+        "avatar": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", 
+        "duracion_video": 135,
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Selecciona la respuesta correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Qué documento puedes necesitar para subir al autobús?",
+            "opciones": ["Billete", "Pasaporte", "Receta", "Factura"],
+            "respuesta_correcta": "Billete"
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la mejor opción (اختر الخيار الأنسب)",
+            "pregunta": "La estación de ____ está al lado del museo.",
+            "opciones": ["metro", "médico", "banco", "pan"],
+            "respuesta_correcta": "metro"
+          }
+        ]
+      },
+      { 
+        "unidad": 5, 
+        "titulo": "Comer fuera", 
+        "avatar": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", 
+        "duracion_video": 120,
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la opción correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Qué dices para pedir la cuenta en un restaurante?",
+            "opciones": ["¿Me trae la cuenta, por favor?", "¿Dónde está la estación?", "¿Cuánto pesa?", "¿Qué talla usa?"],
+            "respuesta_correcta": "¿Me trae la cuenta, por favor?"
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Completa el diálogo (أكمل الحوار)",
+            "pregunta": "— ¿Qué desea beber? — ____ agua, por favor.",
+            "opciones": ["Quiero", "Quieras", "Quiere", "Quise"],
+            "respuesta_correcta": "Quiero"
+          }
+        ]
+      },
+      { 
+        "unidad": 6, 
+        "titulo": "De compras", 
+        "avatar": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", 
+        "duracion_video": 130,
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Selecciona la respuesta correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Qué significa 'rebajas'?",
+            "opciones": ["Descuentos", "Horario", "Devoluciones", "Tallas"],
+            "respuesta_correcta": "Descuentos"
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la opción correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Con qué pagas si no usas tarjeta?",
+            "opciones": ["Efectivo", "Factura", "Ticket", "Prueba"],
+            "respuesta_correcta": "Efectivo"
+          }
+        ]
+      },
+      { 
+        "unidad": 7, 
+        "titulo": "El tiempo libre", 
+        "avatar": "https://images.unsplash.com/photo-1505576399279-565b52d4ac71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", 
+        "duracion_video": 125,
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la mejor opción (اختر الخيار الأنسب)",
+            "pregunta": "¿Qué actividad corresponde a 'tiempo libre'?",
+            "opciones": ["Leer un libro", "Ir al trabajo", "Hacer un examen", "Pagar impuestos"],
+            "respuesta_correcta": "Leer un libro"
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Selecciona la respuesta correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "Los fines de semana ____ al parque con mis amigos.",
+            "opciones": ["voy", "fui", "iré", "iba"],
+            "respuesta_correcta": "voy"
+          }
+        ]
+      },
+      { 
+        "unidad": 8, 
+        "titulo": "En el banco", 
+        "avatar": "https://images.unsplash.com/photo-1607028073451-9aa0f17aed6a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", 
+        "duracion_video": 140,
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Selecciona la respuesta correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Qué documento te pueden pedir para abrir una cuenta?",
+            "opciones": ["DNI/Pasaporte", "Receta médica", "Entrada de cine", "Billete de tren"],
+            "respuesta_correcta": "DNI/Pasaporte"
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la opción correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "Para sacar dinero del cajero necesitas tu ____.",
+            "opciones": ["tarjeta", "entrada", "receta", "abono"],
+            "respuesta_correcta": "tarjeta"
+          }
+        ]
+      },
+      { 
+        "unidad": 9, 
+        "titulo": "El trabajo", 
+        "avatar": "https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80", 
+        "duracion_video": 145,
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la opción correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Dónde entregas tu currículum para solicitar un empleo?",
+            "opciones": ["En una empresa", "En el restaurante", "En la farmacia", "En el gimnasio"],
+            "respuesta_correcta": "En una empresa"
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Selecciona la respuesta correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "Una entrevista de trabajo es una reunión entre el candidato y ____.",
+            "opciones": ["el empleador", "el cliente", "el turista", "el recepcionista"],
+            "respuesta_correcta": "el empleador"
+          }
+        ]
+      },
+      { 
+        "unidad": 10, 
+        "titulo": "Fiestas y celebraciones", 
+        "avatar": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80", 
+        "duracion_video": 130,
+        "ejercicios": [
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Elige la opción correcta (اختر الإجابة الصحيحة)",
+            "pregunta": "¿Qué necesitas para invitar a amigos a una fiesta?",
+            "opciones": ["Fecha y lugar", "Factura y receta", "Talla y color", "Ruta y billete"],
+            "respuesta_correcta": "Fecha y lugar"
+          },
+          {
+            "tipo": "opcion_multiple",
+            "enunciado": "Completa la frase (أكمل الجملة)",
+            "pregunta": "En España, muchas fiestas se celebran en ____.",
+            "opciones": ["verano", "otoño", "invierno", "madrugada"],
+            "respuesta_correcta": "verano"
+          }
+        ]
+      }
+    ]
+  },
+  "A3": {
+    "unidades": [
+      { "unidad": 1, "titulo": "Trabajo y profesiones", "avatar": "https://www.ejemplo.com/video5", "duracion_video": 150 },
+      { "unidad": 2, "titulo": "El transporte", "avatar": "https://www.ejemplo.com/video6", "duracion_video": 125 }
+    ]
+  },
+  "A4": {
+    "unidades": [
+      { "unidad": 1, "titulo": "Cultura y costumbres", "avatar": "https://www.ejemplo.com/video7", "duracion_video": 160 },
+      { "unidad": 2, "titulo": "Historia de España", "avatar": "https://www.ejemplo.com/video8", "duracion_video": 170 }
+    ]
+  }
+}

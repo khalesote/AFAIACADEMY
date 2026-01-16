@@ -1,0 +1,56 @@
+[
+  {
+    "autor": "Miguel de Cervantes",
+    "video": "1.mp4",
+    "texto": "Buenas tardes, ilustres colegas. Soy Miguel de Cervantes, autor de 'Don Quijote de la Mancha'. Viví en la España del Siglo de Oro, una época de grandes cambios y aventuras.",
+    "arabe": "مساء الخير أيها الزملاء الكرام. أنا ميغيل دي ثيربانتس، مؤلف 'دون كيخوتي دي لا مانتشا'. عشت في إسبانيا العصر الذهبي، زمن التغيرات والمغامرات العظيمة."
+  },
+  {
+    "autor": "Garcilaso de la Vega",
+    "video": "2.mp4",
+    "texto": "Es un honor, don Miguel. Yo soy Garcilaso de la Vega, poeta y soldado, precursor del Renacimiento español. Mis versos intentaron traer el humanismo italiano a nuestra tierra.",
+    "arabe": "إنه لشرف يا دون ميغيل. أنا غارثيلاسو دي لا فيغا، شاعر وجندي، وممهد لعصر النهضة الإسبانية. حاولت قصائدي جلب النزعة الإنسانية الإيطالية إلى أرضنا."
+  },
+  {
+    "autor": "Federico García Lorca",
+    "video": "3.mp4",
+    "texto": "Qué alegría compartir este espacio. Soy Federico García Lorca, poeta y dramaturgo de la Generación del 27. En mi obra exploro la pasión, la tragedia y las raíces populares de España.",
+    "arabe": "يا لها من سعادة أن أشارككم هذا المكان. أنا فيديريكو غارسيا لوركا، شاعر وكاتب مسرحي من جيل 27. في أعمالي أستكشف الشغف والمأساة والجذور الشعبية لإسبانيا."
+  },
+  {
+    "autor": "Miguel de Cervantes",
+    "video": "4.mp4",
+    "texto": "Decidme, ¿cómo ha cambiado el arte de narrar historias desde nuestros tiempos hasta el vuestro?",
+    "arabe": "أخبروني، كيف تغير فن سرد القصص من عصرنا إلى عصركم؟"
+  },
+  {
+    "autor": "Federico García Lorca",
+    "video": "5.mp4",
+    "texto": "La poesía y el teatro se han abierto a nuevas formas y voces. Yo busqué dar voz a los marginados y explorar la emoción humana en toda su intensidad.",
+    "arabe": "انفتحت الشعر والمسرح على أشكال وأصوات جديدة. سعيت لمنح صوت للمهمشين واستكشاف المشاعر الإنسانية بكل قوتها."
+  },
+  {
+    "autor": "Garcilaso de la Vega",
+    "video": "6.mp4",
+    "texto": "En mi época, la poesía era el medio para expresar el amor, el dolor y la belleza. ¿Qué lugar ocupa la poesía hoy?",
+    "arabe": "في عصري، كان الشعر وسيلة للتعبير عن الحب والألم والجمال. ما مكانة الشعر اليوم؟"
+  },
+  {
+    "autor": "Federico García Lorca",
+    "video": "7.mp4",
+    "texto": "La poesía sigue siendo refugio de los sentimientos. En mi tiempo, el arte buscaba la belleza en lo misterioso y lo intangible.",
+    "arabe": "لا يزال الشعر ملاذًا للمشاعر. في زمني، كان الفن يبحث عن الجمال في الغامض وغير الملموس."
+  },
+  {
+    "autor": "Miguel de Cervantes",
+    "video": "8.mp4",
+    "texto": "¿Y qué retos enfrentan los escritores actuales?",
+    "arabe": "وما التحديات التي يواجهها الكتّاب المعاصرون؟"
+  },
+  {
+    "autor": "Federico García Lorca",
+    "video": "9.mp4",
+    "texto": "La censura, la incomprensión y, a veces, el exilio. Pero la pasión por la palabra y el arte es más fuerte que cualquier obstáculo.",
+    "arabe": "الرقابة، وسوء الفهم، وأحيانًا المنفى. لكن الشغف بالكلمة والفن أقوى من أي عقبة."
+  }
+]

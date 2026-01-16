@@ -1,0 +1,63 @@
+================================================================================
+                    REGISTRO DE PROPIEDAD INTELECTUAL
+                    MINISTERIO DE CULTURA Y DEPORTE
+================================================================================
+
+TÍTULO DE LA OBRA:
+Academia de Inmigrantes - Módulo PreFormación Profesional
+
+AUTOR/ES:
+[Indique aquí su nombre y apellidos completos]
+
+DESCRIPCIÓN:
+Este archivo contiene el código fuente del módulo "PreFormación Profesional" 
+de la aplicación móvil "Academia de Inmigrantes", que incluye:
+
+- Sistema de formación profesional para inmigrantes
+- Generador de CVs y plantillas profesionales
+- Sistema de pagos integrado para formación profesional
+- Agenda y gestión de cursos profesionales
+- Café Literario y recursos educativos
+- Libros descargables
+- Backend y API para formación profesional
+
+CONTENIDO DEL ARCHIVO:
+- Código fuente TypeScript/React Native
+- Componentes de pago (Stripe)
+- Generador de CVs profesional
+- Sistema de agenda y cursos
+- Backend Node.js
+- Configuración de servicios
+
+FECHA: 02 de diciembre de 2025
+
+ARCHIVO: 2_PreFormacion_20251202.zip
+TAMAÑO: 0.06 MB
+ARCHIVOS INCLUIDOS: 18 archivos
+
+================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

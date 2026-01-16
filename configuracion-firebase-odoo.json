@@ -1,0 +1,130 @@
+{
+  "firebase": {
+    "projectId": "academia-inmigrantes-movil",
+    "apiKey": "AIzaSyAvyKrByXcclQNLfZIyyyn3Hc5fWutMiBY",
+    "authDomain": "academia-inmigrantes-movil.firebaseapp.com",
+    "storageBucket": "academia-inmigrantes-movil.firebasestorage.app",
+    "messagingSenderId": "366110120529",
+    "appId": "1:366110120529:android:ad147c976b206ac1bbf670",
+    "region": "europe-west1"
+  },
+  "firestore": {
+    "coleccion": "users",
+    "idDocumento": "uid",
+    "campos": {
+      "uid": {
+        "tipo": "string",
+        "requerido": true
+      },
+      "email": {
+        "tipo": "string",
+        "requerido": false
+      },
+      "firstName": {
+        "tipo": "string",
+        "requerido": false
+      },
+      "lastName": {
+        "tipo": "string",
+        "requerido": false
+      },
+      "phone": {
+        "tipo": "string",
+        "requerido": false
+      },
+      "documento": {
+        "tipo": "string",
+        "requerido": false
+      },
+      "tipoDocumento": {
+        "tipo": "string",
+        "requerido": false
+      },
+      "provincia": {
+        "tipo": "string",
+        "requerido": false
+      },
+      "fechaNacimiento": {
+        "tipo": "string",
+        "requerido": false,
+        "formato": "YYYY-MM-DD"
+      },
+      "matriculado": {
+        "tipo": "boolean",
+        "requerido": false
+      },
+      "matriculado_escuela_virtual": {
+        "tipo": "boolean",
+        "requerido": false
+      },
+      "matriculado_A1A2": {
+        "tipo": "boolean",
+        "requerido": false
+      },
+      "matriculado_B1B2": {
+        "tipo": "boolean",
+        "requerido": false
+      },
+      "fechaMatricula": {
+        "tipo": "timestamp",
+        "requerido": false
+      },
+      "nivelMatriculado": {
+        "tipo": "string",
+        "requerido": false,
+        "valores": ["A1A2", "B1B2"]
+      },
+      "profileImage": {
+        "tipo": "string",
+        "requerido": false
+      },
+      "createdAt": {
+        "tipo": "timestamp",
+        "requerido": false
+      },
+      "updatedAt": {
+        "tipo": "timestamp",
+        "requerido": false
+      }
+    }
+  },
+  "mapeoOdoo": {
+    "modelo": "res.partner",
+    "campos": {
+      "name": "firstName + ' ' + lastName",
+      "email": "email",
+      "phone": "phone",
+      "mobile": "phone",
+      "city": "provincia",
+      "comment": "UID: {uid}, Documento: {documento}, Nivel: {nivelMatriculado}",
+      "x_firebase_uid": "uid",
+      "x_documento": "documento",
+      "x_nivel_matriculado": "nivelMatriculado",
+      "x_fecha_matricula": "fechaMatricula"
+    }
+  },
+  "ejemploDocumento": {
+    "uid": "user_1234567890_abc123",
+    "email": "juan.perez@example.com",
+    "firstName": "Juan",
+    "lastName": "Pérez",
+    "phone": "+34612345678",
+    "documento": "12345678X",
+    "tipoDocumento": "DNI",
+    "provincia": "Madrid",
+    "fechaNacimiento": "1990-05-15",
+    "matriculado": true,
+    "matriculado_escuela_virtual": true,
+    "matriculado_A1A2": true,
+    "matriculado_B1B2": false,
+    "nivelMatriculado": "A1A2",
+    "createdAt": {
+      "_seconds": 1705315200,
+      "_nanoseconds": 0
+    },
+    "updatedAt": {
+      "_seconds": 1705315200,
+      "_nanoseconds": 0
+    }
+  }
+}

@@ -1,0 +1,732 @@
+================================================================================
+    ACADEMIA DE INMIGRANTES - PRESENTACIÓN DETALLADA DE LA APLICACIÓN
+================================================================================
+
+Versión: 1.0.0
+Fecha: 2024
+Plataforma: React Native / Expo (Android e iOS)
+
+================================================================================
+1. INTRODUCCIÓN Y OBJETIVO
+================================================================================
+
+La Academia de Inmigrantes es una aplicación móvil educativa desarrollada con 
+React Native y Expo, diseñada específicamente para acompañar a personas 
+migrantes en su proceso de integración lingüística, cultural y administrativa 
+en España.
+
+OBJETIVOS PRINCIPALES:
+- Facilitar el aprendizaje del español desde nivel principiante (A1) hasta 
+  avanzado (B2)
+- Proporcionar recursos culturales y de integración
+- Ofrecer herramientas para gestión de trámites administrativos
+- Proporcionar formación profesional y laboral
+- Facilitar la creación de CVs y búsqueda de empleo
+- Conectar con servicios de asesoría especializada
+
+PÚBLICO OBJETIVO:
+- Migrantes que necesitan aprender o fortalecer su dominio del español
+- Personas que requieren orientación en trámites de extranjería
+- Usuarios que buscan formación profesional y empleo
+- Entidades colaboradoras (ONGs, asesores) que buscan recursos centralizados
+
+
+================================================================================
+2. ARQUITECTURA TÉCNICA
+================================================================================
+
+TECNOLOGÍAS PRINCIPALES:
+- Framework: Expo (React Native)
+- Lenguaje: TypeScript/JavaScript
+- Navegación: expo-router (stack y tabs)
+- Persistencia local: AsyncStorage
+- Base de datos: SQLite (para diccionario)
+- Servicios: Firebase (autenticación), EmailJS (formularios)
+- Pagos: Stripe (integración de pagos)
+
+DEPENDENCIAS CLAVE:
+- expo-av: Reproducción de audio y video
+- expo-speech: Síntesis de voz para pronunciación
+- expo-speech-recognition: Reconocimiento de voz
+- react-native-webview: Visualización de contenido web
+- expo-linear-gradient: Gradientes para diseño visual
+- @expo/vector-icons: Iconografía (Ionicons, FontAwesome, MaterialCommunity)
+- expo-file-system: Gestión de archivos
+- expo-print: Generación de PDFs
+
+
+================================================================================
+3. ESTRUCTURA DE NAVEGACIÓN
+================================================================================
+
+PANTALLA PRINCIPAL (Home Screen - app/index.tsx):
+- Punto de entrada de la aplicación
+- Ticker bilingüe (español/árabe) con promociones
+- Acceso directo a "Escuela Virtual"
+- Noticias de inmigración
+- Widgets de contacto y servicios
+
+ESCUELA VIRTUAL (SchoolScreen.tsx):
+- Vista académica central con acceso a todos los niveles
+- Sistema de niveles: A1, A2, B1, B2
+- Seguimiento de progreso por nivel y unidad
+- Tutor virtual bot con mensajes de apoyo
+- Sistema de matrícula y desbloqueo de niveles
+- Recursos complementarios:
+  * Café Literario
+  * Juegos de Tareas
+  * Diccionario
+  * Biblioteca Digital
+  * Cultura General
+
+ESTRUCTURA DE NIVELES:
+
+NIVEL A1 (Acceso):
+- 7 unidades temáticas
+- Examen final
+- Expresión oral y escrita
+- Contenido: Presentaciones, saludos, números, colores, familia, rutinas diarias
+
+NIVEL A2 (Plataforma):
+- 10 unidades temáticas
+- Examen final
+- Expresión oral y escrita
+- Contenido: Compras, viajes, trabajo, salud, vivienda, transporte
+
+NIVEL B1 (Umbral):
+- 27 unidades temáticas aproximadamente
+- Examen final
+- Expresión oral y escrita
+- Contenido: Relaciones, alimentación, trabajo, cultura, tecnología, medio ambiente
+
+NIVEL B2 (Avanzado):
+- 19 unidades temáticas aproximadamente
+- Examen final
+- Expresión oral y escrita
+- Contenido: Literatura, debates, estudios superiores, liderazgo, arte
+
+
+================================================================================
+4. FUNCIONALIDADES DETALLADAS
+================================================================================
+
+4.1 SISTEMA DE APRENDIZAJE POR UNIDADES
+
+Cada unidad incluye:
+- Vocabulario temático con traducción al árabe
+- Diálogos interactivos con audio
+- Ejercicios interactivos:
+  * Opción múltiple
+  * Rellenar huecos
+  * Relacionar conceptos
+  * Comprensión lectora
+  * Expresión escrita
+- Barra de progreso visual
+- Botón "Unidad finalizada" para desbloquear la siguiente
+- Sistema de desbloqueo progresivo (solo la primera unidad está disponible 
+  inicialmente)
+
+4.2 SISTEMA DE EVALUACIÓN
+
+EXÁMENES POR NIVEL:
+- Examen final al completar todas las unidades
+- Examen oral con reconocimiento de voz
+- Examen escrito con ejercicios de comprensión y expresión
+- Sistema de puntuación automática
+- Generación de diplomas al aprobar
+
+GATES DE EVALUACIÓN:
+- Gate oral: Frases cortas a leer usando reconocimiento de voz
+- Gate escrito: Ejercicios de comprensión y expresión
+- Feedback automático según puntuación
+
+4.3 FONÉTICA Y PRONUNCIACIÓN
+
+MÓDULOS DISPONIBLES:
+- Fonética de Vocales: Pronunciación de las 5 vocales españolas
+- Fonética y Pronunciación: Video con karaoke de texto sincronizado
+- Juego de Reconocimiento: Grabar pronunciación y compartir por WhatsApp
+- Ejercicios interactivos de pronunciación
+
+4.4 RECURSOS COMPLEMENTARIOS
+
+CAFÉ LITERARIO:
+- Diálogos guiados por unidades
+- Contenido bilingüe español-árabe
+- Navegación temática
+
+JUEGOS DE TAREAS:
+- Juego de Alfabeto
+- Juego de Audio
+- Juego de Colores
+- Juego de Emparejar
+- Juego de Instrumentos
+- Juego de Memoria
+- Juego de Ordenar
+- Juego de Palabras
+- Juego de Selección
+- Snake de Letras
+
+DICCIONARIO:
+- Búsqueda de palabras en español
+- Traducción al árabe
+- Base de datos SQLite local
+- Pronunciación con síntesis de voz
+
+BIBLIOTECA DIGITAL:
+- Acceso a libros y materiales descargables
+- Recursos educativos adicionales
+- Contenido cultural
+
+CULTURA GENERAL:
+- Información sobre costumbres españolas
+- Historia y tradiciones
+- Guías de integración cultural
+
+4.5 HERRAMIENTAS PROFESIONALES
+
+CREADOR DE CV:
+- Asistente paso a paso para generar currículum
+- Formato Europass
+- Plantillas profesionales (moderna, clásica, minimalista)
+- Exportación a PDF
+- Campos bilingües (español/árabe)
+- Secciones:
+  * Datos personales
+  * Experiencia profesional
+  * Educación y formación
+  * Competencias personales
+  * Idiomas con niveles CEFR
+
+CURSOS DE FORMACIÓN PROFESIONAL:
+- Curso de Cocina
+- Curso de Electricidad
+- Curso de Fontanería
+- Curso de Carpintería
+- Curso de Mecánica
+- Curso de Pintura
+- Curso de Albañilería
+- Curso de Soldadura
+- Curso de Jardinería
+- Curso de Limpieza
+- Curso de Atención al Cliente
+- Curso de Camarero
+- Curso de Recepcionista
+- Curso de Repartidor
+- Curso de Almacén
+- Curso de Carretillero
+- Curso de Comercio
+- Curso de Carnicería
+- Curso de Panadería
+- Curso de Peluquería
+- Curso de Estética
+- Curso de Cuidado de Mayores
+- Curso de Manipulación de Alimentos
+- Curso de Seguridad Laboral
+- Curso de Informática
+- Curso de Excel
+- Curso de Word
+- Curso de Agricultura
+
+Cada curso incluye:
+- Contenido teórico extenso
+- Guías prácticas
+- Enlaces a recursos adicionales
+- Información sobre certificaciones
+
+4.6 ASESORÍA Y TRÁMITES
+
+ASESORÍA DE INMIGRACIÓN:
+- Formulario bilingüe de solicitud
+- Selección de tipo de cita (presencial o telefónica)
+- Envío automático de solicitudes
+- Seguimiento de estado
+
+INFORMACIÓN ADMINISTRATIVA:
+- Abogados de Extranjería
+- Ayudas y ONGs
+- Carpeta Ciudadana
+- Aprende a Gestionar Papeles
+- Comunidad e Información
+
+4.7 RECURSOS CULTURALES
+
+MÚSICA:
+- Contenido sobre música española
+- Canciones y letras
+
+TEATRO:
+- Obras teatrales
+- Guías de lectura
+
+MUSEOS:
+- Información sobre museos españoles
+- Guías culturales
+
+CUENTOS POPULARES:
+- Relatos tradicionales españoles
+- Lectura textual con audio
+- Descripción bilingüe
+
+FIESTAS Y TRADICIONES:
+- Calendario de festividades
+- Explicación de tradiciones
+
+4.8 GRAMÁTICA Y VOCABULARIO
+
+GRAMÁTICA:
+- Lecciones de gramática por temas
+- Ejercicios prácticos
+- Explicaciones bilingües
+
+VOCABULARIO:
+- Listas temáticas de vocabulario
+- Tarjetas de memoria
+- Ejercicios de repaso
+
+VERBOS:
+- Conjugaciones verbales
+- Tiempos verbales
+- Ejercicios de práctica
+
+ADJETIVOS:
+- Listas de adjetivos
+- Grados del adjetivo
+- Ejercicios
+
+SER Y ESTAR:
+- Explicación de diferencias
+- Ejercicios prácticos
+- Casos de uso
+
+4.9 NOTICIAS Y COMUNIDAD
+
+NOTICIAS DE INMIGRACIÓN:
+- Feed de noticias actualizadas
+- Filtrado por categorías
+- Visualización detallada
+- Fuentes externas integradas
+
+COMUNIDAD:
+- Información de comunidades
+- Recursos compartidos
+- Enlaces a servicios
+
+
+================================================================================
+5. SISTEMA DE PROGRESO Y GAMIFICACIÓN
+================================================================================
+
+5.1 SEGUIMIENTO DE PROGRESO
+
+- Progreso por nivel (A1, A2, B1, B2)
+- Progreso por unidad dentro de cada nivel
+- Indicadores visuales de completitud
+- Estadísticas de avance
+
+5.2 SISTEMA DE DESBLOQUEO
+
+- Solo la primera unidad está desbloqueada inicialmente
+- Cada unidad se desbloquea al completar la anterior
+- Los niveles se desbloquean al aprobar el nivel anterior
+- Sistema de matrícula para acceso a niveles superiores
+
+5.3 DIPLOMAS Y CERTIFICACIONES
+
+- Diploma generado al completar cada nivel
+- Certificado de finalización
+- Exportación de diplomas en PDF
+- Validación de logros
+
+5.4 TUTOR VIRTUAL
+
+- Mensajes de bienvenida
+- Felicitaciones por progreso
+- Recordatorios de práctica
+- Motivación y apoyo
+- Mensajes bilingües (español/árabe)
+
+
+================================================================================
+6. DISEÑO Y EXPERIENCIA DE USUARIO
+================================================================================
+
+6.1 DISEÑO VISUAL
+
+ESQUEMA DE COLORES UNIFICADO:
+- Color principal: #79A890 (verde esmeralda)
+- Color secundario: #9DC3AA (verde claro)
+- Gradientes: LinearGradient con colores unificados
+- Diseño consistente en toda la aplicación
+
+ELEMENTOS DE DISEÑO:
+- Botones con gradientes
+- Iconos de Ionicons
+- Tipografía clara y legible
+- Espaciado consistente
+- Animaciones suaves
+
+6.2 INTERFAZ BILINGÜE
+
+- Todos los textos principales en español y árabe
+- Navegación bilingüe
+- Instrucciones traducidas
+- Soporte RTL (Right-to-Left) para árabe
+
+6.3 ACCESIBILIDAD
+
+- Tamaños de fuente ajustables
+- Contraste adecuado
+- Navegación intuitiva
+- Feedback visual claro
+
+
+================================================================================
+7. GESTIÓN DE DATOS Y ALMACENAMIENTO
+================================================================================
+
+7.1 ALMACENAMIENTO LOCAL
+
+AsyncStorage:
+- Progreso del usuario por nivel
+- Unidades completadas
+- Configuraciones de usuario
+- Datos de matrícula
+- Preferencias de idioma
+
+SQLite:
+- Base de datos del diccionario
+- Búsqueda rápida de palabras
+- Almacenamiento offline
+
+7.2 CONTEXTO DE PROGRESO
+
+UserProgressContext:
+- Gestión global del progreso
+- Sincronización entre pantallas
+- Actualización en tiempo real
+- Persistencia automática
+
+7.3 SERVICIOS EXTERNOS
+
+Firebase:
+- Autenticación de usuarios
+- Almacenamiento en la nube (futuro)
+
+EmailJS:
+- Envío de formularios
+- Notificaciones por email
+
+Stripe:
+- Procesamiento de pagos
+- Suscripciones (futuro)
+
+
+================================================================================
+8. FUNCIONALIDADES TÉCNICAS AVANZADAS
+================================================================================
+
+8.1 RECONOCIMIENTO DE VOZ
+
+- Reconocimiento de pronunciación
+- Evaluación de expresión oral
+- Feedback en tiempo real
+- Integración con Web Speech API
+
+8.2 SÍNTESIS DE VOZ
+
+- Reproducción de textos en español
+- Pronunciación de palabras del diccionario
+- Audio de diálogos
+- Control de velocidad y tono
+
+8.3 REPRODUCCIÓN DE VIDEO
+
+- Videos educativos integrados
+- Controles de reproducción
+- Sincronización con texto (karaoke)
+- Almacenamiento local de videos
+
+8.4 GENERACIÓN DE PDF
+
+- Exportación de CVs
+- Generación de diplomas
+- Compartir documentos
+- Almacenamiento local
+
+8.5 GESTIÓN DE ARCHIVOS
+
+- Descarga de materiales
+- Almacenamiento local
+- Compartir archivos
+- Gestión de espacio
+
+
+================================================================================
+9. ESTRUCTURA DE ARCHIVOS PRINCIPAL
+================================================================================
+
+app/
+├── index.tsx                    # Pantalla principal (Home)
+├── (tabs)/
+│   ├── SchoolScreen.tsx         # Escuela Virtual
+│   ├── A1_Acceso/              # Nivel A1
+│   │   ├── index.tsx
+│   │   └── clases/
+│   │       ├── Unidad1.tsx ... Unidad7.tsx
+│   │       ├── ExamenFinal.tsx
+│   │       ├── ExpresionOral.tsx
+│   │       └── ExpresionEscrita.tsx
+│   ├── A2_Plataforma/          # Nivel A2
+│   │   ├── index.tsx
+│   │   └── clases/
+│   │       ├── Unidad1.tsx ... Unidad10.tsx
+│   │       └── ...
+│   ├── B1_Umbral/              # Nivel B1
+│   │   ├── index.tsx
+│   │   └── clases/
+│   │       ├── Relaciones.tsx
+│   │       ├── Alimentacion.tsx
+│   │       ├── Trabajo.tsx
+│   │       └── ... (27 unidades)
+│   ├── B2_Avanzado/            # Nivel B2
+│   │   ├── index.tsx
+│   │   └── clases/
+│   │       └── ... (19 unidades)
+│   ├── FoneticaMenuScreen.tsx
+│   ├── FoneticaVocalesScreen.tsx
+│   ├── FoneticaPronunciacionScreen.tsx
+│   ├── FoneticaJuegoReconocimientoScreen.tsx
+│   ├── CafeLiterarioScreen.tsx
+│   ├── JuegosDeTareasScreen.tsx
+│   ├── DiccionarioScreen.tsx
+│   ├── BibliotecaDigitalScreen.tsx
+│   ├── CulturaGeneralScreen.tsx
+│   ├── CreadorCVScreen.tsx
+│   ├── AsesoriaScreen.tsx
+│   └── ... (más pantallas)
+
+components/
+├── EjerciciosInteractivos.tsx   # Componente de ejercicios
+├── UnitMeta.tsx                 # Metadatos de unidades
+└── ... (más componentes)
+
+contexts/
+└── UserProgressContext.tsx      # Contexto de progreso global
+
+utils/
+├── unitProgress.ts              # Gestión de progreso por unidad
+├── userDatabase.ts              # Base de datos de usuarios
+└── ... (más utilidades)
+
+services/
+├── userService.ts               # Servicio de usuarios
+├── newsService.ts               # Servicio de noticias
+└── ... (más servicios)
+
+
+================================================================================
+10. FLUJOS DE USUARIO PRINCIPALES
+================================================================================
+
+10.1 FLUJO DE APRENDIZAJE
+
+1. Usuario accede a la aplicación
+2. Navega a "Escuela Virtual"
+3. Selecciona un nivel (A1, A2, B1, B2)
+4. Accede a la primera unidad desbloqueada
+5. Estudia el contenido de la unidad:
+   - Lee vocabulario
+   - Escucha diálogos
+   - Completa ejercicios
+6. Marca la unidad como finalizada
+7. Se desbloquea la siguiente unidad
+8. Repite el proceso hasta completar todas las unidades
+9. Realiza el examen final
+10. Obtiene el diploma del nivel
+
+10.2 FLUJO DE CREACIÓN DE CV
+
+1. Usuario accede a "Creador de CV"
+2. Completa datos personales (Paso 1)
+3. Añade experiencia profesional (Paso 2)
+4. Añade educación y formación (Paso 3)
+5. Añade competencias personales (Paso 4)
+6. Revisa la vista previa
+7. Exporta a PDF
+8. Comparte o guarda el CV
+
+10.3 FLUJO DE ASESORÍA
+
+1. Usuario accede a "Asesoría"
+2. Completa formulario bilingüe
+3. Selecciona tipo de cita
+4. Envía solicitud
+5. Recibe confirmación
+6. Espera contacto del asesor
+
+10.4 FLUJO DE JUEGOS
+
+1. Usuario accede a "Juegos de Tareas"
+2. Selecciona un juego
+3. Juega y aprende
+4. Ve puntuación
+5. Puede repetir o cambiar de juego
+
+
+================================================================================
+11. CARACTERÍSTICAS ESPECIALES
+================================================================================
+
+11.1 SISTEMA DE MATRÍCULA
+
+- Matrícula en niveles A1-A2
+- Matrícula en niveles B1-B2
+- Desbloqueo automático al matricularse
+- Seguimiento de estado de matrícula
+
+11.2 SISTEMA DE PRUEBA (TRIAL)
+
+- Período de prueba inicial
+- Verificación de instalación
+- Acceso limitado sin verificación
+- Integración con TikTok para verificación (opcional)
+
+11.3 NOTIFICACIONES
+
+- Recordatorios de práctica
+- Notificaciones de progreso
+- Alertas de nuevas unidades
+- Notificaciones de logros
+
+11.4 COMPARTIR Y EXPORTAR
+
+- Compartir progreso
+- Exportar diplomas
+- Compartir CVs
+- Compartir grabaciones de voz
+
+
+================================================================================
+12. REQUISITOS TÉCNICOS
+================================================================================
+
+PLATAFORMAS SOPORTADAS:
+- Android (versión mínima: API 21)
+- iOS (versión mínima: iOS 13)
+
+REQUISITOS DEL DISPOSITIVO:
+- Conexión a Internet (para algunas funcionalidades)
+- Permisos de micrófono (para reconocimiento de voz)
+- Permisos de almacenamiento (para descargas)
+- Espacio de almacenamiento: ~100MB mínimo
+
+DEPENDENCIAS EXTERNAS:
+- Servicios de Firebase (opcional)
+- API de noticias (para feed de noticias)
+- Servicios de pago Stripe (opcional)
+
+
+================================================================================
+13. FUTURAS MEJORAS Y EXPANSIONES
+================================================================================
+
+FUNCIONALIDADES PLANEADAS:
+- Niveles C1 y C2 (avanzado y maestría)
+- Sistema de chat en tiempo real
+- Comunidad de usuarios
+- Foros de discusión
+- Sistema de logros y badges
+- Modo offline completo
+- Sincronización en la nube
+- Multiidioma adicional (francés, inglés)
+- Integración con redes sociales
+- Sistema de tutorías en vivo
+- Marketplace de recursos educativos
+
+
+================================================================================
+14. SOPORTE Y MANTENIMIENTO
+================================================================================
+
+ACTUALIZACIONES:
+- Actualizaciones regulares de contenido
+- Corrección de errores
+- Mejoras de rendimiento
+- Nuevas funcionalidades
+
+SOPORTE:
+- Documentación técnica
+- Guías de usuario
+- FAQ (Preguntas frecuentes)
+- Canal de contacto
+
+
+================================================================================
+15. CONCLUSIÓN
+================================================================================
+
+La Academia de Inmigrantes es una aplicación completa y robusta diseñada para 
+facilitar el aprendizaje del español y la integración de personas migrantes 
+en España. Con más de 60 unidades educativas, múltiples recursos culturales, 
+herramientas profesionales y un sistema de progreso gamificado, ofrece una 
+experiencia de aprendizaje integral y personalizada.
+
+La aplicación combina tecnología moderna (React Native, Expo) con contenido 
+educativo de calidad y una interfaz bilingüe intuitiva, haciendo que el 
+aprendizaje del español sea accesible, efectivo y agradable para todos los 
+usuarios.
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

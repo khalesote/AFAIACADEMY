@@ -1,0 +1,63 @@
+================================================================================
+                    REGISTRO DE PROPIEDAD INTELECTUAL
+                    MINISTERIO DE CULTURA Y DEPORTE
+================================================================================
+
+TÍTULO DE LA OBRA:
+Academia de Inmigrantes - Módulo Escuela Virtual
+
+AUTOR/ES:
+[Indique aquí su nombre y apellidos completos]
+
+DESCRIPCIÓN:
+Este archivo contiene el código fuente del módulo "Escuela Virtual" de la 
+aplicación móvil "Academia de Inmigrantes", que incluye:
+
+- Sistema de aprendizaje de español para inmigrantes
+- Niveles A1, A2, B1 y B2 según el Marco Común Europeo de Referencia (MCER)
+- Profesor Virtual con tutoría automatizada
+- Sistema de ejercicios interactivos
+- Sistema de evaluación y seguimiento de progreso
+- Componentes de clases de español
+- Sistema de diplomas y certificaciones
+
+CONTENIDO DEL ARCHIVO:
+- Código fuente TypeScript/React Native
+- Componentes de interfaz de usuario
+- Lógica de negocio y gestión de progreso
+- Contextos y estados de la aplicación
+- Archivos de configuración
+- Assets educativos (audio y video)
+
+FECHA: 02 de diciembre de 2025
+
+ARCHIVO: 1_EscuelaVirtual_20251202.zip
+TAMAÑO: 1.83 MB
+ARCHIVOS INCLUIDOS: 49 archivos
+
+================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

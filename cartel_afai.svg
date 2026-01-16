@@ -1,0 +1,84 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1976D2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1565C0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f8f9fa;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="ctaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#388E3C;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="url(#headerGradient)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="750" cy="-50" r="80" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="-30" cy="550" r="60" fill="rgba(255,255,255,0.1)"/>
+
+  <!-- Header Card -->
+  <rect x="50" y="50" width="700" height="500" rx="20" fill="url(#cardGradient)" stroke="#e0e0e0" stroke-width="2"/>
+
+  <!-- Logo placeholder -->
+  <rect x="350" y="80" width="100" height="100" rx="15" fill="rgba(25,118,210,0.1)" stroke="#1976D2" stroke-width="2"/>
+  <text x="400" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#1976D2">AFAI</text>
+
+  <!-- Main title -->
+  <text x="400" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#1976D2">Academia de Inmigrantes</text>
+
+  <!-- Subtitle -->
+  <text x="400" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#666">Aprende Español • Desarrolla tu Carrera • Integra en España</text>
+
+  <!-- Arabic title -->
+  <text x="400" y="270" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#1976D2" direction="rtl">أكاديمية المهاجرين</text>
+
+  <!-- Services section -->
+  <text x="400" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#1976D2">🌟 Nuestros Servicios</text>
+
+  <!-- Service 1 -->
+  <rect x="80" y="340" width="160" height="80" rx="10" fill="rgba(248,249,250,0.8)" stroke="#1976D2" stroke-width="1"/>
+  <text x="90" y="355" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1976D2">✅ Español A1-A4</text>
+  <text x="90" y="375" font-family="Arial, sans-serif" font-size="12" fill="#555">Cursos completos con</text>
+  <text x="90" y="390" font-family="Arial, sans-serif" font-size="12" fill="#555">traducción árabe</text>
+
+  <!-- Service 2 -->
+  <rect x="260" y="340" width="160" height="80" rx="10" fill="rgba(248,249,250,0.8)" stroke="#1976D2" stroke-width="1"/>
+  <text x="270" y="355" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1976D2">✅ Formación Profesional</text>
+  <text x="270" y="375" font-family="Arial, sans-serif" font-size="12" fill="#555">17 cursos especializados</text>
+  <text x="270" y="390" font-family="Arial, sans-serif" font-size="12" fill="#555">en profesiones demandadas</text>
+
+  <!-- Service 3 -->
+  <rect x="440" y="340" width="160" height="80" rx="10" fill="rgba(248,249,250,0.8)" stroke="#1976D2" stroke-width="1"/>
+  <text x="450" y="355" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1976D2">✅ Juegos Interactivos</text>
+  <text x="450" y="375" font-family="Arial, sans-serif" font-size="12" fill="#555">Aprende divirtiéndote</text>
+  <text x="450" y="390" font-family="Arial, sans-serif" font-size="12" fill="#555">con actividades dinámicas</text>
+
+  <!-- Service 4 -->
+  <rect x="620" y="340" width="160" height="80" rx="10" fill="rgba(248,249,250,0.8)" stroke="#1976D2" stroke-width="1"/>
+  <text x="630" y="355" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1976D2">✅ Asesoría Personalizada</text>
+  <text x="630" y="375" font-family="Arial, sans-serif" font-size="12" fill="#555">Orientación laboral</text>
+  <text x="630" y="390" font-family="Arial, sans-serif" font-size="12" fill="#555">y soporte continuo</text>
+
+  <!-- CTA Section -->
+  <rect x="100" y="440" width="600" height="100" rx="15" fill="url(#ctaGradient)"/>
+  <text x="400" y="465" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">¡Únete a Nuestra Comunidad!</text>
+  <text x="400" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="white">Miles de inmigrantes árabes ya han transformado su futuro</text>
+
+  <!-- Download buttons -->
+  <rect x="250" y="500" width="140" height="35" rx="17" fill="#FF9800"/>
+  <text x="320" y="520" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">📱 Descargar App</text>
+
+  <rect x="410" y="500" width="140" height="35" rx="17" fill="#FF9800"/>
+  <text x="480" y="520" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">🎓 Matricularse</text>
+
+  <!-- Contact info -->
+  <text x="400" y="555" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#666">🌐 afaiacademiadeinmigrantes.com | 📱 WhatsApp: +34 665 666 288</text>
+
+  <!-- Footer -->
+  <text x="400" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666" opacity="0.8">© 2025 Academia de Inmigrantes - Transformando vidas a través del aprendizaje</text>
+</svg>

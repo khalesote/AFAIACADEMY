@@ -1,0 +1,4 @@
+[
+  {"preguntaES": "¿Cómo te llamas?", "preguntaAR": "ما اسمك؟", "tipo": "seleccion", "opciones": ["Me llamo ...", "Tengo ... años", "Vivo en ...", "Soy de ..."], "respuesta": "Me llamo ..."},
+  {"preguntaES": "¿De dónde eres?", "preguntaAR": "من أين أنت؟", "tipo": "seleccion", "opciones": ["Soy de ...", "Me llamo ...", "Vivo en ...", "Tengo ... años"], "respuesta": "Soy de ..."}
+]

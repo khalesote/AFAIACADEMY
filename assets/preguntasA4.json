@@ -1,0 +1,4 @@
+[
+  {"preguntaES": "¿Por qué quieres aprender español?", "preguntaAR": "لماذا تريد تعلم الإسبانية؟", "tipo": "seleccion", "opciones": ["Porque ...", "Vivo en ...", "Me llamo ...", "Soy de ..."], "respuesta": "Porque ..."},
+  {"preguntaES": "¿Has visitado España?", "preguntaAR": "هل زرت إسبانيا؟", "respuesta": "Sí / No", "tipo": "seleccion", "opciones": ["Sí", "No"]}
+]

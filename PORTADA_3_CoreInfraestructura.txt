@@ -1,0 +1,65 @@
+================================================================================
+                    REGISTRO DE PROPIEDAD INTELECTUAL
+                    MINISTERIO DE CULTURA Y DEPORTE
+================================================================================
+
+TÍTULO DE LA OBRA:
+Academia de Inmigrantes - Módulo Core e Infraestructura
+
+AUTOR/ES:
+[Indique aquí su nombre y apellidos completos]
+
+DESCRIPCIÓN:
+Este archivo contiene el código fuente del módulo "Core e Infraestructura" 
+de la aplicación móvil "Academia de Inmigrantes", que incluye:
+
+- Arquitectura base de la aplicación
+- Sistema de autenticación y registro de usuarios
+- Sistema de pagos (Stripe y Cecabank)
+- Reconocimiento facial y prevención de capturas de pantalla
+- Configuración de la aplicación (Firebase, Expo, etc.)
+- Hooks personalizados y utilidades core
+- Backend API y servicios
+- Configuración de build y despliegue
+
+CONTENIDO DEL ARCHIVO:
+- Código fuente TypeScript/React Native
+- Sistema de autenticación
+- Integración de pagos
+- Utilidades de seguridad
+- Configuración de proyecto
+- Backend y APIs
+- Hooks personalizados
+
+FECHA: 02 de diciembre de 2025
+
+ARCHIVO: 3_CoreInfraestructura_20251202.zip
+TAMAÑO: 0.09 MB
+ARCHIVOS INCLUIDOS: 61 archivos
+
+================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

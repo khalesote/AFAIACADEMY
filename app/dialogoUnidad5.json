@@ -1,0 +1,38 @@
+[
+  {
+    "autor": "Lorca",
+    "texto": "Decidme... ¿por qué seguimos hablando, aunque la muerte nos haya callado?",
+    "arabe": "قولوا لي... لماذا نستمر في الحديث رغم أن الموت أسكتنا؟",
+    "video": "lorca_001.mp4"
+  },
+  {
+    "autor": "Cervantes",
+    "texto": "Porque las palabras que tocan el alma no mueren. En cada lector se reencarnan.",
+    "arabe": "لأن الكلمات التي تمس الروح لا تموت. إنها تتجسد من جديد في كل قارئ.",
+    "video": "cervantes_001.mp4"
+  },
+  {
+    "autor": "Garcilaso",
+    "texto": "Y porque el amor, la guerra y el dolor no entienden de siglos. Somos testigos eternos de lo humano.",
+    "arabe": "ولأن الحب والحرب والألم لا تعرف القرون. نحن شهود أبديون على الإنسانية.",
+    "video": "garcilaso_001.mp4"
+  },
+  {
+    "autor": "Lorca",
+    "texto": "Brindemos, entonces, por este café literario que nos reúne sin tiempo, sin frontera... sólo con letras.",
+    "arabe": "فلنحتفل إذًا بهذا المقهى الأدبي الذي يجمعنا بلا زمن ولا حدود... فقط بالحروف.",
+    "video": "lorca_002.mp4"
+  },
+  {
+    "autor": "Cervantes",
+    "texto": "Que sirvan más tinta y pan, que aún nos queda charla.",
+    "arabe": "ليقدموا المزيد من الحبر والخبز، فما زال لدينا حديث طويل.",
+    "video": "cervantes_002.mp4"
+  },
+  {
+    "autor": "Garcilaso",
+    "texto": "Y versos por compartir.",
+    "arabe": "وأبيات لنشاركها.",
+    "video": "garcilaso_002.mp4"
+  }
+]

@@ -1,0 +1,149 @@
+================================================================================
+    CÓMO OBTENER LA REFERENCIA ALFANUMÉRICA PARA REGISTRAR TU APP EN OEPM
+================================================================================
+
+Esta referencia es ÚNICA para tu aplicación "Academia de Inmigrantes"
+y solo TÚ (el administrador/propietario) la puedes ver.
+
+Los usuarios finales NO necesitan ni ven esta referencia.
+
+================================================================================
+MÉTODO 1: DESDE LA APLICACIÓN (RECOMENDADO)
+================================================================================
+
+1. Abre la aplicación
+2. Inicia sesión con tu cuenta de administrador:
+   Email: admin@academiadeinmigrantes.es
+3. Ve a la pantalla "Información de Usuario"
+4. Verás una sección especial "Referencia de la Aplicación" (solo visible para ti)
+5. Ahí verás tu referencia en formato: ACAD-XXXX-XXXX-XXXX-XXXX
+6. Toca el botón "Ver Referencia Completa" para verla en un diálogo
+
+================================================================================
+MÉTODO 2: DESDE EL CÓDIGO
+================================================================================
+
+Ejecuta este código en tu aplicación o consola de desarrollo:
+
+```typescript
+import { getAppReferenceForOEPM } from './utils/getAppReferenceForOEPM';
+
+// Obtener la referencia
+const referencia = await getAppReferenceForOEPM();
+console.log('Referencia para OEPM:', referencia);
+```
+
+================================================================================
+MÉTODO 3: DESDE ASYNCSTORAGE
+================================================================================
+
+La referencia se guarda en AsyncStorage con la clave: 'app_reference_oepm'
+
+Puedes obtenerla ejecutando:
+
+```typescript
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const referencia = await AsyncStorage.getItem('app_reference_oepm');
+console.log('Referencia OEPM:', referencia);
+```
+
+================================================================================
+FORMATO DE LA REFERENCIA
+================================================================================
+
+Formato: ACAD-XXXX-XXXX-XXXX-XXXX
+
+Donde:
+- ACAD = Prefijo de la aplicación (Academia)
+- XXXX = Segmentos alfanuméricos (letras mayúsculas A-Z y números 0-9)
+
+Ejemplo: ACAD-A3B7-9F2C-4D8E-1G5H
+
+================================================================================
+INFORMACIÓN PARA EL REGISTRO EN OEPM
+================================================================================
+
+Cuando registres tu aplicación en OEPM, necesitarás proporcionar:
+
+1. REFERENCIA ALFANUMÉRICA:
+   Formato: ACAD-XXXX-XXXX-XXXX-XXXX
+   (La referencia generada automáticamente)
+
+2. NOMBRE DE LA APLICACIÓN:
+   Academia de Inmigrantes
+
+3. VERSIÓN:
+   1.0.0
+
+4. PLATAFORMAS:
+   Android e iOS
+
+5. DESCRIPCIÓN:
+   Aplicación educativa móvil desarrollada con React Native y Expo
+   para facilitar el aprendizaje del español y la integración de
+   personas migrantes en España.
+
+================================================================================
+IMPORTANTE
+================================================================================
+
+✅ La referencia se genera automáticamente la primera vez que ejecutas la app
+✅ La referencia es ÚNICA para tu aplicación
+✅ Solo TÚ (administrador) puedes verla
+✅ Los usuarios finales NO ven ni necesitan esta referencia
+✅ La referencia se guarda permanentemente en AsyncStorage
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

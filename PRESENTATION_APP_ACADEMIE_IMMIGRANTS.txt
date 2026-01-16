@@ -1,0 +1,732 @@
+================================================================================
+    ACADÉMIE DES IMMIGRANTS - PRÉSENTATION DÉTAILLÉE DE L'APPLICATION
+================================================================================
+
+Version: 1.0.0
+Date: 2024
+Plateforme: React Native / Expo (Android et iOS)
+
+================================================================================
+1. INTRODUCTION ET OBJECTIF
+================================================================================
+
+L'Académie des Immigrants est une application mobile éducative développée avec 
+React Native et Expo, conçue spécifiquement pour accompagner les personnes 
+migrantes dans leur processus d'intégration linguistique, culturelle et 
+administrative en Espagne.
+
+OBJECTIFS PRINCIPAUX:
+- Faciliter l'apprentissage de l'espagnol du niveau débutant (A1) jusqu'au 
+  niveau avancé (B2)
+- Fournir des ressources culturelles et d'intégration
+- Offrir des outils pour la gestion des démarches administratives
+- Fournir une formation professionnelle et professionnelle
+- Faciliter la création de CV et la recherche d'emploi
+- Connecter avec des services de conseil spécialisés
+
+PUBLIC CIBLE:
+- Migrants qui ont besoin d'apprendre ou de renforcer leur maîtrise de l'espagnol
+- Personnes qui nécessitent une orientation dans les démarches d'immigration
+- Utilisateurs qui recherchent une formation professionnelle et un emploi
+- Entités collaboratrices (ONG, conseillers) qui cherchent des ressources centralisées
+
+
+================================================================================
+2. ARCHITECTURE TECHNIQUE
+================================================================================
+
+TECHNOLOGIES PRINCIPALES:
+- Framework: Expo (React Native)
+- Langage: TypeScript/JavaScript
+- Navigation: expo-router (stack et tabs)
+- Persistance locale: AsyncStorage
+- Base de données: SQLite (pour le dictionnaire)
+- Services: Firebase (authentification), EmailJS (formulaires)
+- Paiements: Stripe (intégration des paiements)
+
+DÉPENDANCES CLÉS:
+- expo-av: Lecture audio et vidéo
+- expo-speech: Synthèse vocale pour la prononciation
+- expo-speech-recognition: Reconnaissance vocale
+- react-native-webview: Visualisation de contenu web
+- expo-linear-gradient: Dégradés pour le design visuel
+- @expo/vector-icons: Iconographie (Ionicons, FontAwesome, MaterialCommunity)
+- expo-file-system: Gestion de fichiers
+- expo-print: Génération de PDFs
+
+
+================================================================================
+3. STRUCTURE DE NAVIGATION
+================================================================================
+
+ÉCRAN PRINCIPAL (Home Screen - app/index.tsx):
+- Point d'entrée de l'application
+- Ticker bilingue (espagnol/arabe) avec promotions
+- Accès direct à "École Virtuelle"
+- Actualités sur l'immigration
+- Widgets de contact et services
+
+ÉCOLE VIRTUELLE (SchoolScreen.tsx):
+- Vue académique centrale avec accès à tous les niveaux
+- Système de niveaux: A1, A2, B1, B2
+- Suivi de progression par niveau et unité
+- Tuteur virtuel bot avec messages de soutien
+- Système d'inscription et déverrouillage de niveaux
+- Ressources complémentaires:
+  * Café Littéraire
+  * Jeux de Tâches
+  * Dictionnaire
+  * Bibliothèque Numérique
+  * Culture Générale
+
+STRUCTURE DES NIVEAUX:
+
+NIVEAU A1 (Accès):
+- 7 unités thématiques
+- Examen final
+- Expression orale et écrite
+- Contenu: Présentations, salutations, nombres, couleurs, famille, routines quotidiennes
+
+NIVEAU A2 (Plateforme):
+- 10 unités thématiques
+- Examen final
+- Expression orale et écrite
+- Contenu: Achats, voyages, travail, santé, logement, transport
+
+NIVEAU B1 (Seuil):
+- Environ 27 unités thématiques
+- Examen final
+- Expression orale et écrite
+- Contenu: Relations, alimentation, travail, culture, technologie, environnement
+
+NIVEAU B2 (Avancé):
+- Environ 19 unités thématiques
+- Examen final
+- Expression orale et écrite
+- Contenu: Littérature, débats, études supérieures, leadership, art
+
+
+================================================================================
+4. FONCTIONNALITÉS DÉTAILLÉES
+================================================================================
+
+4.1 SYSTÈME D'APPRENTISSAGE PAR UNITÉS
+
+Chaque unité comprend:
+- Vocabulaire thématique avec traduction en arabe
+- Dialogues interactifs avec audio
+- Exercices interactifs:
+  * Choix multiples
+  * Remplir les blancs
+  * Relier les concepts
+  * Compréhension de lecture
+  * Expression écrite
+- Barre de progression visuelle
+- Bouton "Unité terminée" pour déverrouiller la suivante
+- Système de déverrouillage progressif (seule la première unité est disponible 
+  initialement)
+
+4.2 SYSTÈME D'ÉVALUATION
+
+EXAMENS PAR NIVEAU:
+- Examen final après avoir complété toutes les unités
+- Examen oral avec reconnaissance vocale
+- Examen écrit avec exercices de compréhension et expression
+- Système de notation automatique
+- Génération de diplômes à la réussite
+
+PORTES D'ÉVALUATION:
+- Porte orale: Phrases courtes à lire en utilisant la reconnaissance vocale
+- Porte écrite: Exercices de compréhension et expression
+- Feedback automatique selon la note
+
+4.3 PHONÉTIQUE ET PRONONCIATION
+
+MODULES DISPONIBLES:
+- Phonétique des Voyelles: Prononciation des 5 voyelles espagnoles
+- Phonétique et Prononciation: Vidéo avec karaoké de texte synchronisé
+- Jeu de Reconnaissance: Enregistrer la prononciation et partager par WhatsApp
+- Exercices interactifs de prononciation
+
+4.4 RESSOURCES COMPLÉMENTAIRES
+
+CAFÉ LITTÉRAIRE:
+- Dialogues guidés par unités
+- Contenu bilingue espagnol-arabe
+- Navigation thématique
+
+JEUX DE TÂCHES:
+- Jeu de l'Alphabet
+- Jeu Audio
+- Jeu des Couleurs
+- Jeu d'Assortiment
+- Jeu d'Instruments
+- Jeu de Mémoire
+- Jeu de Classement
+- Jeu de Mots
+- Jeu de Sélection
+- Serpent de Lettres
+
+DICTIONNAIRE:
+- Recherche de mots en espagnol
+- Traduction en arabe
+- Base de données SQLite locale
+- Prononciation avec synthèse vocale
+
+BIBLIOTHÈQUE NUMÉRIQUE:
+- Accès aux livres et matériaux téléchargeables
+- Ressources éducatives supplémentaires
+- Contenu culturel
+
+CULTURE GÉNÉRALE:
+- Informations sur les coutumes espagnoles
+- Histoire et traditions
+- Guides d'intégration culturelle
+
+4.5 OUTILS PROFESSIONNELS
+
+CRÉATEUR DE CV:
+- Assistant étape par étape pour générer un curriculum vitae
+- Format Europass
+- Modèles professionnels (moderne, classique, minimaliste)
+- Exportation en PDF
+- Champs bilingues (espagnol/arabe)
+- Sections:
+  * Données personnelles
+  * Expérience professionnelle
+  * Éducation et formation
+  * Compétences personnelles
+  * Langues avec niveaux CECR
+
+COURS DE FORMATION PROFESSIONNELLE:
+- Cours de Cuisine
+- Cours d'Électricité
+- Cours de Plomberie
+- Cours de Menuiserie
+- Cours de Mécanique
+- Cours de Peinture
+- Cours de Maçonnerie
+- Cours de Soudure
+- Cours de Jardinage
+- Cours de Nettoyage
+- Cours d'Accueil Client
+- Cours de Serveur
+- Cours de Réceptionniste
+- Cours de Livreur
+- Cours d'Entrepôt
+- Cours de Cariste
+- Cours de Commerce
+- Cours de Boucherie
+- Cours de Boulangerie
+- Cours de Coiffure
+- Cours d'Esthétique
+- Cours de Soins aux Personnes Âgées
+- Cours de Manipulation d'Aliments
+- Cours de Sécurité au Travail
+- Cours d'Informatique
+- Cours d'Excel
+- Cours de Word
+- Cours d'Agriculture
+
+Chaque cours comprend:
+- Contenu théorique étendu
+- Guides pratiques
+- Liens vers ressources supplémentaires
+- Informations sur les certifications
+
+4.6 CONSEIL ET DÉMARCHES
+
+CONSEIL EN IMMIGRATION:
+- Formulaire bilingue de demande
+- Sélection du type de rendez-vous (présentiel ou téléphonique)
+- Envoi automatique des demandes
+- Suivi de l'état
+
+INFORMATIONS ADMINISTRATIVES:
+- Avocats en Immigration
+- Aides et ONG
+- Dossier Citoyen
+- Apprendre à Gérer les Papiers
+- Communauté et Information
+
+4.7 RESSOURCES CULTURELLES
+
+MUSIQUE:
+- Contenu sur la musique espagnole
+- Chansons et paroles
+
+THÉÂTRE:
+- Pièces de théâtre
+- Guides de lecture
+
+MUSÉES:
+- Informations sur les musées espagnols
+- Guides culturels
+
+CONTES POPULAIRES:
+- Récits traditionnels espagnols
+- Lecture textuelle avec audio
+- Description bilingue
+
+FÊTES ET TRADITIONS:
+- Calendrier des festivités
+- Explication des traditions
+
+4.8 GRAMMAIRE ET VOCABULAIRE
+
+GRAMMAIRE:
+- Leçons de grammaire par thèmes
+- Exercices pratiques
+- Explications bilingues
+
+VOCABULAIRE:
+- Listes thématiques de vocabulaire
+- Cartes mémoire
+- Exercices de révision
+
+VERBES:
+- Conjugaisons verbales
+- Temps verbaux
+- Exercices de pratique
+
+ADJECTIFS:
+- Listes d'adjectifs
+- Degrés de l'adjectif
+- Exercices
+
+SER ET ESTAR:
+- Explication des différences
+- Exercices pratiques
+- Cas d'usage
+
+4.9 ACTUALITÉS ET COMMUNAUTÉ
+
+ACTUALITÉS SUR L'IMMIGRATION:
+- Flux d'actualités mis à jour
+- Filtrage par catégories
+- Visualisation détaillée
+- Sources externes intégrées
+
+COMMUNAUTÉ:
+- Informations sur les communautés
+- Ressources partagées
+- Liens vers services
+
+
+================================================================================
+5. SYSTÈME DE PROGRESSION ET GAMIFICATION
+================================================================================
+
+5.1 SUIVI DE PROGRESSION
+
+- Progression par niveau (A1, A2, B1, B2)
+- Progression par unité dans chaque niveau
+- Indicateurs visuels de complétude
+- Statistiques d'avancement
+
+5.2 SYSTÈME DE DÉVERROUILLAGE
+
+- Seule la première unité est déverrouillée initialement
+- Chaque unité se déverrouille en complétant la précédente
+- Les niveaux se déverrouillent en réussissant le niveau précédent
+- Système d'inscription pour accéder aux niveaux supérieurs
+
+5.3 DIPLÔMES ET CERTIFICATIONS
+
+- Diplôme généré en complétant chaque niveau
+- Certificat de finalisation
+- Exportation de diplômes en PDF
+- Validation des réalisations
+
+5.4 TUTEUR VIRTUAL
+
+- Messages de bienvenue
+- Félicitations pour la progression
+- Rappels de pratique
+- Motivation et soutien
+- Messages bilingues (espagnol/arabe)
+
+
+================================================================================
+6. DESIGN ET EXPÉRIENCE UTILISATEUR
+================================================================================
+
+6.1 DESIGN VISUEL
+
+SCHÉMA DE COULEURS UNIFIÉ:
+- Couleur principale: #79A890 (vert émeraude)
+- Couleur secondaire: #9DC3AA (vert clair)
+- Dégradés: LinearGradient avec couleurs unifiées
+- Design cohérent dans toute l'application
+
+ÉLÉMENTS DE DESIGN:
+- Boutons avec dégradés
+- Icônes Ionicons
+- Typographie claire et lisible
+- Espacement cohérent
+- Animations douces
+
+6.2 INTERFACE BILINGUE
+
+- Tous les textes principaux en espagnol et arabe
+- Navigation bilingue
+- Instructions traduites
+- Support RTL (Right-to-Left) pour l'arabe
+
+6.3 ACCESSIBILITÉ
+
+- Tailles de police ajustables
+- Contraste adéquat
+- Navigation intuitive
+- Feedback visuel clair
+
+
+================================================================================
+7. GESTION DES DONNÉES ET STOCKAGE
+================================================================================
+
+7.1 STOCKAGE LOCAL
+
+AsyncStorage:
+- Progression de l'utilisateur par niveau
+- Unités complétées
+- Configurations utilisateur
+- Données d'inscription
+- Préférences de langue
+
+SQLite:
+- Base de données du dictionnaire
+- Recherche rapide de mots
+- Stockage hors ligne
+
+7.2 CONTEXTE DE PROGRESSION
+
+UserProgressContext:
+- Gestion globale de la progression
+- Synchronisation entre écrans
+- Mise à jour en temps réel
+- Persistance automatique
+
+7.3 SERVICES EXTERNES
+
+Firebase:
+- Authentification des utilisateurs
+- Stockage dans le cloud (futur)
+
+EmailJS:
+- Envoi de formulaires
+- Notifications par email
+
+Stripe:
+- Traitement des paiements
+- Abonnements (futur)
+
+
+================================================================================
+8. FONCTIONNALITÉS TECHNIQUES AVANCÉES
+================================================================================
+
+8.1 RECONNAISSANCE VOCALE
+
+- Reconnaissance de prononciation
+- Évaluation de l'expression orale
+- Feedback en temps réel
+- Intégration avec Web Speech API
+
+8.2 SYNTHÈSE VOCALE
+
+- Lecture de textes en espagnol
+- Prononciation des mots du dictionnaire
+- Audio des dialogues
+- Contrôle de vitesse et ton
+
+8.3 LECTURE VIDÉO
+
+- Vidéos éducatives intégrées
+- Contrôles de lecture
+- Synchronisation avec texte (karaoké)
+- Stockage local des vidéos
+
+8.4 GÉNÉRATION DE PDF
+
+- Exportation de CVs
+- Génération de diplômes
+- Partager des documents
+- Stockage local
+
+8.5 GESTION DE FICHIERS
+
+- Téléchargement de matériaux
+- Stockage local
+- Partager des fichiers
+- Gestion de l'espace
+
+
+================================================================================
+9. STRUCTURE DES FICHIERS PRINCIPAUX
+================================================================================
+
+app/
+├── index.tsx                    # Écran principal (Home)
+├── (tabs)/
+│   ├── SchoolScreen.tsx         # École Virtuelle
+│   ├── A1_Acceso/              # Niveau A1
+│   │   ├── index.tsx
+│   │   └── clases/
+│   │       ├── Unidad1.tsx ... Unidad7.tsx
+│   │       ├── ExamenFinal.tsx
+│   │       ├── ExpresionOral.tsx
+│   │       └── ExpresionEscrita.tsx
+│   ├── A2_Plataforma/          # Niveau A2
+│   │   ├── index.tsx
+│   │   └── clases/
+│   │       ├── Unidad1.tsx ... Unidad10.tsx
+│   │       └── ...
+│   ├── B1_Umbral/              # Niveau B1
+│   │   ├── index.tsx
+│   │   └── clases/
+│   │       ├── Relaciones.tsx
+│   │       ├── Alimentacion.tsx
+│   │       ├── Trabajo.tsx
+│   │       └── ... (27 unités)
+│   ├── B2_Avanzado/            # Niveau B2
+│   │   ├── index.tsx
+│   │   └── clases/
+│   │       └── ... (19 unités)
+│   ├── FoneticaMenuScreen.tsx
+│   ├── FoneticaVocalesScreen.tsx
+│   ├── FoneticaPronunciacionScreen.tsx
+│   ├── FoneticaJuegoReconocimientoScreen.tsx
+│   ├── CafeLiterarioScreen.tsx
+│   ├── JuegosDeTareasScreen.tsx
+│   ├── DiccionarioScreen.tsx
+│   ├── BibliotecaDigitalScreen.tsx
+│   ├── CulturaGeneralScreen.tsx
+│   ├── CreadorCVScreen.tsx
+│   ├── AsesoriaScreen.tsx
+│   └── ... (plus d'écrans)
+
+components/
+├── EjerciciosInteractivos.tsx   # Composant d'exercices
+├── UnitMeta.tsx                 # Métadonnées d'unités
+└── ... (plus de composants)
+
+contexts/
+└── UserProgressContext.tsx      # Contexte de progression global
+
+utils/
+├── unitProgress.ts              # Gestion de progression par unité
+├── userDatabase.ts              # Base de données d'utilisateurs
+└── ... (plus d'utilitaires)
+
+services/
+├── userService.ts               # Service d'utilisateurs
+├── newsService.ts               # Service d'actualités
+└── ... (plus de services)
+
+
+================================================================================
+10. FLUX UTILISATEUR PRINCIPAUX
+================================================================================
+
+10.1 FLUX D'APPRENTISSAGE
+
+1. Utilisateur accède à l'application
+2. Navigue vers "École Virtuelle"
+3. Sélectionne un niveau (A1, A2, B1, B2)
+4. Accède à la première unité déverrouillée
+5. Étudie le contenu de l'unité:
+   - Lit le vocabulaire
+   - Écoute les dialogues
+   - Complète les exercices
+6. Marque l'unité comme terminée
+7. L'unité suivante se déverrouille
+8. Répète le processus jusqu'à compléter toutes les unités
+9. Passe l'examen final
+10. Obtient le diplôme du niveau
+
+10.2 FLUX DE CRÉATION DE CV
+
+1. Utilisateur accède à "Créateur de CV"
+2. Complète les données personnelles (Étape 1)
+3. Ajoute l'expérience professionnelle (Étape 2)
+4. Ajoute l'éducation et la formation (Étape 3)
+5. Ajoute les compétences personnelles (Étape 4)
+6. Consulte l'aperçu
+7. Exporte en PDF
+8. Partage ou sauvegarde le CV
+
+10.3 FLUX DE CONSEIL
+
+1. Utilisateur accède à "Conseil"
+2. Complète le formulaire bilingue
+3. Sélectionne le type de rendez-vous
+4. Envoie la demande
+5. Reçoit la confirmation
+6. Attend le contact du conseiller
+
+10.4 FLUX DE JEUX
+
+1. Utilisateur accède à "Jeux de Tâches"
+2. Sélectionne un jeu
+3. Joue et apprend
+4. Voit le score
+5. Peut répéter ou changer de jeu
+
+
+================================================================================
+11. CARACTÉRISTIQUES SPÉCIALES
+================================================================================
+
+11.1 SYSTÈME D'INSCRIPTION
+
+- Inscription aux niveaux A1-A2
+- Inscription aux niveaux B1-B2
+- Déverrouillage automatique lors de l'inscription
+- Suivi de l'état d'inscription
+
+11.2 SYSTÈME D'ESSAI (TRIAL)
+
+- Période d'essai initiale
+- Vérification d'installation
+- Accès limité sans vérification
+- Intégration avec TikTok pour vérification (optionnel)
+
+11.3 NOTIFICATIONS
+
+- Rappels de pratique
+- Notifications de progression
+- Alertes de nouvelles unités
+- Notifications de réalisations
+
+11.4 PARTAGER ET EXPORTER
+
+- Partager la progression
+- Exporter les diplômes
+- Partager les CVs
+- Partager les enregistrements vocaux
+
+
+================================================================================
+12. EXIGENCES TECHNIQUES
+================================================================================
+
+PLATEFORMES SUPPORTÉES:
+- Android (version minimale: API 21)
+- iOS (version minimale: iOS 13)
+
+EXIGENCES DU DISPOSITIF:
+- Connexion Internet (pour certaines fonctionnalités)
+- Permissions de microphone (pour reconnaissance vocale)
+- Permissions de stockage (pour téléchargements)
+- Espace de stockage: ~100MB minimum
+
+DÉPENDANCES EXTERNES:
+- Services Firebase (optionnel)
+- API d'actualités (pour flux d'actualités)
+- Services de paiement Stripe (optionnel)
+
+
+================================================================================
+13. AMÉLIORATIONS ET EXPANSIONS FUTURES
+================================================================================
+
+FONCTIONNALITÉS PRÉVUES:
+- Niveaux C1 et C2 (avancé et maîtrise)
+- Système de chat en temps réel
+- Communauté d'utilisateurs
+- Forums de discussion
+- Système de réalisations et badges
+- Mode hors ligne complet
+- Synchronisation dans le cloud
+- Multilingue supplémentaire (français, anglais)
+- Intégration avec réseaux sociaux
+- Système de tutorat en direct
+- Marketplace de ressources éducatives
+
+
+================================================================================
+14. SUPPORT ET MAINTENANCE
+================================================================================
+
+MISES À JOUR:
+- Mises à jour régulières du contenu
+- Correction d'erreurs
+- Améliorations de performance
+- Nouvelles fonctionnalités
+
+SUPPORT:
+- Documentation technique
+- Guides utilisateur
+- FAQ (Questions fréquentes)
+- Canal de contact
+
+
+================================================================================
+15. CONCLUSION
+================================================================================
+
+L'Académie des Immigrants est une application complète et robuste conçue pour 
+faciliter l'apprentissage de l'espagnol et l'intégration des personnes migrantes 
+en Espagne. Avec plus de 60 unités éducatives, de multiples ressources 
+culturelles, des outils professionnels et un système de progression gamifié, 
+elle offre une expérience d'apprentissage intégrale et personnalisée.
+
+L'application combine une technologie moderne (React Native, Expo) avec un 
+contenu éducatif de qualité et une interface bilingue intuitive, rendant 
+l'apprentissage de l'espagnol accessible, efficace et agréable pour tous les 
+utilisateurs.
+
+================================================================================
+FIN DU DOCUMENT
+================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

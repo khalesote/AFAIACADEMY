@@ -1,0 +1,10 @@
+def useExpoModules() {
+    def projectRoot = rootProject.projectDir.parentFile
+    def expoModules = new File(projectRoot, "node_modules/expo/android")
+    if (expoModules.exists()) {
+        include ':expo'
+        project(':expo').projectDir = expoModules
+    }
+}
+
+ext.useExpoModules = { useExpoModules() } 

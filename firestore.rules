@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Reglas para la colección de usuarios
+    match /users/{userId} {
+      // Permitir lectura a todos (temporalmente para desarrollo)
+      allow read: if true;
+      
+      // Permitir crear documentos nuevos (necesario para matrículas sin autenticación)
+      allow create: if true;
+      
+      // Permitir actualización a todos (temporalmente para desarrollo)
+      // En producción, deberías restringir esto
+      allow update: if true;
+      
+      // Permitir eliminación solo si el usuario está autenticado
+      allow delete: if request.auth != null;
+    }
+    
+    // Reglas para códigos de acceso usados
+    match /access_codes_used/{code} {
+      // Permitir lectura a todos (necesario para validar códigos durante matrícula)
+      allow read: if true;
+      
+      // Permitir crear documentos nuevos (la app verifica si ya existe antes de crear)
+      allow create: if true;
+      
+      // No permitir actualización (los códigos usados son inmutables)
+      allow update: if false;
+      
+      // Permitir eliminación solo para administradores (reset de códigos)
+      // En producción, deberías restringir esto más
+      allow delete: if true; // Temporalmente permitido para reset
+    }
+    
+    // Reglas para códigos válidos (si se usa esta colección)
+    match /access_codes_valid/{code} {
+      // Permitir lectura a todos (necesario para validar códigos)
+      allow read: if true;
+      
+      // Permitir crear y actualizar (para administración)
+      allow create, update: if true;
+      
+      // Permitir eliminación (para administración)
+      allow delete: if true;
+    }
+    
+    // Reglas para otras colecciones
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

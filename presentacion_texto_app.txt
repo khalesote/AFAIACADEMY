@@ -1,0 +1,115 @@
+ACADEMIA DE INMIGRANTES - PRESENTACIÓN
+
+¿QUÉ ES LA ACADEMIA DE INMIGRANTES?
+
+La Academia de Inmigrantes es una aplicación móvil innovadora diseñada para facilitar el aprendizaje del español como lengua extranjera. Nuestro objetivo principal es proporcionar una herramienta educativa integral que combine el aprendizaje del idioma español con la comprensión de la cultura y sociedad española, facilitando la integración de inmigrantes en España.
+
+NUESTRA MISIÓN
+
+Ayudar a los inmigrantes a dominar el idioma español de manera efectiva y divertida, proporcionándoles las herramientas necesarias para comunicarse con confianza en situaciones cotidianas y profesionales.
+
+SERVICIOS QUE OFRECEMOS
+
+1. ESCUELA VIRTUAL COMPLETA
+   - 4 niveles de aprendizaje progresivo (A1, A2, B1, B2)
+   - 32 unidades temáticas completas
+   - 160 ejercicios interactivos
+   - Contenido bilingüe español-árabe
+   - Aprendizaje a tu propio ritmo
+
+2. NIVELES DE APRENDIZAJE
+
+   NIVEL A1 - ACCESO (8 unidades completas)
+   - Vocabulario básico para situaciones cotidianas
+   - Gramática fundamental del español
+   - Diálogos simples y expresiones básicas
+   - Ejercicios interactivos para principiantes
+
+   NIVEL A2 - PLATAFORMA (8 unidades completas)
+   - Expresiones cotidianas y conversaciones básicas
+   - Gramática intermedia
+   - Vocabulario ampliado para diferentes contextos
+   - Ejercicios más avanzados
+
+   NIVEL B1 - UMBRAL (8 unidades completas)
+   - Comunicación independiente en español
+   - Gramática compleja y estructuras avanzadas
+   - Diálogos avanzados para situaciones profesionales
+   - Ejercicios especializados
+
+   NIVEL B2 - AVANZADO (8 unidades en desarrollo)
+   - Comunicación fluida y natural
+   - Gramática avanzada y expresiones idiomáticas
+   - Expresión compleja y argumentación
+   - Ejercicios de nivel superior
+
+3. TIPOS DE EJERCICIOS POR UNIDAD
+   - Opción múltiple: Para evaluar comprensión
+   - Rellenar huecos: Para practicar vocabulario y gramática
+   - Expresión escrita: Para desarrollar habilidades de escritura
+   - Comprensión lectora: Para mejorar la lectura
+   - Relacionar conceptos: Para asociar ideas y vocabulario
+
+4. CARACTERÍSTICAS TÉCNICAS
+   - Aplicación móvil desarrollada con React Native y Expo
+   - Interfaz completamente bilingüe (español-árabe)
+   - Diseño responsivo y navegación intuitiva
+   - Funcionalidad offline (sin necesidad de internet)
+   - Sistema de usuarios con registro y autenticación
+   - Seguimiento del progreso personal
+
+5. CONTENIDO TEMÁTICO
+   Las unidades cubren temas relevantes para la vida cotidiana:
+   - Transporte y movilidad
+   - Trabajo y empleo
+   - Salud y bienestar
+   - Estudios y educación
+   - Cultura y sociedad
+   - Tecnología y comunicación
+   - Viajes y turismo
+   - Deportes y ocio
+
+6. BENEFICIOS PARA LOS USUARIOS
+   - Aprendizaje estructurado y progresivo
+   - Flexibilidad de horarios y ritmo personal
+   - Integración cultural además del idioma
+   - Práctica interactiva y entretenida
+   - Acceso desde cualquier dispositivo móvil
+   - Contenido adaptado a necesidades reales
+
+7. PÚBLICO OBJETIVO
+   - Inmigrantes que desean aprender español
+   - Personas que necesitan integrarse en la sociedad española
+   - Estudiantes de español como lengua extranjera
+   - Profesionales que requieren el idioma para su trabajo
+   - Cualquier persona interesada en la cultura española
+
+8. DIFERENCIALES DE NUESTRA APLICACIÓN
+   - Enfoque específico en la integración de inmigrantes
+   - Contenido bilingüe español-árabe
+   - Ejercicios prácticos y contextualizados
+   - Información cultural y social de España
+   - Metodología adaptada a necesidades reales
+   - Interfaz accesible y fácil de usar
+
+9. FUTURAS MEJORAS PLANIFICADAS
+   - Completar el nivel B2 avanzado
+   - Sistema de evaluación y certificaciones
+   - Gamificación con puntos y logros
+   - Contenido multimedia (audio y video)
+   - Comunidad de usuarios y foros
+   - Analytics detallado del progreso
+
+10. INFORMACIÓN DE CONTACTO
+    - Email: info@academiadeinmigrantes.es
+    - Teléfono: +34 XXX XXX XXX
+    - Dirección: [Dirección de la academia]
+    - Horario: Lunes a Viernes: 9:00 - 18:00
+
+¿POR QUÉ ELEGIR LA ACADEMIA DE INMIGRANTES?
+
+Nuestra aplicación no solo te enseña español, sino que te ayuda a comprender la cultura y sociedad española. Con un método estructurado, ejercicios interactivos y contenido relevante para tu vida diaria, tendrás todas las herramientas necesarias para dominar el idioma y integrarte exitosamente en España.
+
+¡Únete a la Academia de Inmigrantes y descubre una nueva forma de aprender español!
+
+

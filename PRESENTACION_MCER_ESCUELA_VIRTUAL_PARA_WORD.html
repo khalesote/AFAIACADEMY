@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escuela Virtual - Cumplimiento MCER</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+        @page {
+            size: A4;
+            margin: 2.5cm;
+        }
+        
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 24pt;
+            margin: 20pt 0 15pt 0;
+            text-align: center;
+            border-bottom: 3pt solid #764ba2;
+            padding-bottom: 10pt;
+            page-break-after: avoid;
+        }
+
+        h2 {
+            color: #764ba2;
+            font-size: 18pt;
+            margin: 25pt 0 15pt 0;
+            border-left: 4pt solid #667eea;
+            padding-left: 10pt;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            color: #667eea;
+            font-size: 14pt;
+            margin: 15pt 0 10pt 0;
+            page-break-after: avoid;
+        }
+
+        h4 {
+            color: #d63031;
+            font-size: 12pt;
+            margin: 12pt 0 8pt 0;
+            page-break-after: avoid;
+        }
+
+        .intro {
+            text-align: center;
+            font-size: 12pt;
+            color: #555;
+            margin: 15pt 0;
+        }
+
+        .mcer-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 6pt 12pt;
+            border-radius: 15pt;
+            font-weight: bold;
+            margin: 5pt;
+            font-size: 10pt;
+        }
+
+        .level-section {
+            margin: 20pt 0;
+            padding: 15pt;
+            border: 1pt solid #ddd;
+            border-left: 5pt solid;
+            page-break-inside: avoid;
+        }
+
+        .level-section.A1 { border-left-color: #4CAF50; background: #f1f8f4; }
+        .level-section.A2 { border-left-color: #2196F3; background: #f0f7ff; }
+        .level-section.B1 { border-left-color: #FF9800; background: #fff8f0; }
+        .level-section.B2 { border-left-color: #9C27B0; background: #faf5ff; }
+
+        .level-title {
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 8pt;
+            color: #333;
+        }
+
+        .level-subtitle {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 12pt;
+            font-size: 11pt;
+        }
+
+        .check-list {
+            list-style: none;
+            padding: 0;
+            margin: 10pt 0;
+        }
+
+        .check-list li {
+            padding: 5pt 0;
+            padding-left: 25pt;
+            position: relative;
+            font-size: 10.5pt;
+        }
+
+        .check-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 12pt;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20pt 0;
+        }
+
+        .stats-table td {
+            border: 1pt solid #667eea;
+            padding: 12pt;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .stats-table .stat-number {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stats-table .stat-label {
+            font-size: 10pt;
+            color: #666;
+        }
+
+        .competence-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15pt 0;
+        }
+
+        .competence-table th {
+            background: #667eea;
+            color: white;
+            padding: 8pt;
+            text-align: left;
+            font-size: 10pt;
+            font-weight: bold;
+        }
+
+        .competence-table td {
+            border: 1pt solid #ddd;
+            padding: 8pt;
+            font-size: 10pt;
+        }
+
+        .compliance-bar-container {
+            background: #e0e0e0;
+            height: 20pt;
+            border-radius: 5pt;
+            margin: 5pt 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .compliance-fill {
+            height: 100%;
+            background: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 9pt;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            border-left: 4pt solid #e17055;
+            padding: 15pt;
+            margin: 15pt 0;
+            border-radius: 5pt;
+        }
+
+        .competence-grid {
+            display: table;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 10pt;
+            margin: 15pt 0;
+        }
+
+        .competence-card {
+            display: table-cell;
+            background: #f8f9fa;
+            border: 1pt solid #ddd;
+            border-top: 4pt solid #667eea;
+            padding: 12pt;
+            vertical-align: top;
+            width: 50%;
+        }
+
+        .competence-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10pt;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20pt;
+            margin-top: 30pt;
+            border-top: 2pt solid #667eea;
+            color: #666;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15pt 0;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20pt 0;
+        }
+
+        .summary-table td {
+            border: 1pt solid #ddd;
+            padding: 10pt;
+            text-align: center;
+        }
+
+        .summary-table .level-name {
+            font-weight: bold;
+            font-size: 12pt;
+            background: #f8f9fa;
+        }
+
+        .summary-table .compliance-percent {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Portada -->
+    <div style="text-align: center; padding: 40pt 0;">
+        <h1 style="border: none; font-size: 28pt; margin-bottom: 20pt;">🏫 Escuela Virtual</h1>
+        <h2 style="text-align: center; border: none; margin-top: 20pt; font-size: 20pt;">
+            Cumplimiento con el Marco Común Europeo de Referencia (MCER)
+        </h2>
+        <div class="intro" style="margin-top: 30pt;">
+            <p style="font-size: 14pt; margin: 20pt 0;">
+                Presentación del contenido educativo y su alineación con los estándares internacionales del MCER
+            </p>
+            <div style="margin: 30pt 0;">
+                <span class="mcer-badge">A1 - Acceso</span>
+                <span class="mcer-badge">A2 - Plataforma</span>
+                <span class="mcer-badge">B1 - Umbral</span>
+                <span class="mcer-badge">B2 - Avanzado</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Introducción al MCER -->
+    <h2>📚 ¿Qué es el MCER?</h2>
+    <p style="text-align: justify; font-size: 11pt; line-height: 1.8; margin: 15pt 0;">
+        El <strong>Marco Común Europeo de Referencia para las Lenguas (MCER)</strong> es un estándar internacional 
+        que define las competencias lingüísticas en diferentes niveles. Nuestra Escuela Virtual está diseñada 
+        para cumplir con estas recomendaciones, garantizando una educación de calidad reconocida internacionalmente.
+    </p>
+    
+    <table class="stats-table">
+        <tr>
+            <td>
+                <div class="stat-number">4</div>
+                <div class="stat-label">Niveles MCER</div>
+            </td>
+            <td>
+                <div class="stat-number">5</div>
+                <div class="stat-label">Competencias</div>
+            </td>
+            <td>
+                <div class="stat-number">53</div>
+                <div class="stat-label">Unidades Totales</div>
+            </td>
+            <td>
+                <div class="stat-number">70-75%</div>
+                <div class="stat-label">Cumplimiento</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Competencias del MCER -->
+    <h2>🎯 Las 5 Competencias del MCER</h2>
+    <table class="competence-grid" style="display: table;">
+        <tr>
+            <td class="competence-card">
+                <div class="competence-title">👂 Comprensión Auditiva</div>
+                <p style="font-size: 10pt;">Capacidad de entender el lenguaje hablado en diferentes contextos y velocidades.</p>
+            </td>
+            <td class="competence-card">
+                <div class="competence-title">📖 Comprensión de Lectura</div>
+                <p style="font-size: 10pt;">Capacidad de entender textos escritos de diferentes tipos y complejidades.</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="competence-card">
+                <div class="competence-title">💬 Interacción Oral</div>
+                <p style="font-size: 10pt;">Capacidad de participar en conversaciones y diálogos de manera efectiva.</p>
+            </td>
+            <td class="competence-card">
+                <div class="competence-title">🗣️ Producción Oral</div>
+                <p style="font-size: 10pt;">Capacidad de expresarse oralmente de manera clara y coherente.</p>
+            </td>
+        </tr>
+        <tr>
+            <td class="competence-card" colspan="2">
+                <div class="competence-title">✍️ Producción Escrita</div>
+                <p style="font-size: 10pt;">Capacidad de escribir textos de diferentes tipos y propósitos.</p>
+            </td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Nivel A1 -->
+    <h2>🟢 Nivel A1 - Acceso</h2>
+    <div class="level-section A1">
+        <div class="level-title">A1 - Acceso</div>
+        <div class="level-subtitle">Puedes entender y usar expresiones cotidianas y frases básicas</div>
+        
+        <h3>Estructura del Curso:</h3>
+        <ul class="check-list">
+            <li>7 unidades didácticas secuenciales</li>
+            <li>Alfabeto español y fonética</li>
+            <li>Sistema de progreso por unidades</li>
+            <li>Módulo de Expresión Oral con reconocimiento de voz</li>
+            <li>Módulo de Expresión Escrita</li>
+            <li>Examen final integrado</li>
+            <li>Módulos especializados: Formularios y Documentos, Letreros y Carteles</li>
+        </ul>
+
+        <h3>Cumplimiento por Competencia:</h3>
+        <table class="competence-table">
+            <tr>
+                <th>Competencia</th>
+                <th>Cumplimiento</th>
+            </tr>
+            <tr>
+                <td>Comprensión Auditiva</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 70%;">70%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Comprensión de Lectura</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 75%;">75%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Interacción Oral</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 85%;">85%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Producción Oral</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 80%;">80%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Producción Escrita</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 75%;">75%</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Nivel A2 -->
+    <h2>🟡 Nivel A2 - Plataforma</h2>
+    <div class="level-section A2">
+        <div class="level-title">A2 - Plataforma</div>
+        <div class="level-subtitle">Puedes comunicarte en situaciones simples y rutinarias</div>
+        
+        <h3>Estructura del Curso:</h3>
+        <ul class="check-list">
+            <li>10 unidades didácticas completas</li>
+            <li>Módulo de Gramática avanzada</li>
+            <li>Módulo de Vocabulario ampliado</li>
+            <li>Expresión Oral con ejercicios de descripción</li>
+            <li>Expresión Escrita con práctica de notas y mensajes</li>
+            <li>Examen final y sistema de diplomas</li>
+        </ul>
+
+        <h3>Cumplimiento por Competencia:</h3>
+        <table class="competence-table">
+            <tr>
+                <th>Competencia</th>
+                <th>Cumplimiento</th>
+            </tr>
+            <tr>
+                <td>Comprensión Auditiva</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 65%;">65%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Comprensión de Lectura</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 70%;">70%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Interacción Oral</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 75%;">75%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Producción Oral</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 70%;">70%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Producción Escrita</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 70%;">70%</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Nivel B1 -->
+    <h2>🟠 Nivel B1 - Umbral</h2>
+    <div class="level-section B1">
+        <div class="level-title">B1 - Umbral</div>
+        <div class="level-subtitle">Puedes manejar la mayoría de las situaciones durante viajes</div>
+        
+        <h3>Estructura del Curso:</h3>
+        <ul class="check-list">
+            <li><strong>20 unidades temáticas</strong> (excelente cobertura):</li>
+            <li>Relaciones, Trabajo, Estudios, Cultura</li>
+            <li>Medios de Comunicación, Salud, Medio Ambiente</li>
+            <li>Tecnología, Turismo, Vida Cotidiana</li>
+            <li>Alimentación, Compras, Deportes, Experiencias</li>
+            <li>Fiestas y Tradiciones, Problemas Sociales</li>
+            <li>Transporte, Vivienda, Voluntariado</li>
+            <li>Módulo de Gramática compleja</li>
+            <li>Expresión Oral y Escrita avanzadas</li>
+            <li>Examen final completo</li>
+        </ul>
+
+        <h3>Cumplimiento por Competencia:</h3>
+        <table class="competence-table">
+            <tr>
+                <th>Competencia</th>
+                <th>Cumplimiento</th>
+            </tr>
+            <tr>
+                <td>Comprensión Auditiva</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 70%;">70%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Comprensión de Lectura</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 75%;">75%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Interacción Oral</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 75%;">75%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Producción Oral</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 75%;">75%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Producción Escrita</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 80%;">80%</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Nivel B2 -->
+    <h2>🔴 Nivel B2 - Avanzado</h2>
+    <div class="level-section B2">
+        <div class="level-title">B2 - Avanzado</div>
+        <div class="level-subtitle">Puedes interactuar con fluidez con hablantes nativos</div>
+        
+        <h3>Estructura del Curso:</h3>
+        <ul class="check-list">
+            <li><strong>16 unidades temáticas avanzadas</strong> (excelente cobertura):</li>
+            <li>Literatura Española, Mundo Laboral, Historia de España</li>
+            <li>Economía y Consumo, Cultura y Arte, Arte y Teatro</li>
+            <li>Ciencia y Tecnología, Actualidad Internacional</li>
+            <li>Debates Sociales, Estudios Superiores</li>
+            <li>Relaciones Interculturales, Salud Mental</li>
+            <li>Civilización y Patrimonio, Liderazgo y Gestión</li>
+            <li>Poesía y Análisis, Viajes y Turismo</li>
+            <li>Expresión Oral y Escrita de nivel avanzado</li>
+            <li>Examen final y sistema de diplomas</li>
+        </ul>
+
+        <h3>Cumplimiento por Competencia:</h3>
+        <table class="competence-table">
+            <tr>
+                <th>Competencia</th>
+                <th>Cumplimiento</th>
+            </tr>
+            <tr>
+                <td>Comprensión Auditiva</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 70%;">70%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Comprensión de Lectura</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 75%;">75%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Interacción Oral</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 75%;">75%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Producción Oral</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 75%;">75%</div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Producción Escrita</td>
+                <td>
+                    <div class="compliance-bar-container">
+                        <div class="compliance-fill" style="width: 75%;">75%</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Fortalezas -->
+    <h2>💪 Fortalezas de la Escuela Virtual</h2>
+    
+    <table style="width: 100%; border-collapse: separate; border-spacing: 10pt;">
+        <tr>
+            <td style="background: #f8f9fa; border: 1pt solid #ddd; border-top: 4pt solid #667eea; padding: 12pt; vertical-align: top; width: 50%;">
+                <div class="competence-title">📚 Estructura Sólida</div>
+                <ul class="check-list">
+                    <li>Progresión clara entre niveles</li>
+                    <li>Sistema de unidades secuenciales</li>
+                    <li>Módulos de expresión oral y escrita en todos los niveles</li>
+                    <li>Seguimiento de progreso individualizado</li>
+                </ul>
+            </td>
+            <td style="background: #f8f9fa; border: 1pt solid #ddd; border-top: 4pt solid #667eea; padding: 12pt; vertical-align: top; width: 50%;">
+                <div class="competence-title">🎯 Cobertura Temática</div>
+                <ul class="check-list">
+                    <li>Excelente cobertura en B1 y B2 (36 unidades)</li>
+                    <li>Temas relevantes y actuales</li>
+                    <li>Variedad de contextos (trabajo, estudios, cultura, etc.)</li>
+                    <li>Contenido adaptado a necesidades de inmigrantes</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td style="background: #f8f9fa; border: 1pt solid #ddd; border-top: 4pt solid #667eea; padding: 12pt; vertical-align: top;">
+                <div class="competence-title">🔧 Tecnología Avanzada</div>
+                <ul class="check-list">
+                    <li>Reconocimiento de voz implementado</li>
+                    <li>Sistema de progreso y seguimiento</li>
+                    <li>Interfaz bilingüe (español/árabe)</li>
+                    <li>Evaluación automática</li>
+                </ul>
+            </td>
+            <td style="background: #f8f9fa; border: 1pt solid #ddd; border-top: 4pt solid #667eea; padding: 12pt; vertical-align: top;">
+                <div class="competence-title">📊 Sistema de Evaluación</div>
+                <ul class="check-list">
+                    <li>Exámenes finales en todos los niveles</li>
+                    <li>Sistema de diplomas</li>
+                    <li>Seguimiento de progreso detallado</li>
+                    <li>Evaluación de competencias específicas</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Resumen de Cumplimiento -->
+    <h2>📊 Resumen de Cumplimiento MCER</h2>
+    
+    <table class="summary-table">
+        <tr>
+            <td class="level-name" style="background: #f1f8f4; border-left: 5pt solid #4CAF50;">A1 - Acceso</td>
+            <td class="compliance-percent" style="color: #4CAF50;">70%</td>
+            <td style="font-size: 10pt;">7 unidades completas<br/>Expresión oral: 85%<br/>Expresión escrita: 75%</td>
+        </tr>
+        <tr>
+            <td class="level-name" style="background: #f0f7ff; border-left: 5pt solid #2196F3;">A2 - Plataforma</td>
+            <td class="compliance-percent" style="color: #2196F3;">65%</td>
+            <td style="font-size: 10pt;">10 unidades completas<br/>Módulos especializados<br/>Sistema de diplomas</td>
+        </tr>
+        <tr>
+            <td class="level-name" style="background: #fff8f0; border-left: 5pt solid #FF9800;">B1 - Umbral</td>
+            <td class="compliance-percent" style="color: #FF9800;">75%</td>
+            <td style="font-size: 10pt;">20 unidades temáticas<br/>Excelente cobertura<br/>Producción escrita: 80%</td>
+        </tr>
+        <tr>
+            <td class="level-name" style="background: #faf5ff; border-left: 5pt solid #9C27B0;">B2 - Avanzado</td>
+            <td class="compliance-percent" style="color: #9C27B0;">70%</td>
+            <td style="font-size: 10pt;">16 unidades avanzadas<br/>Temas complejos<br/>Nivel avanzado completo</td>
+        </tr>
+    </table>
+
+    <div class="highlight-box" style="margin-top: 20pt;">
+        <h4>🎯 Objetivo de Mejora</h4>
+        <p style="font-size: 11pt;">
+            Implementar las mejoras sugeridas para alcanzar un <strong>cumplimiento del 85-90%</strong> en todos los niveles, 
+            lo que permitiría ofrecer <strong>certificación oficial</strong> según estándares MCER.
+        </p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Conclusión -->
+    <h2>✅ Conclusión</h2>
+    
+    <p style="text-align: justify; font-size: 11pt; margin: 15pt 0; line-height: 1.8;">
+        La <strong>Escuela Virtual</strong> tiene una <strong>base sólida</strong> y cumple con <strong>muchos aspectos</strong> 
+        del Marco Común Europeo de Referencia (MCER), especialmente en:
+    </p>
+    
+    <ul class="check-list" style="font-size: 11pt; margin: 15pt 0;">
+        <li>Estructura y progresión de niveles (A1, A2, B1, B2)</li>
+        <li>Cobertura temática (53 unidades en total)</li>
+        <li>Implementación tecnológica (reconocimiento de voz, seguimiento de progreso)</li>
+        <li>Sistema de evaluación (exámenes finales, diplomas)</li>
+        <li>Competencias específicas (expresión oral y escrita en todos los niveles)</li>
+    </ul>
+
+    <div class="highlight-box" style="margin: 20pt 0;">
+        <h4>🌟 Valor Añadido</h4>
+        <p style="font-size: 11pt;">
+            La Escuela Virtual no solo cumple con los estándares MCER, sino que además ofrece:
+        </p>
+        <ul class="check-list" style="margin-top: 10pt;">
+            <li>Contenido bilingüe (español/árabe) para facilitar el aprendizaje</li>
+            <li>Enfoque específico en necesidades de inmigrantes</li>
+            <li>Tecnología de reconocimiento de voz para práctica oral</li>
+            <li>Sistema de progreso individualizado</li>
+            <li>Acceso desde dispositivos móviles</li>
+        </ul>
+    </div>
+
+    <p style="font-size: 12pt; margin-top: 25pt; text-align: center; font-weight: bold; color: #667eea;">
+        La Escuela Virtual está preparada para ofrecer una educación de calidad 
+        alineada con los estándares internacionales del MCER.
+    </p>
+
+    <!-- Footer -->
+    <div class="footer">
+        <h3 style="color: #667eea; margin-bottom: 8pt; font-size: 14pt;">Academia de Inmigrantes</h3>
+        <p style="font-size: 11pt;">Escuela Virtual - Cumplimiento MCER</p>
+        <p style="margin-top: 8pt; font-size: 10pt; color: #999;">© 2024 - Todos los derechos reservados</p>
+    </div>
+</body>
+</html>
+
