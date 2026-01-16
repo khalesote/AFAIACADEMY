@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const Stripe = require('stripe');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 const vision = require('@google-cloud/vision');
 const Tesseract = require('tesseract.js');
 const admin = require('firebase-admin');
@@ -121,6 +122,223 @@ app.use((req, res, next) => {
   });
   next();
 });
+
+// ============================================
+// ENDPOINTS CECABANK (TPV VIRTUAL)
+// ============================================
+
+app.post('/api/cecabank/ok', express.urlencoded({ extended: true }), (req, res) => {
+  try {
+    console.log('✅ Cecabank OK recibido');
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="UTF-8"><title>Pago Exitoso</title></head>
+      <body style="font-family: Arial, sans-serif; text-align:center; padding: 40px;">
+        <div style="font-size:48px;">✅</div>
+        <h1>Pago Procesado Correctamente</h1>
+        <p>Puedes cerrar esta ventana y volver a la aplicación.</p>
+      </body>
+      </html>
+    `);
+  } catch (error) {
+    console.error('❌ Error en Cecabank OK:', error);
+    res.status(500).send('Error procesando pago');
+  }
+});
+
+app.post('/api/cecabank/ko', express.urlencoded({ extended: true }), (req, res) => {
+  try {
+    console.log('❌ Cecabank KO recibido');
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="UTF-8"><title>Pago Fallido</title></head>
+      <body style="font-family: Arial, sans-serif; text-align:center; padding: 40px;">
+        <div style="font-size:48px;">❌</div>
+        <h1>Pago No Procesado</h1>
+        <p>Puedes cerrar esta ventana y volver a la aplicación.</p>
+      </body>
+      </html>
+    `);
+  } catch (error) {
+    console.error('❌ Error en Cecabank KO:', error);
+    res.status(500).send('Error procesando pago');
+  }
+});
+
+app.post('/api/cecabank/redirect', express.urlencoded({ extended: true }), async (req, res) => {
+  try {
+    const formData = req.body || {};
+
+    const requiredVars = [
+      'CECABANK_MERCHANT_ID',
+      'CECABANK_ACQUIRER_BIN',
+      'CECABANK_TERMINAL_ID',
+      'CECABANK_CLAVE',
+    ];
+    const missingVars = requiredVars.filter((v) => !process.env[v]);
+    if (missingVars.length) {
+      return res.status(500).send(`Faltan variables Cecabank: ${missingVars.join(', ')}`);
+    }
+
+    const requiredFields = [
+      'MerchantID', 'AcquirerBIN', 'TerminalID', 'Num_operacion',
+      'Importe', 'TipoMoneda', 'Exponente', 'Cifrado',
+      'URL_OK', 'URL_KO', 'Idioma', 'FechaOperacion',
+      'HoraOperacion', 'Firma'
+    ];
+    const missingFields = requiredFields.filter((f) => !formData[f]);
+    if (missingFields.length) {
+      return res.status(400).send(`Campos faltantes: ${missingFields.join(', ')}`);
+    }
+
+    const fechaOperacion = String(formData.FechaOperacion || '').trim();
+    const horaOperacion = String(formData.HoraOperacion || '').trim();
+
+    const importeNormalizado = String(formData.Importe || '').replace(/^0+/, '') || '0';
+    const referencia = String(formData.Num_operacion || '').trim();
+
+    if (formData.Cifrado === 'SHA256' || formData.Cifrado === 'HMAC') {
+      formData.Cifrado = 'HMAC_SHA256';
+    }
+
+    const firma = generateCecabankSignature(
+      formData.Num_operacion,
+      importeNormalizado,
+      fechaOperacion,
+      horaOperacion,
+      formData.URL_OK,
+      formData.URL_KO,
+      referencia
+    );
+
+    formData.Firma = firma;
+    formData.FechaOperacion = fechaOperacion;
+    formData.HoraOperacion = horaOperacion;
+    formData.Referencia = referencia;
+
+    const urlCecabank = getCecabankGatewayUrl();
+    const ordenCampos = [
+      'MerchantID',
+      'AcquirerBIN',
+      'TerminalID',
+      'Num_operacion',
+      'Importe',
+      'TipoMoneda',
+      'Exponente',
+      'Referencia',
+      'Cifrado',
+      'Firma',
+      'URL_OK',
+      'URL_KO',
+      'Idioma',
+      'FechaOperacion',
+      'HoraOperacion',
+      'Descripcion',
+      'Email',
+      'Nombre',
+    ];
+
+    const formFields = ordenCampos
+      .filter((campo) => (campo === 'URL_KO' ? formData.URL_KO !== undefined : formData[campo] !== undefined))
+      .map((campo) => {
+        const fieldName = campo === 'URL_KO' ? 'URL_NOK' : campo;
+        const value = String(formData[campo] || '');
+        const escapedKey = String(fieldName)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+        const escapedValue = value
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+        return `            <input type="hidden" name="${escapedKey}" value="${escapedValue}" />`;
+      })
+      .join('\n');
+
+    const html = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Redirigiendo a Cecabank...</title>
+    <style>
+      body { font-family: Arial, sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; background:#f5f5f5; }
+      .container { text-align:center; padding:20px; }
+      .spinner { border:4px solid #f3f3f3; border-top:4px solid #4CAF50; border-radius:50%; width:40px; height:40px; animation: spin 1s linear infinite; margin:20px auto; }
+      @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Redirigiendo al TPV de Cecabank...</h2>
+      <div class="spinner"></div>
+      <p>Por favor, espera mientras se procesa tu pago.</p>
+    </div>
+    <form id="cecabankForm" method="POST" action="${urlCecabank}" enctype="application/x-www-form-urlencoded" style="display:none;">
+${formFields}
+    </form>
+    <script>
+      (function(){
+        function submitForm(){ try { const f = document.getElementById('cecabankForm'); if (f) { f.submit(); } } catch(e) {} }
+        if (document.readyState === 'complete' || document.readyState === 'interactive') submitForm();
+        else document.addEventListener('DOMContentLoaded', submitForm);
+        setTimeout(submitForm, 100);
+      })();
+    </script>
+  </body>
+</html>`;
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+  } catch (error) {
+    console.error('❌ Error en Cecabank redirect:', error);
+    res.status(500).send('Error al redirigir a Cecabank');
+  }
+});
+
+function getCecabankGatewayUrl() {
+  const entorno = (process.env.CECABANK_ENTORNO || 'produccion').toLowerCase();
+  if (entorno === 'test' || entorno === 'testing' || entorno === 'sandbox') {
+    return 'https://tpv.ceca.es/tpvweb/tpv/compra.action';
+  }
+  return 'https://pgw.ceca.es/tpvweb/tpv/compra.action';
+}
+
+function generateCecabankSignature(numOperacion, importe, fecha, hora, urlOk, urlKo, referencia) {
+  const merchantId = String(process.env.CECABANK_MERCHANT_ID || '').trim();
+  const acquirerBin = String(process.env.CECABANK_ACQUIRER_BIN || '').trim();
+  const terminalId = String(process.env.CECABANK_TERMINAL_ID || '').trim();
+  const clave = String(process.env.CECABANK_CLAVE || '').trim();
+
+  if (!merchantId || !acquirerBin || !terminalId || !clave) {
+    throw new Error('CECABANK_* no configurado en backend');
+  }
+
+  const tipoMoneda = '978';
+  const exponente = '2';
+
+  const numOpStr = String(numOperacion || '').trim();
+  const importeStr = String(importe || '').trim();
+  const referenciaStr = String(referencia || numOpStr || '0').trim();
+
+  const cadenaFirma =
+    merchantId +
+    acquirerBin +
+    terminalId +
+    numOpStr +
+    importeStr +
+    tipoMoneda +
+    exponente +
+    String(urlOk || '').trim() +
+    String(urlKo || '').trim() +
+    referenciaStr +
+    clave;
+
+  return crypto.createHash('sha256').update(cadenaFirma, 'utf8').digest('hex');
+}
 
 // Configurar Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_123456789', {

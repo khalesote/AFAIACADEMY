@@ -13,20 +13,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUserProgress } from '@/contexts/UserProgressContext';
 import { useUser } from '@/contexts/UserContext';
 import AccessCodeInput from '../../components/AccessCodeInput';
-import StripePayment from '../../components/StripePayment';
+import CecabankPayment from '../../components/CecabankPayment';
 import { MaterialIcons } from '@expo/vector-icons';
 import { markAccessCodeAsUsed, initializeAccessCodes } from '../../utils/accessCodes';
+import { CECABANK_PRICES } from '../../config/cecabank';
 import { UserService } from '../../services/userService';
 import { auth } from '../../config/firebase';
 
-const ENROLLMENT_PRICES: Record<string, number> = {
-  MATRICULA_A1: 36,
-  MATRICULA_A2: 48,
-  MATRICULA_B1: 60,
-  MATRICULA_B2: 80,
-  MATRICULA_A1A2: 60,
-  MATRICULA_B1B2: 120,
-};
+const ENROLLMENT_PRICES: Record<string, number> = CECABANK_PRICES;
 
 // Definir la interfaz para los datos del formulario
 interface FormData {
@@ -64,6 +58,11 @@ export default function MatriculaScreen() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'payment' | 'code'>('payment');
+
+  const priceKey = `MATRICULA_${selectedLevel}` as keyof typeof ENROLLMENT_PRICES;
+  const amount = ENROLLMENT_PRICES[priceKey] || 0;
+  const operationType = `matricula-${selectedLevel.toLowerCase()}` as string;
+  const customerName = `${safeFormData.nombre} ${safeFormData.apellido1} ${safeFormData.apellido2}`.trim();
 
   useEffect(() => {
     if (selectedLevelParam) {
@@ -469,10 +468,15 @@ export default function MatriculaScreen() {
         {/* Proceso de pago o código */}
         {paymentMethod === 'payment' ? (
           <View style={styles.paymentContainer}>
-            <StripePayment
-              level={selectedLevel}
+            <CecabankPayment
+              operationType={operationType}
+              amount={amount}
+              description={`Matrícula ${selectedLevel}`}
+              customerEmail={safeFormData.email || undefined}
+              customerName={customerName || undefined}
               onPaymentSuccess={handlePaymentSuccess}
               onPaymentCancel={() => setPaymentMethod('code')}
+              onPaymentError={(error) => Alert.alert('Error de pago', error)}
             />
             {isLoading && (
               <ActivityIndicator size="small" color="#4CAF50" style={{ marginTop: 10 }} />
