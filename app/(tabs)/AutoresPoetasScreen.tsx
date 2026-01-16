@@ -6,7 +6,7 @@ const autoresPoetas = [
   {
     nombre: "Miguel de Cervantes",
     nombreAr: "ميغيل دي ثيربانتس",
-    imagen: require("../assets/autores/cervantes.jpg"),
+    imagen: require("../../assets/autores/cervantes.jpg"),
     biografia:
       "Considerado el mayor escritor en lengua española. Autor de Don Quijote de la Mancha. Su obra marcó el inicio de la novela moderna.",
     biografiaAr:
@@ -27,7 +27,7 @@ const autoresPoetas = [
   {
     nombre: "Gabriel García Márquez",
     nombreAr: "غابرييل غارسيا ماركيز",
-    imagen: require("../assets/autores/garcia_marquez.jpg"),
+    imagen: require("../../assets/autores/garcia_marquez.jpg"),
     biografia:
       "Escritor colombiano, Premio Nobel de Literatura en 1982. Máximo exponente del realismo mágico latinoamericano.",
     biografiaAr:
@@ -41,14 +41,14 @@ const autoresPoetas = [
   },
   {
     nombre: "Federico García Lorca",
-    imagen: require("../assets/autores/lorca.jpg"),
+    imagen: require("../../assets/autores/lorca.jpg"),
     biografia:
       "Poeta y dramaturgo andaluz, figura clave de la Generación del 27. Su obra destaca por su simbolismo y compromiso social.",
     obras: ["Bodas de sangre", "Romancero gitano", "La casa de Bernarda Alba"],
   },
   {
     nombre: "Pablo Neruda",
-    imagen: require("../assets/autores/neruda.jpeg"),
+    imagen: require("../../assets/autores/neruda.jpeg"),
     biografia:
       "Poeta chileno, Premio Nobel de Literatura en 1971. Conocido por su poesía apasionada y social.",
     obras: [
@@ -59,7 +59,7 @@ const autoresPoetas = [
   },
   {
     nombre: "Jorge Luis Borges",
-    imagen: require("../assets/autores/borges.jpg"),
+    imagen: require("../../assets/autores/borges.jpg"),
     biografia:
       "Escritor y poeta argentino, uno de los grandes literatos del siglo XX. Maestro del cuento, el ensayo y la poesía.",
     obras: ["Ficciones", "El Aleph", "El libro de arena"],

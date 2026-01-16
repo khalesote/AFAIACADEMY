@@ -7,7 +7,7 @@ import { useRouter } from 'expo-router';
 import UnidadCard from './UnidadCard';
 import { useUserProgress } from '@/contexts/UserProgressContext';
 import { LinearGradient } from 'expo-linear-gradient';
-const data = require('../../../assets/unidades_y_examenes.json');
+const data = require('../../../../assets/unidades_y_examenes.json');
 
 export default function Unidad4() {
   const router = useRouter();

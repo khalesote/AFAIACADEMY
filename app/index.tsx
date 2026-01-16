@@ -458,9 +458,12 @@ export function HomeScreenContent() {
       return undefined;
     }
 
+    // El contenido está duplicado; usar la mitad del ancho para un loop suave.
+    const totalWidth = Math.max(prayerTimesContentWidth / 2, 1);
+    prayerTimesScrollPosition.current = 0;
+
     const stepPx = 1;
     const intervalMs = 20; // Velocidad del scroll
-    const totalWidth = prayerTimesContentWidth;
 
     const intervalId = setInterval(() => {
       if (!prayerTimesScrollRef.current) {
@@ -505,9 +508,9 @@ export function HomeScreenContent() {
               >
                 <Ionicons name="person-circle" size={20} color="#007AFF" />
                 <Text style={styles.userNameText}>
-                  {firebaseUser.firstName && firebaseUser.lastName 
-                    ? `${firebaseUser.firstName} ${firebaseUser.lastName}`
-                    : firebaseUser.name || firebaseUser.email || 'Usuario'}
+                  {user?.firstName && user?.lastName
+                    ? `${user.firstName} ${user.lastName}`
+                    : firebaseUser.displayName || user?.email || firebaseUser.email || 'Usuario'}
                 </Text>
               </TouchableOpacity>
             ) : (
@@ -694,7 +697,7 @@ export function HomeScreenContent() {
         {/* Logo Principal */}
         <View style={styles.mainLogoContainer}>
           <Image
-            source={require('./assets/logo.jpg')}
+            source={require('../assets/images/logo.jpg')}
             style={styles.mainLogo}
             resizeMode="contain"
           />
@@ -802,28 +805,14 @@ export function HomeScreenContent() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.highlightCard}>
-          <View style={styles.highlightHeader}>
-            <Ionicons name="document-text" size={22} color="#1f4f8b" />
-            <Text style={styles.highlightTitle}>Creador de CV</Text>
-            <View style={styles.newBadge}>
-              <Text style={styles.newBadgeText}>NEW</Text>
-            </View>
-          </View>
-          <Text style={styles.highlightSubtitle}>
-            Genera tu currículum profesional en español y árabe con formato oficial.
-          </Text>
-          <Text style={styles.highlightSubtitleAr}>
-            أنشئ سيرتك الذاتية باللغة الإسبانية والعربية بسهولة.
-          </Text>
-          <TouchableOpacity
-            style={styles.highlightButton}
-            onPress={() => router.push("/(tabs)/CreadorCVScreen")}
-          >
-            <Ionicons name="sparkles" size={18} color="#FFD700" />
-            <Text style={styles.highlightButtonText}>Crear CV ahora</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={[styles.highlightButton, { marginBottom: 20 }]}
+          onPress={() => router.push("/(tabs)/CreadorCVProScreen")}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="document-text" size={18} color="#FFD700" />
+          <Text style={styles.highlightButtonText}>Creador de CV</Text>
+        </TouchableOpacity>
 
         {/* Categorías Principales */}
         <View style={styles.categoriesSection}>
@@ -1011,17 +1000,6 @@ export function HomeScreenContent() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.quickAccessItem}
-              onPress={() => handleMenuPress(() => router.push("/SnakeLetrasScreen"))}
-            >
-              <View style={styles.quickAccessIcon}>
-                <Ionicons name="game-controller" size={24} color="#FFD700" />
-              </View>
-              <Text style={styles.quickAccessText}>Comedor de letras</Text>
-              <Text style={styles.quickAccessTextAr}>أكل الحروف</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
   style={styles.quickAccessItem}
   onPress={() => handleMenuPress(() => router.push("/AgendaScreen"))}
 >
@@ -1056,7 +1034,7 @@ export function HomeScreenContent() {
 
             <TouchableOpacity
               style={styles.quickAccessItem}
-              onPress={() => handleMenuPress(() => router.push("/(tabs)/CreadorCVScreen"))}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/CreadorCVProScreen"))}
             >
               <View style={styles.quickAccessIcon}>
                 <Ionicons name="document-text" size={24} color="#FFD700" />
@@ -1277,11 +1255,11 @@ const styles = StyleSheet.create({
   },
   // --- Promo ticker (texto compacto) ---
   tickerSection: {
-    height: 36,
-    marginTop: 12,
-    marginBottom: 16,
+    height: 28,
+    marginTop: 8,
+    marginBottom: 10,
     backgroundColor: '#ffffff',
-    borderRadius: 18,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: '#e6e6e6',
     overflow: 'hidden',
@@ -1294,25 +1272,25 @@ const styles = StyleSheet.create({
   },
   tickerText: {
     color: '#2c3e50',
-    fontSize: 14,
+    fontSize: 12,
     marginRight: 24,
   },
   tickerTextAr: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#1b5e20',
     marginHorizontal: 12,
     writingDirection: 'rtl',
     textAlign: 'right',
   },
   prayerTimesSection: {
-    marginTop: 8,
-    paddingHorizontal: 12,
-    marginBottom: 8,
-    height: 50,
+    marginTop: 6,
+    paddingHorizontal: 8,
+    marginBottom: 6,
+    height: 40,
     justifyContent: 'center',
   },
   prayerTimesLoading: {
-    height: 50,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1333,14 +1311,14 @@ const styles = StyleSheet.create({
     borderRightColor: '#e9ecef',
   },
   provinceName: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: '#333',
     marginRight: 2,
-    minWidth: 90,
+    minWidth: 80,
   },
   provinceArrow: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
     color: '#666',
     marginRight: 10,
@@ -1351,24 +1329,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#000',
     borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
     marginRight: 6,
     borderWidth: 1,
     borderColor: '#333',
   },
   prayerTimeValue: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 'bold',
     color: '#FFD700',
   },
   prayerTimeSeparator: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#FFD700',
     marginHorizontal: 2,
   },
   prayerTimeNameAr: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
     color: '#FFD700',
     writingDirection: 'rtl',

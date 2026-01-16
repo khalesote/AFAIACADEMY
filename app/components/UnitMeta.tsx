@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { completeUnit, getUnitsForLevel } from '../../utils/unitProgress';
 
-const data: any = require('../assets/unidades_y_examenes.json');
+const data: any = require('../../assets/unidades_y_examenes.json');
 
 type Nivel = 'A1' | 'A2' | 'B1' | 'B2';
 

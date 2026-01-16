@@ -6,7 +6,7 @@ import EjerciciosInteractivos from '../../../components/EjerciciosInteractivos';
 import { useRouter } from 'expo-router';
 import { useUserProgress } from '@/contexts/UserProgressContext';
 import { LinearGradient } from 'expo-linear-gradient';
-const data = require('../../../assets/unidades_y_examenes.json');
+const data = require('../../../../assets/unidades_y_examenes.json');
 
 export default function Unidad7() {
   const router = useRouter();

@@ -7,7 +7,7 @@ import EjerciciosInteractivos from '../../../components/EjerciciosInteractivos';
 import { useRouter } from 'expo-router';
 import UnidadCard from './UnidadCard';
 import { useUserProgress } from '@/contexts/UserProgressContext';
-const data = require('../../../assets/unidades_y_examenes.json');
+const data = require('../../../../assets/unidades_y_examenes.json');
 
 export default function Unidad6() {
   const router = useRouter();

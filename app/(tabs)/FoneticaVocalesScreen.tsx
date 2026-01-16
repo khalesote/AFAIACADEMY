@@ -8,32 +8,32 @@ import { LinearGradient } from 'expo-linear-gradient';
 const vocales = [
   {
     letra: 'A',
-    videoLetra: require('../assets/videos/vocal_a_letra.mp4'),
-    videoPalabra: require('../assets/videos/vocal_a_palabra.mp4'),
+    videoLetra: require('../../assets/videos/vocal_a_letra.mp4'),
+    videoPalabra: require('../../assets/videos/vocal_a_palabra.mp4'),
     ejemploPalabra: 'Arma',
   },
   {
     letra: 'E',
-    videoLetra: require('../assets/videos/vocal_e_letra.mp4'),
-    videoPalabra: require('../assets/videos/vocal_e_palabra.mp4'),
+    videoLetra: require('../../assets/videos/vocal_e_letra.mp4'),
+    videoPalabra: require('../../assets/videos/vocal_e_palabra.mp4'),
     ejemploPalabra: 'Eco',
   },
   {
     letra: 'I',
-    videoLetra: require('../assets/videos/vocal_i_letra.mp4'),
-    videoPalabra: require('../assets/videos/vocal_i_palabra.mp4'),
+    videoLetra: require('../../assets/videos/vocal_i_letra.mp4'),
+    videoPalabra: require('../../assets/videos/vocal_i_palabra.mp4'),
     ejemploPalabra: 'Ipo',
   },
   {
     letra: 'O',
-    videoLetra: require('../assets/videos/vocal_o_letra.mp4'),
-    videoPalabra: require('../assets/videos/vocal_o_palabra.mp4'),
+    videoLetra: require('../../assets/videos/vocal_o_letra.mp4'),
+    videoPalabra: require('../../assets/videos/vocal_o_palabra.mp4'),
     ejemploPalabra: 'Ojo',
   },
   {
     letra: 'U',
-    videoLetra: require('../assets/videos/vocal_u_letra.mp4'),
-    videoPalabra: require('../assets/videos/vocal_u_palabra.mp4'),
+    videoLetra: require('../../assets/videos/vocal_u_letra.mp4'),
+    videoPalabra: require('../../assets/videos/vocal_u_palabra.mp4'),
     ejemploPalabra: 'Uña',
   },
 ];

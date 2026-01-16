@@ -1,0 +1,554 @@
+{
+  "examen_ccse": [
+    {
+      "id": 1,
+      "categoria": "Gobierno, legislación y participación ciudadana",
+      "categoria_ar": "الحكومة والتشريع والمشاركة المواطنة",
+      "pregunta": "¿Cuál es la forma política del Estado español?",
+      "pregunta_ar": "ما هي الشكل السياسي للدولة الإسبانية؟",
+      "opciones": [
+        "Monarquía parlamentaria",
+        "República federal",
+        "Monarquía absoluta",
+        "República unitaria"
+      ],
+      "opciones_ar": [
+        "الملكية البرلمانية",
+        "الجمهورية الاتحادية",
+        "الملكية المطلقة",
+        "الجمهورية الموحدة"
+      ],
+      "respuesta_correcta": 0,
+      "explicacion": "España es una Monarquía parlamentaria, donde el Rey es el Jefe del Estado y el poder ejecutivo lo ejerce el Gobierno.",
+      "explicacion_ar": "إسبانيا هي ملكية برلمانية، حيث الملك هو رئيس الدولة والسلطة التنفيذية يمارسها الحكومة."
+    },
+    {
+      "id": 2,
+      "categoria": "Gobierno, legislación y participación ciudadana",
+      "categoria_ar": "الحكومة والتشريع والمشاركة المواطنة",
+      "pregunta": "¿Cuántas cámaras tiene el Parlamento español?",
+      "pregunta_ar": "كم عدد الغرف في البرلمان الإسباني؟",
+      "opciones": [
+        "Una",
+        "Dos",
+        "Tres",
+        "Cuatro"
+      ],
+      "opciones_ar": [
+        "واحدة",
+        "اثنتان",
+        "ثلاث",
+        "أربع"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "El Parlamento español tiene dos cámaras: el Congreso de los Diputados y el Senado.",
+      "explicacion_ar": "البرلمان الإسباني له غرفتان: مجلس النواب ومجلس الشيوخ."
+    },
+    {
+      "id": 3,
+      "categoria": "Gobierno, legislación y participación ciudadana",
+      "categoria_ar": "الحكومة والتشريع والمشاركة المواطنة",
+      "pregunta": "¿Cuál es la edad mínima para votar en España?",
+      "pregunta_ar": "ما هي الحد الأدنى للعمر للتصويت في إسبانيا؟",
+      "opciones": [
+        "16 años",
+        "17 años",
+        "18 años",
+        "21 años"
+      ],
+      "opciones_ar": [
+        "16 سنة",
+        "17 سنة",
+        "18 سنة",
+        "21 سنة"
+      ],
+      "respuesta_correcta": 2,
+      "explicacion": "En España, la edad mínima para ejercer el derecho al voto es de 18 años.",
+      "explicacion_ar": "في إسبانيا، الحد الأدنى للعمر لممارسة حق التصويت هو 18 سنة."
+    },
+    {
+      "id": 4,
+      "categoria": "Gobierno, legislación y participación ciudadana",
+      "categoria_ar": "الحكومة والتشريع والمشاركة المواطنة",
+      "pregunta": "¿Quién es el Jefe del Estado en España?",
+      "pregunta_ar": "من هو رئيس الدولة في إسبانيا؟",
+      "opciones": [
+        "El Presidente del Gobierno",
+        "El Rey",
+        "El Presidente del Congreso",
+        "El Presidente del Tribunal Supremo"
+      ],
+      "opciones_ar": [
+        "رئيس الحكومة",
+        "الملك",
+        "رئيس الكونغرس",
+        "رئيس المحكمة العليا"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "El Rey es el Jefe del Estado y representa la unidad de España.",
+      "explicacion_ar": "الملك هو رئيس الدولة ويمثل وحدة إسبانيا."
+    },
+    {
+      "id": 5,
+      "categoria": "Gobierno, legislación y participación ciudadana",
+      "categoria_ar": "الحكومة والتشريع والمشاركة المواطنة",
+      "pregunta": "¿Cuál es el máximo órgano judicial en España?",
+      "pregunta_ar": "ما هي أعلى هيئة قضائية في إسبانيا؟",
+      "opciones": [
+        "El Tribunal Constitucional",
+        "El Tribunal Supremo",
+        "La Audiencia Nacional",
+        "El Consejo General del Poder Judicial"
+      ],
+      "opciones_ar": [
+        "المحكمة الدستورية",
+        "المحكمة العليا",
+        "المحكمة الوطنية",
+        "المجلس العام للسلطة القضائية"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "El Tribunal Supremo es el máximo órgano judicial en España, excepto en materia constitucional.",
+      "explicacion_ar": "المحكمة العليا هي أعلى هيئة قضائية في إسبانيا، باستثناء المسائل الدستورية."
+    },
+    {
+      "id": 6,
+      "categoria": "Derechos y deberes fundamentales",
+      "categoria_ar": "الحقوق والواجبات الأساسية",
+      "pregunta": "¿Cuál es un derecho fundamental reconocido en la Constitución española?",
+      "pregunta_ar": "ما هو حق أساسي معترف به في الدستور الإسباني؟",
+      "opciones": [
+        "Derecho a la vivienda",
+        "Derecho a la educación",
+        "Derecho a un trabajo",
+        "Derecho a un coche"
+      ],
+      "opciones_ar": [
+        "الحق في السكن",
+        "الحق في التعليم",
+        "الحق في العمل",
+        "الحق في سيارة"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "La Constitución española reconoce el derecho a la educación como un derecho fundamental.",
+      "explicacion_ar": "الدستور الإسباني يعترف بالحق في التعليم كحق أساسي."
+    },
+    {
+      "id": 7,
+      "categoria": "Derechos y deberes fundamentales",
+      "categoria_ar": "الحقوق والواجبات الأساسية",
+      "pregunta": "¿Cuál es un deber de los ciudadanos españoles?",
+      "pregunta_ar": "ما هو واجب المواطنين الإسبان؟",
+      "opciones": [
+        "Votar en todas las elecciones",
+        "Contribuir al sostenimiento de los gastos públicos",
+        "Tener un trabajo",
+        "Pertenecer a un partido político"
+      ],
+      "opciones_ar": [
+        "الاقتراع في جميع الانتخابات",
+        "المساهمة في دعم النفقات العامة",
+        "الحصول على عمل",
+        "الانتماء إلى حزب سياسي"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "Los ciudadanos tienen el deber de contribuir al sostenimiento de los gastos públicos mediante el pago de impuestos.",
+      "explicacion_ar": "المواطنون لديهم واجب المساهمة في دعم النفقات العامة من خلال دفع الضرائب."
+    },
+    {
+      "id": 8,
+      "categoria": "Derechos y deberes fundamentales",
+      "categoria_ar": "الحقوق والواجبات الأساسية",
+      "pregunta": "¿Qué garantiza la Constitución española respecto a la libertad religiosa?",
+      "pregunta_ar": "ماذا يضمن الدستور الإسباني فيما يتعلق بالحرية الدينية؟",
+      "opciones": [
+        "Solo la religión católica",
+        "La libertad religiosa y de culto",
+        "Solo religiones monoteístas",
+        "Ninguna libertad religiosa"
+      ],
+      "opciones_ar": [
+        "الدين الكاثوليكي فقط",
+        "الحرية الدينية وحرية العبادة",
+        "الأديان التوحيدية فقط",
+        "لا حرية دينية"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "La Constitución garantiza la libertad ideológica, religiosa y de culto de los individuos y las comunidades.",
+      "explicacion_ar": "الدستور يضمن الحرية الأيديولوجية والدينية وحرية العبادة للأفراد والجماعات."
+    },
+    {
+      "id": 9,
+      "categoria": "Derechos y deberes fundamentales",
+      "categoria_ar": "الحقوق والواجبات الأساسية",
+      "pregunta": "¿Qué derecho fundamental garantiza la igualdad ante la ley?",
+      "pregunta_ar": "ما هو الحق الأساسي الذي يضمن المساواة أمام القانون؟",
+      "opciones": [
+        "Derecho a la no discriminación",
+        "Derecho a la propiedad",
+        "Derecho a la huelga",
+        "Derecho a la asociación"
+      ],
+      "opciones_ar": [
+        "الحق في عدم التمييز",
+        "الحق في الملكية",
+        "الحق في الإضراب",
+        "الحق في الجمعيات"
+      ],
+      "respuesta_correcta": 0,
+      "explicacion": "La Constitución garantiza la igualdad ante la ley y prohíbe la discriminación por razón de nacimiento, raza, sexo, religión u opinión.",
+      "explicacion_ar": "الدستور يضمن المساواة أمام القانون ويمنع التمييز بسبب المولد أو العرق أو الجنس أو الدين أو الرأي."
+    },
+    {
+      "id": 10,
+      "categoria": "Derechos y deberes fundamentales",
+      "categoria_ar": "الحقوق والواجبات الأساسية",
+      "pregunta": "¿Cuál es la edad mínima para trabajar en España?",
+      "pregunta_ar": "ما هي الحد الأدنى للعمر للعمل في إسبانيا؟",
+      "opciones": [
+        "14 años",
+        "16 años",
+        "18 años",
+        "21 años"
+      ],
+      "opciones_ar": [
+        "14 سنة",
+        "16 سنة",
+        "18 سنة",
+        "21 سنة"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "En España, la edad mínima para trabajar es de 16 años, con algunas restricciones para menores.",
+      "explicacion_ar": "في إسبانيا، الحد الأدنى للعمر للعمل هو 16 سنة، مع بعض القيود للقاصرين."
+    },
+    {
+      "id": 11,
+      "categoria": "Organización territorial de España",
+      "categoria_ar": "التنظيم الإقليمي لإسبانيا",
+      "pregunta": "¿Cuántas comunidades autónomas tiene España?",
+      "pregunta_ar": "كم عدد المجتمعات المستقلة في إسبانيا؟",
+      "opciones": [
+        "15",
+        "17",
+        "19",
+        "21"
+      ],
+      "opciones_ar": [
+        "15",
+        "17",
+        "19",
+        "21"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "España tiene 17 comunidades autónomas y 2 ciudades autónomas (Ceuta y Melilla).",
+      "explicacion_ar": "إسبانيا لديها 17 مجتمعًا مستقلًا ومدينتان مستقلتان (سبتة ومليلية)."
+    },
+    {
+      "id": 12,
+      "categoria": "Organización territorial de España",
+      "categoria_ar": "التنظيم الإقليمي لإسبانيا",
+      "pregunta": "¿Cuál es la capital de la Comunidad de Madrid?",
+      "pregunta_ar": "ما هي عاصمة مجتمع مدريد؟",
+      "opciones": [
+        "Toledo",
+        "Madrid",
+        "Alcalá de Henares",
+        "Getafe"
+      ],
+      "opciones_ar": [
+        "طليطلة",
+        "مدريد",
+        "ألكالا دي إيناريس",
+        "خيتافي"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "La capital de la Comunidad de Madrid es Madrid, que también es la capital de España.",
+      "explicacion_ar": "عاصمة مجتمع مدريد هي مدريد، وهي أيضًا عاصمة إسبانيا."
+    },
+    {
+      "id": 13,
+      "categoria": "Organización territorial de España",
+      "categoria_ar": "التنظيم الإقليمي لإسبانيا",
+      "pregunta": "¿Qué dos ciudades autónomas tiene España en el norte de África?",
+      "pregunta_ar": "ما هي المدينتان المستقلتان اللتان تمتلكهما إسبانيا في شمال إفريقيا؟",
+      "opciones": [
+        "Ceuta y Melilla",
+        "Tánger y Tetuán",
+        "Cádiz y Algeciras",
+        "Málaga y Granada"
+      ],
+      "opciones_ar": [
+        "سبتة ومليلية",
+        "طنجة وتطوان",
+        "قادس والجزيرة الخضراء",
+        "مالقة وغرناطة"
+      ],
+      "respuesta_correcta": 0,
+      "explicacion": "España tiene dos ciudades autónomas en el norte de África: Ceuta y Melilla.",
+      "explicacion_ar": "إسبانيا لديها مدينتان مستقلتان في شمال إفريقيا: سبتة ومليلية."
+    },
+    {
+      "id": 14,
+      "categoria": "Cultura e Historia de España",
+      "categoria_ar": "الثقافة وتاريخ إسبانيا",
+      "pregunta": "¿En qué año se aprobó la Constitución española actual?",
+      "pregunta_ar": "في أي عام تمت الموافقة على الدستور الإسباني الحالي؟",
+      "opciones": [
+        "1975",
+        "1976",
+        "1977",
+        "1978"
+      ],
+      "opciones_ar": [
+        "1975",
+        "1976",
+        "1977",
+        "1978"
+      ],
+      "respuesta_correcta": 3,
+      "explicacion": "La Constitución española actual fue aprobada en 1978 y entró en vigor el 29 de diciembre de ese año.",
+      "explicacion_ar": "تمت الموافقة على الدستور الإسباني الحالي في عام 1978 ودخل حيز التنفيذ في 29 ديسمبر من ذلك العام."
+    },
+    {
+      "id": 15,
+      "categoria": "Cultura e Historia de España",
+      "categoria_ar": "الثقافة وتاريخ إسبانيا",
+      "pregunta": "¿Qué escritor español escribió 'Don Quijote de la Mancha'?",
+      "pregunta_ar": "ما هو الكاتب الإسباني الذي كتب 'دون كيخوتي دي لا مانشا'؟",
+      "opciones": [
+        "Federico García Lorca",
+        "Miguel de Cervantes",
+        "Antonio Machado",
+        "Lope de Vega"
+      ],
+      "opciones_ar": [
+        "فيديريكو غارثيا لوركا",
+        "ميغيل دي ثيربانتس",
+        "أنطونيو ماتشادو",
+        "لوبي دي فيغا"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "Miguel de Cervantes escribió 'Don Quijote de la Mancha', considerada una de las obras más importantes de la literatura universal.",
+      "explicacion_ar": "كتب ميغيل دي ثيربانتس 'دون كيخوتي دي لا مانشا'، التي تعتبر واحدة من أهم أعمال الأدب العالمي."
+    },
+    {
+      "id": 16,
+      "categoria": "Cultura e Historia de España",
+      "categoria_ar": "الثقافة وتاريخ إسبانيا",
+      "pregunta": "¿Qué museo de Madrid alberga una de las mejores colecciones de pintura europea?",
+      "pregunta_ar": "ما هو متحف مدريد الذي يضم واحدة من أفضل مجموعات الرسم الأوروبي؟",
+      "opciones": [
+        "Museo Reina Sofía",
+        "Museo del Prado",
+        "Museo Thyssen-Bornemisza",
+        "Museo Arqueológico"
+      ],
+      "opciones_ar": [
+        "متحف رينا صوفيا",
+        "متحف برادو",
+        "متحف تيسين-بورنيميسا",
+        "المتحف الأثري"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "El Museo del Prado en Madrid es uno de los museos más importantes del mundo y alberga una excepcional colección de pintura europea.",
+      "explicacion_ar": "متحف برادو في مدريد هو واحد من أهم المتاحف في العالم ويضم مجموعة استثنائية من الرسم الأوروبي."
+    },
+    {
+      "id": 17,
+      "categoria": "Cultura e Historia de España",
+      "categoria_ar": "الثقافة وتاريخ إسبانيا",
+      "pregunta": "¿Qué fiesta se celebra el 12 de octubre en España?",
+      "pregunta_ar": "ما هو العيد الذي يُحتفل به في 12 أكتوبر في إسبانيا؟",
+      "opciones": [
+        "Día de la Constitución",
+        "Día de la Hispanidad",
+        "Día de la Independencia",
+        "Día de la Bandera"
+      ],
+      "opciones_ar": [
+        "يوم الدستور",
+        "يوم الهسبانية",
+        "يوم الاستقلال",
+        "يوم العلم"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "El 12 de octubre se celebra el Día de la Hispanidad, también conocido como Día Nacional de España.",
+      "explicacion_ar": "في 12 أكتوبر يُحتفل بيوم الهسبانية، المعروف أيضًا باسم اليوم الوطني لإسبانيا."
+    },
+    {
+      "id": 18,
+      "categoria": "Cultura e Historia de España",
+      "categoria_ar": "الثقافة وتاريخ إسبانيا",
+      "pregunta": "¿Qué idioma cooficial se habla en Cataluña además del español?",
+      "pregunta_ar": "ما هي اللغة الرسمية المشتركة التي تُتحدث في كاتالونيا بالإضافة إلى الإسبانية؟",
+      "opciones": [
+        "Gallego",
+        "Euskera",
+        "Catalán",
+        "Valenciano"
+      ],
+      "opciones_ar": [
+        "الجاليكية",
+        "الباسكية",
+        "الكتالونية",
+        "الفالنسية"
+      ],
+      "respuesta_correcta": 2,
+      "explicacion": "En Cataluña, además del español (castellano), el catalán es lengua cooficial.",
+      "explicacion_ar": "في كاتالونيا، بالإضافة إلى الإسبانية (القشتالية)، الكتالونية هي لغة رسمية مشتركة."
+    },
+    {
+      "id": 19,
+      "categoria": "Cultura e Historia de España",
+      "categoria_ar": "الثقافة وتاريخ إسبانيا",
+      "pregunta": "¿Qué plato típico español es una tortilla de patatas?",
+      "pregunta_ar": "ما هو الطبق الإسباني النموذجي الذي هو عجة البطاطس؟",
+      "opciones": [
+        "Paella",
+        "Tortilla española",
+        "Gazpacho",
+        "Jamón serrano"
+      ],
+      "opciones_ar": [
+        "البايلا",
+        "العجة الإسبانية",
+        "الغازباتشو",
+        "لحم الخنزير المقدد"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "La tortilla española o tortilla de patatas es uno de los platos más típicos de la cocina española.",
+      "explicacion_ar": "العجة الإسبانية أو عجة البطاطس هي واحدة من الأطباق الأكثر نموذجية في المطبخ الإسباني."
+    },
+    {
+      "id": 20,
+      "categoria": "Cultura e Historia de España",
+      "categoria_ar": "الثقافة وتاريخ إسبانيا",
+      "pregunta": "¿Qué deporte es el más popular en España?",
+      "pregunta_ar": "ما هي الرياضة الأكثر شعبية في إسبانيا؟",
+      "opciones": [
+        "Baloncesto",
+        "Fútbol",
+        "Tenis",
+        "Ciclismo"
+      ],
+      "opciones_ar": [
+        "كرة السلة",
+        "كرة القدم",
+        "التنس",
+        "ركوب الدراجات"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "El fútbol es el deporte más popular en España, con una gran tradición y seguimiento.",
+      "explicacion_ar": "كرة القدم هي الرياضة الأكثر شعبية في إسبانيا، مع تقليد كبير ومتابعة."
+    },
+    {
+      "id": 21,
+      "categoria": "Sociedad española",
+      "categoria_ar": "المجتمع الإسباني",
+      "pregunta": "¿Cuál es la moneda oficial de España?",
+      "pregunta_ar": "ما هي العملة الرسمية لإسبانيا؟",
+      "opciones": [
+        "Peseta",
+        "Euro",
+        "Dólar",
+        "Libra"
+      ],
+      "opciones_ar": [
+        "البيزيتا",
+        "اليورو",
+        "الدولار",
+        "الجنيه"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "La moneda oficial de España es el Euro desde el 1 de enero de 2002.",
+      "explicacion_ar": "العملة الرسمية لإسبانيا هي اليورو منذ 1 يناير 2002."
+    },
+    {
+      "id": 22,
+      "categoria": "Sociedad española",
+      "categoria_ar": "المجتمع الإسباني",
+      "pregunta": "¿Cuál es el número de teléfono de emergencias en España?",
+      "pregunta_ar": "ما هو رقم هاتف الطوارئ في إسبانيا؟",
+      "opciones": [
+        "090",
+        "112",
+        "911",
+        "061"
+      ],
+      "opciones_ar": [
+        "090",
+        "112",
+        "911",
+        "061"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "El número 112 es el número único de emergencias en España para cualquier tipo de emergencia.",
+      "explicacion_ar": "الرقم 112 هو رقم الطوارئ الوحيد في إسبانيا لأي نوع من حالات الطوارئ."
+    },
+    {
+      "id": 23,
+      "categoria": "Sociedad española",
+      "categoria_ar": "المجتمع الإسباني",
+      "pregunta": "¿A qué edad es obligatoria la educación en España?",
+      "pregunta_ar": "في أي عمر يكون التعليم إلزاميًا في إسبانيا؟",
+      "opciones": [
+        "De 3 a 16 años",
+        "De 6 a 16 años",
+        "De 6 a 18 años",
+        "De 3 a 18 años"
+      ],
+      "opciones_ar": [
+        "من 3 إلى 16 سنة",
+        "من 6 إلى 16 سنة",
+        "من 6 إلى 18 سنة",
+        "من 3 إلى 18 سنة"
+      ],
+      "respuesta_correcta": 1,
+      "explicacion": "La educación es obligatoria en España desde los 6 hasta los 16 años.",
+      "explicacion_ar": "التعليم إلزامي في إسبانيا من 6 إلى 16 سنة."
+    },
+    {
+      "id": 24,
+      "categoria": "Sociedad española",
+      "categoria_ar": "المجتمع الإسباني",
+      "pregunta": "¿Qué sistema de salud público existe en España?",
+      "pregunta_ar": "ما هو نظام الصحة العامة الموجود في إسبانيا؟",
+      "opciones": [
+        "Sistema Nacional de Salud",
+        "Sistema Privado de Salud",
+        "Sistema Mixto",
+        "No hay sistema público"
+      ],
+      "opciones_ar": [
+        "النظام الوطني للصحة",
+        "النظام الصحي الخاص",
+        "النظام المختلط",
+        "لا يوجد نظام عام"
+      ],
+      "respuesta_correcta": 0,
+      "explicacion": "España tiene un Sistema Nacional de Salud que garantiza la atención sanitaria universal y gratuita.",
+      "explicacion_ar": "إسبانيا لديها نظام وطني للصحة يضمن الرعاية الصحية الشاملة والمجانية."
+    },
+    {
+      "id": 25,
+      "categoria": "Sociedad española",
+      "categoria_ar": "المجتمع الإسباني",
+      "pregunta": "¿Cuál es la jornada laboral máxima legal en España?",
+      "pregunta_ar": "ما هي الحد الأقصى القانوني لساعات العمل في إسبانيا؟",
+      "opciones": [
+        "35 horas semanales",
+        "38 horas semanales",
+        "40 horas semanales",
+        "42 horas semanales"
+      ],
+      "opciones_ar": [
+        "35 ساعة أسبوعيًا",
+        "38 ساعة أسبوعيًا",
+        "40 ساعة أسبوعيًا",
+        "42 ساعة أسبوعيًا"
+      ],
+      "respuesta_correcta": 2,
+      "explicacion": "La jornada laboral máxima legal en España es de 40 horas semanales.",
+      "explicacion_ar": "الحد الأقصى القانوني لساعات العمل في إسبانيا هو 40 ساعة أسبوعيًا."
+    }
+  ]
+}

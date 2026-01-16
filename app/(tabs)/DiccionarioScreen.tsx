@@ -34,7 +34,7 @@ export default function DiccionarioScreen() {
         const dbInfo = await FileSystem.getInfoAsync(DB_PATH);
         if (!dbInfo.exists) {
           // Busca el asset en assets/app o assets/ según corresponda
-          const asset = Asset.fromModule(require('../assets/diccionario.db'));
+          const asset = Asset.fromModule(require('../../assets/diccionario.db'));
           await asset.downloadAsync();
           await FileSystem.copyAsync({ from: asset.localUri!, to: DB_PATH });
         }

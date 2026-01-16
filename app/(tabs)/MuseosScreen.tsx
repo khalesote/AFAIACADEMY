@@ -11,7 +11,7 @@ const museosFamosos = [
     descripcion:
       "Uno de los museos de arte más importantes del mundo, famoso por su colección de pintura europea.",
     descripcionAr: "واحد من أهم متاحف الفن في العالم، مشهور بمجموعته من اللوحات الأوروبية.",
-    imagen: require("../assets/museos/prado.jpg"),
+    imagen: require("../../assets/museos/prado.jpg"),
   },
   {
     nombre: "Museo Nacional Centro de Arte Reina Sofía",
@@ -21,7 +21,7 @@ const museosFamosos = [
     descripcion:
       'Especializado en arte moderno y contemporáneo. Alberga el famoso "Guernica" de Picasso.',
     descripcionAr: 'متخصص في الفن الحديث والمعاصر. يضم لوحة "غيرنيكا" الشهيرة لبيكاسو.',
-    imagen: require("../assets/museos/reinasofia.jpg"),
+    imagen: require("../../assets/museos/reinasofia.jpg"),
   },
   {
     nombre: "Museo Thyssen-Bornemisza",
@@ -31,7 +31,7 @@ const museosFamosos = [
     descripcion:
       'Completa el "Triángulo del Arte" de Madrid con una colección diversa de pintura occidental.',
     descripcionAr: 'يكمل "مثلث الفن" في مدريد بمجموعة متنوعة من اللوحات الغربية.',
-    imagen: require("../assets/museos/thyssen.jpg"),
+    imagen: require("../../assets/museos/thyssen.jpg"),
   },
   {
     nombre: "Museo Guggenheim",
@@ -41,7 +41,7 @@ const museosFamosos = [
     descripcion:
       "Icono de la arquitectura contemporánea y el arte moderno, diseñado por Frank Gehry.",
     descripcionAr: "رمز للهندسة المعمارية المعاصرة والفن الحديث، من تصميم فرانك جيري.",
-    imagen: require("../assets/museos/guggenheim.jpg"),
+    imagen: require("../../assets/museos/guggenheim.jpg"),
   },
   {
     nombre: "Museo Picasso",
@@ -51,7 +51,7 @@ const museosFamosos = [
     descripcion:
       "Dedicado a la obra de Pablo Picasso, con una de las colecciones más completas del artista.",
     descripcionAr: "مكرس لأعمال بابلو بيكاسو، ويضم واحدة من أكثر مجموعاته اكتمالاً.",
-    imagen: require("../assets/museos/picasso.jpg"),
+    imagen: require("../../assets/museos/picasso.jpg"),
   },
   {
     nombre: "Museo Nacional de Arte de Cataluña (MNAC)",
@@ -60,7 +60,7 @@ const museosFamosos = [
     ciudadAr: "برشلونة",
     descripcion: "Destacado por su colección de arte románico y gótico.",
     descripcionAr: "يشتهر بمجموعته من الفن الروماني والقوطي.",
-    imagen: require("../assets/museos/mnac.jpg"),
+    imagen: require("../../assets/museos/mnac.jpg"),
   },
   {
     nombre: "Museo de Bellas Artes de Sevilla",
@@ -70,7 +70,7 @@ const museosFamosos = [
     descripcion:
       "Importante museo de pintura española, especialmente de la escuela sevillana y barroca.",
     descripcionAr: "متحف مهم للفن الإسباني، خاصة المدرسة الإشبيلية والفن الباروكي.",
-    imagen: require("../assets/museos/sevilla.jpg"),
+    imagen: require("../../assets/museos/sevilla.jpg"),
   },
 ];
 

@@ -63,7 +63,7 @@ export default function TikTokVerification({ onVerificationComplete }: TikTokVer
     >
       <View style={styles.content}>
         <Image 
-          source={require('../assets/tiktok-logo.png')} 
+          source={require('../../assets/tiktok-logo.png')} 
           style={styles.logo}
           resizeMode="contain"
         />

@@ -20,7 +20,7 @@ import { markExamenNacionalidadCodeAsUsed } from '../../utils/accessCodes';
 import { useUser } from '@/contexts/UserContext';
 
 // Importar el JSON de preguntas
-const examData = require('../assets/examen_nacionalidad_ccse.json');
+const examData = require('../../assets/examen_nacionalidad_ccse.json');
 
 interface Pregunta {
   id: number;

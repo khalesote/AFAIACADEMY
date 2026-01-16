@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Speech from "expo-speech";
 import { useRouter } from "expo-router";
 
-import banderas from "../assets/banderas.json";
+import banderas from "../../assets/banderas.json";
 
 function reproducir(texto: string, idioma: "es" | "ar") {
   const options: Speech.SpeechOptions = {

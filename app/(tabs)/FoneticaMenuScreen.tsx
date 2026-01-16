@@ -51,24 +51,6 @@ export default function FoneticaMenuScreen() {
           </View>
         </LinearGradient>
       </TouchableOpacity>
-      {/* Botón Práctica Fonética */}
-      <TouchableOpacity
-        style={styles.menuButton}
-        onPress={() => router.push('/(tabs)/FoneticaPronunciacionScreen')}
-        activeOpacity={0.8}
-      >
-        <LinearGradient
-          colors={['#000', '#000']}
-          style={styles.menuButtonGradient}
-        >
-          <Ionicons name="school-outline" size={20} color="#FFD700" style={{ marginRight: 10 }} />
-          <View style={{ alignItems: 'center' }}>
-            <Text style={styles.menuButtonText}>Práctica Fonética</Text>
-            <Text style={styles.menuButtonTextAr}>تدريب الصوتيات</Text>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
-
     </ScrollView>
   );
 }
