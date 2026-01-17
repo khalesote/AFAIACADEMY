@@ -11,7 +11,7 @@ import {
   Modal
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, addDoc, getDocs, query, orderBy, where, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, where, Timestamp, onSnapshot, updateDoc, increment, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import { firestore, storage } from '../../config/firebase';
@@ -64,12 +64,17 @@ export default function ForumScreen() {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [newCommentContent, setNewCommentContent] = useState('');
   const { user, profileImage } = useUser();
+  const [commentUnsubscribers, setCommentUnsubscribers] = useState<{ [postId: string]: () => void }>({});
 
   useEffect(() => {
-    loadPosts();
+    const unsubscribePosts = loadPosts();
+    return () => {
+      if (unsubscribePosts) unsubscribePosts();
+      Object.values(commentUnsubscribers).forEach(unsub => unsub());
+    };
   }, []);
 
-  const loadPosts = async () => {
+  const loadPosts = () => {
     if (!firestore) {
       console.error('Firestore not available');
       Alert.alert('Error', 'Servicio de base de datos no disponible');
@@ -77,34 +82,37 @@ export default function ForumScreen() {
       return;
     }
 
-    try {
-      const postsQuery = query(
-        collection(firestore, 'forum_posts'),
-        orderBy('createdAt', 'desc')
-      );
-      const querySnapshot = await getDocs(postsQuery);
+    const postsQuery = query(
+      collection(firestore, 'forum_posts'),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(postsQuery, (querySnapshot) => {
       const postsData: ForumPost[] = [];
       querySnapshot.forEach((doc) => {
         postsData.push({ id: doc.id, ...doc.data() } as ForumPost);
       });
       setPosts(postsData);
-    } catch (error) {
+      setLoading(false);
+    }, (error) => {
       console.error('Error loading posts:', error);
       Alert.alert('Error', 'No se pudieron cargar las publicaciones del foro');
-    } finally {
       setLoading(false);
-    }
+    });
+
+    return unsubscribe;
   };
 
-  const loadComments = async (postId: string) => {
+  const loadComments = (postId: string) => {
     if (!firestore) return;
+    if (commentUnsubscribers[postId]) return; // already listening
 
-    try {
-      const commentsQuery = query(
-        collection(firestore, 'forum_comments'),
-        where('postId', '==', postId)
-      );
-      const querySnapshot = await getDocs(commentsQuery);
+    const commentsQuery = query(
+      collection(firestore, 'forum_comments'),
+      where('postId', '==', postId)
+    );
+
+    const unsubscribe = onSnapshot(commentsQuery, (querySnapshot) => {
       const commentsData: ForumComment[] = [];
       querySnapshot.forEach((doc) => {
         commentsData.push({ id: doc.id, ...doc.data() } as ForumComment);
@@ -115,9 +123,11 @@ export default function ForumScreen() {
         return aTime - bTime;
       });
       setComments(prev => ({ ...prev, [postId]: commentsData }));
-    } catch (error) {
+    }, (error) => {
       console.error('Error loading comments:', error);
-    }
+    });
+
+    setCommentUnsubscribers(prev => ({ ...prev, [postId]: unsubscribe }));
   };
 
   const pickPostImage = async () => {
@@ -193,6 +203,7 @@ export default function ForumScreen() {
         imageUrl: imageUrl || null,
         createdAt: Timestamp.now(),
         category: selectedCategory,
+        commentsCount: 0,
       });
 
       setModalVisible(false);
@@ -200,7 +211,6 @@ export default function ForumScreen() {
       setNewPostContent('');
       setNewPostImageUri(null);
       setSelectedCategory('general');
-      loadPosts();
       Alert.alert('Éxito', 'Publicación creada correctamente');
     } catch (error) {
       console.error('Error creating post:', error);
@@ -223,19 +233,15 @@ export default function ForumScreen() {
         createdAt: Timestamp.now(),
       });
 
+      // Update comments count in the post
+      const postRef = doc(firestore, 'forum_posts', selectedPostId);
+      await updateDoc(postRef, {
+        commentsCount: increment(1)
+      });
+
       setCommentModalVisible(false);
       setNewCommentContent('');
       setSelectedPostId(null);
-
-      await loadComments(selectedPostId);
-
-      setPosts(prevPosts =>
-        prevPosts.map(post =>
-          post.id === selectedPostId
-            ? { ...post, commentsCount: (post.commentsCount || 0) + 1 }
-            : post
-        )
-      );
 
       Alert.alert('Éxito', 'Comentario agregado correctamente');
     } catch (error) {
@@ -244,14 +250,23 @@ export default function ForumScreen() {
     }
   };
 
-  const togglePostExpansion = async (postId: string) => {
+  const togglePostExpansion = (postId: string) => {
     const newExpandedPosts = new Set(expandedPosts);
     if (expandedPosts.has(postId)) {
       newExpandedPosts.delete(postId);
+      // unsubscribe comments for this post
+      if (commentUnsubscribers[postId]) {
+        commentUnsubscribers[postId]();
+        setCommentUnsubscribers(prev => {
+          const newUnsubs = { ...prev };
+          delete newUnsubs[postId];
+          return newUnsubs;
+        });
+      }
     } else {
       newExpandedPosts.add(postId);
       if (!comments[postId]) {
-        await loadComments(postId);
+        loadComments(postId);
       }
     }
     setExpandedPosts(newExpandedPosts);
@@ -281,6 +296,7 @@ export default function ForumScreen() {
     const category = getCategoryInfo(item.category);
     const isExpanded = expandedPosts.has(item.id);
     const postComments = comments[item.id] || [];
+    const commentsCount = postComments.length;
 
     return (
       <View style={styles.postCard}>
@@ -323,7 +339,7 @@ export default function ForumScreen() {
               <Text style={styles.commentButtonText}>Comentar</Text>
             </TouchableOpacity>
 
-            {(item.commentsCount || 0) > 0 && (
+            {(commentsCount > 0) && (
               <TouchableOpacity
                 style={styles.expandButton}
                 onPress={() => togglePostExpansion(item.id)}
@@ -334,7 +350,7 @@ export default function ForumScreen() {
                   color="#666"
                 />
                 <Text style={styles.expandButtonText}>
-                  {item.commentsCount} {item.commentsCount === 1 ? 'comentario' : 'comentarios'}
+                  {commentsCount} {commentsCount === 1 ? 'comentario' : 'comentarios'}
                 </Text>
               </TouchableOpacity>
             )}
