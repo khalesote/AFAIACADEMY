@@ -30,7 +30,13 @@ export function generateCvHtmlPro(cvData: CvData): string {
 
 function generateEuropassPro(cvData: CvData): string {
   const { personal, experiencias, formacion, idiomas, competencias, certificaciones, proyectos, configuracion } = cvData;
-  const colors = configuracion.esquemaColor;
+  const colors = {
+    primary: configuracion.esquemaColor?.primary || '#1f4f8b',
+    secondary: configuracion.esquemaColor?.secondary || '#4a90e2',
+    accent: configuracion.esquemaColor?.accent || '#ffd700',
+    text: configuracion.esquemaColor?.text || '#333',
+    background: configuracion.esquemaColor?.background || '#fff',
+  };
 
   const fotoHtml = configuracion.mostrarFoto && personal.foto
     ? `<div class="photo-container"><img src="${personal.foto}" alt="Foto" class="photo" /></div>`
@@ -48,7 +54,7 @@ function generateEuropassPro(cvData: CvData): string {
       ${exp.descripcion ? `<div class="cv-item-description">${sanitize(exp.descripcion)}</div>` : ""}
       ${exp.logros && exp.logros.length > 0 ? `
         <ul class="cv-item-achievements">
-          ${exp.logros.map(logro => `<li>${sanitize(logro)}</li>`).join("")}
+          ${exp.logros.map(logro => `<li>${sanitize(logro?.text)}</li>`).join("")}
         </ul>
       ` : ""}
     </div>
@@ -100,12 +106,8 @@ function generateEuropassPro(cvData: CvData): string {
         ${proj.fechaFin ? `<span class="project-date">${formatDateRange(proj.fechaInicio, proj.fechaFin)}</span>` : ""}
       </div>
       <div class="project-description">${sanitize(proj.descripcion)}</div>
-      ${proj.tecnologias && proj.tecnologias.length > 0 ? `
-        <div class="project-tech">
-          ${proj.tecnologias.map(tech => `<span class="tech-tag">${sanitize(tech)}</span>`).join("")}
-        </div>
-      ` : ""}
-      ${proj.url ? `<div class="project-link"><a href="${proj.url}" target="_blank">Ver proyecto</a></div>` : ""}
+      ${proj.tecnologias && proj.tecnologias.length > 0 ? `<div class="project-tech">Tecnologías: ${proj.tecnologias.map((tech: string) => sanitize(tech)).join(', ')}</div>` : ""}
+      ${proj.url ? `<div class="project-url"><a href="${proj.url}">Ver proyecto</a></div>` : ""}
     </div>
   `).join("");
 

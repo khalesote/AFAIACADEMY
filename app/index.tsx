@@ -488,9 +488,11 @@ export function HomeScreenContent() {
     };
   }, [prayerTimesContentWidth, prayerTimesByProvince.length]);
 
-  const newsTickerContent = newsItems
-    .map((item) => `${item.source}: ${item.title}`)
-    .join('   •   ');
+  const newsTickerContent = newsItems.length > 0 
+    ? "¡Oferta especial! 50% descuento en todas las matrículas de la Escuela Virtual - عرض خاص! خصم 50% على جميع التسجيلات في المدرسة الافتراضية   •   La Academia ofrece servicios de asesoramiento y acompañamiento, consultas en temas administrativos y de extranjería. Solicita cita previa en la sección Asesoría y Acompañamiento - تقدم الأكاديمية خدمات الاستشارة والمرافقة، استشارات في المواضيع الإدارية والأجانب. اطلب موعدًا مسبقًا في قسم الاستشارة والمرافقة   •   Si tienes dudas sobre aprendizaje de español o trámites administrativos/extranjería, publica en Foro Comunidad para resolverlas - إذا كان لديك أسئلة حول تعلم الإسبانية أو الإجراءات الإدارية/الأجانب، انشر في منتدى المجتمع لحلها   •   " + newsItems
+        .map((item) => `${item.source}: ${item.title}`)
+        .join('   •   ')
+    : "¡Oferta especial! 50% descuento en todas las matrículas de la Escuela Virtual - عرض خاص! خصم 50% على جميع التسجيلات في المدرسة الافتراضية   •   La Academia ofrece servicios de asesoramiento y acompañamiento, consultas en temas administrativos y de extranjería. Solicita cita previa en la sección Asesoría y Acompañamiento - تقدم الأكاديمية خدمات الاستشارة والمرافقة، استشارات في المواضيع الإدارية والأجانب. اطلب موعدًا مسبقًا في قسم الاستشارة والمرافقة   •   Si tienes dudas sobre aprendizaje de español o trámites administrativos/extranjería, publica en Foro Comunidad para resolverlas - إذا كان لديك أسئلة حول تعلم الإسبانية أو الإجراءات الإدارية/الأجانب، انشر في منتدى المجتمع لحلها";
 
   return (
     <View style={styles.container}>
@@ -821,6 +823,74 @@ export function HomeScreenContent() {
           <Text style={styles.sectionTitle}>Categorías Principales</Text>
 
           <View style={styles.categoriesGrid}>
+            {/* Examen Nacionalidad */}
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/ExamenNacionalidadScreen"))}
+            >
+              <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="document" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Examen Nacionalidad</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>امتحان الجنسية</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>CCSE</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>امتحان الجنسية</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Asesoría */}
+             <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleMenuPress(() => router.push("/AsesoriaScreen"))}
+            >
+               <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="people" size={32} color="#FFD700" />
+                                 <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Asesoría y Acompañamiento</Text>
+                 <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>استشارة ومرافقة</Text>
+                 <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Inmigración</Text>
+                 <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>هجرة</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Foro Comunidad */}
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/ForumScreen"))}
+            >
+              <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="chatbubbles" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Foro Comunidad</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>منتدى المجتمع</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Interacción</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>تفاعل</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Aprende a Escribir */}
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/AprendeEscribirScreen"))}
+            >
+              <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="create" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Aprende a Escribir</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>تعلّم الكتابة</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Leer y escribir</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>قراءة وكتابة</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
             {/* Diccionario */}
             <TouchableOpacity
               style={styles.categoryCard}
@@ -889,23 +959,6 @@ export function HomeScreenContent() {
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Asesoría */}
-             <TouchableOpacity
-              style={styles.categoryCard}
-              onPress={() => handleMenuPress(() => router.push("/AsesoriaScreen"))}
-            >
-               <LinearGradient
-                colors={['#1a1a1a', '#000000']}
-                style={styles.categoryGradient}
-              >
-                <Ionicons name="people" size={32} color="#FFD700" />
-                                 <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Asesoría y Acompañamiento</Text>
-                 <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>استشارة ومرافقة</Text>
-                 <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Inmigración</Text>
-                 <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>هجرة</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
             {/* Agenda del Inmigrante */}
             <TouchableOpacity
               style={styles.categoryCard}
@@ -920,23 +973,6 @@ export function HomeScreenContent() {
                 <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>دليل المهاجر</Text>
                 <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Guía práctica</Text>
                 <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>دليل عملي</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            {/* Examen Nacionalidad */}
-            <TouchableOpacity
-              style={styles.categoryCard}
-              onPress={() => handleMenuPress(() => router.push("/(tabs)/ExamenNacionalidadScreen"))}
-            >
-              <LinearGradient
-                colors={['#1a1a1a', '#000000']}
-                style={styles.categoryGradient}
-              >
-                <Ionicons name="document" size={32} color="#FFD700" />
-                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Examen Nacionalidad</Text>
-                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>امتحان الجنسية</Text>
-                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>CCSE</Text>
-                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>امتحان الجنسية</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -1057,7 +1093,8 @@ export function HomeScreenContent() {
             <Text style={styles.contactText}>
               Web: www.afaiacademiadeinmigrantes.com{'\n'}
               Email: somos@afaiacademiadeinmigrantes.com{'\n'}
-              Teléfono: 876096004
+              Teléfono: 876096004{'\n'}
+              Teléfono móvil: 622-744-837
             </Text>
           </View>
         </View>

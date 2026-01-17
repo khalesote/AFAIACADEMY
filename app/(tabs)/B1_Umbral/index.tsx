@@ -47,8 +47,7 @@ export default function B1Umbral() {
   };
 
   const isUnitAccessible = (index: number) => {
-    if (index === 0) return true;
-    return unitsDone[index - 1] === true;
+    return true;
   };
 
   // Verificar y cargar progreso al cargar y refrescar cuando se vuelve a la pantalla

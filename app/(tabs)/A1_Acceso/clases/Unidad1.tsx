@@ -34,7 +34,7 @@ export default function Unidad1() {
         [
           {
             text: 'Ir a Unidad 2',
-            onPress: () => router.replace('/(tabs)/A1_Acceso')
+            onPress: () => router.replace('/A1_Acceso/clases/Unidad2')
           },
           {
             text: 'Quedarme aquí',

@@ -61,11 +61,10 @@ export default function B2Avanzado() {
     router.push(`/B2_Avanzado/clases/${unitId}`);
   };
 
-  // Lógica de desbloqueo: primera unidad siempre desbloqueada, siguientes solo si completaste la anterior
+  // Lógica de desbloqueo: todas las unidades desbloqueadas
   const isUnitAccessible = useCallback((index: number) => {
-    if (index === 0) return true; // Primera unidad siempre desbloqueada
-    return unitsDone[index - 1] === true; // Siguiente unidad solo si completaste la anterior
-  }, [unitsDone]);
+    return true;
+  }, []);
 
   // Verificar y cargar progreso al cargar y refrescar cuando se vuelve a la pantalla
   useFocusEffect(
@@ -183,20 +182,6 @@ export default function B2Avanzado() {
           </LinearGradient>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.unitButton}
-          onPress={() => diplomaReady && router.push('/(tabs)/DiplomaGeneradoScreen?nivel=B2')}
-          disabled={!diplomaReady}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={diplomaReady ? ['#000', '#000'] : ['#333', '#333']}
-            style={styles.unitButtonGradient}
-          >
-            <Text style={styles.unitButtonText}>{diplomaReady ? 'Obtener Diploma B2' : 'Completa los exámenes para el diploma'}</Text>
-            <Text style={styles.unitButtonTextAr}>{diplomaReady ? 'احصل على شهادة B2' : 'أكمل الاختبارات للشهادة'}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );

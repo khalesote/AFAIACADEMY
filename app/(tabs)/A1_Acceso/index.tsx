@@ -12,27 +12,8 @@ const A1_ACCESO_LEVEL = 'A1';
 export default function A1Acceso() {
   const router = useRouter();
   const { progress, isLoading, reloadProgress, resetLevel } = useUserProgress();
-  // Estado local del progreso de unidades completadas
-  const [localProgress, setLocalProgress] = useState<boolean[]>(Array(7).fill(false));
-  
-  // Cargar progreso desde AsyncStorage
-  const loadProgressFromStorage = useCallback(async () => {
-    try {
-      const stored = await AsyncStorage.getItem('userProgress_v2');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        const unitsCompleted = parsed.A1?.unitsCompleted ?? Array(7).fill(false);
-        setLocalProgress(unitsCompleted);
-        console.log('📂 Progreso A1 cargado:', unitsCompleted);
-      } else {
-        // Si no hay datos, inicializar todo en false (solo unidad 1 desbloqueada)
-        setLocalProgress(Array(7).fill(false));
-      }
-    } catch (error) {
-      console.error('Error cargando progreso A1:', error);
-      setLocalProgress(Array(7).fill(false));
-    }
-  }, []);
+  const levelProgress = progress[A1_ACCESO_LEVEL];
+  const unitsDone = levelProgress?.unitsCompleted ?? Array(7).fill(false);
   
   // Función para resetear el progreso de A1
   const resetA1Progress = useCallback(async () => {
@@ -67,14 +48,8 @@ export default function A1Acceso() {
               // Resetear en el contexto
               await resetLevel('A1');
               
-              // Actualizar estado local
-              setLocalProgress(Array(7).fill(false));
-              
               // Recargar progreso
               await reloadProgress();
-              
-              // Recargar desde storage también
-              await loadProgressFromStorage();
               
               Alert.alert(
                 '✅ Progreso reseteado',
@@ -89,11 +64,8 @@ export default function A1Acceso() {
       console.error('Error reseteando progreso A1:', error);
       Alert.alert('Error', 'No se pudo resetear el progreso de A1.');
     }
-  }, [resetLevel, reloadProgress, loadProgressFromStorage]);
+  }, [resetLevel, reloadProgress]);
   
-  // Obtener el progreso del nivel A1
-  const levelProgress = progress[A1_ACCESO_LEVEL];
-  const unitsDone = localProgress;
   const oralPassed = levelProgress?.oralPassed ?? false;
   const writtenPassed = levelProgress?.writtenPassed ?? false;
   const diplomaReady = levelProgress?.diplomaReady ?? false;
@@ -104,28 +76,15 @@ export default function A1Acceso() {
   }, [router]);
   
   // LÓGICA DE DESBLOQUEO:
-  // - Solo la unidad 1 (índice 0) está desbloqueada inicialmente
-  // - Las demás unidades se desbloquean cuando completas la anterior
+  // - Todas las unidades están desbloqueadas
   const isUnitAccessible = useCallback((index: number) => {
-    // Unidad 1 siempre desbloqueada
-    if (index === 0) return true;
-    // Resto de unidades: solo desbloqueadas si completaste la anterior
-    return unitsDone[index - 1] === true;
-  }, [unitsDone]);
-  
-  // Cargar progreso al cargar y refrescar cuando se vuelve a la pantalla
-  useFocusEffect(
-    useCallback(() => {
-      console.log('🔄 useFocusEffect: Refrescando menú A1');
-      loadProgressFromStorage();
-      reloadProgress();
-    }, [loadProgressFromStorage, reloadProgress])
-  );
+    return true;
+  }, []);
   
   // Cargar progreso al montar
   useEffect(() => {
-    loadProgressFromStorage();
-  }, [loadProgressFromStorage]);
+    reloadProgress();
+  }, [reloadProgress]);
   
   // Log cuando cambia el progreso
   useEffect(() => {
@@ -151,8 +110,8 @@ export default function A1Acceso() {
       <Text style={styles.title}>A1: Acceso</Text>
       <Text style={styles.titleAr}>A1: الوصول</Text>
       <View style={styles.infoBox}>
-        <Text style={styles.infoText}>Para abrir la unidad siguiente tienes que completar los ejercicios de la unidad anterior y pulsar "Unidad finalizada".</Text>
-        <Text style={styles.infoTextAr}>لفتح الوحدة التالية يجب إكمال تمارين الوحدة السابقة والضغط على "انتهت الوحدة".</Text>
+        <Text style={styles.infoText}>Todas las unidades están disponibles para estudiar en cualquier orden.</Text>
+        <Text style={styles.infoTextAr}>جميع الوحدات متاحة للدراسة بأي ترتيب.</Text>
       </View>
 
       {/* Controles de testing eliminados para evitar bloqueos */}
@@ -245,7 +204,7 @@ export default function A1Acceso() {
           const n = i + 1;
           const accessible = isUnitAccessible(i);
           // Solo mostrar como completada si está desbloqueada Y completada
-          const isCompleted = accessible && localProgress[n - 1] === true;
+          const isCompleted = accessible && unitsDone[n - 1] === true;
           // Usar una key que incluya el estado de completado para forzar re-render cuando cambie
           const unitKey = `unit-${n}-${isCompleted ? 'done' : 'pending'}-${accessible ? 'accessible' : 'locked'}`;
           return (
@@ -283,36 +242,13 @@ export default function A1Acceso() {
         <TouchableOpacity
           style={styles.examButton}
           onPress={() => {
-            // Verificar que la unidad 7 esté desbloqueada Y completada
-            // La unidad 7 está desbloqueada si la unidad 6 (índice 5) está completada
-            const unidad6Completed = unitsDone[5] === true;
-            const unidad7Accessible = unidad6Completed; // Unidad 7 desbloqueada si unidad 6 completada
-            const unidad7Completed = unitsDone[6] === true;
-            const examUnlocked = unidad7Accessible && unidad7Completed;
-            
-            if (!examUnlocked) {
-              if (!unidad7Accessible) {
-                Alert.alert(
-                  'Examen final bloqueado',
-                  'Completa la Unidad 6 y marca "Unidad finalizada" para acceder a la Unidad 7 y al examen final.\nأكمل الوحدة 6 واضغط "انتهت الوحدة" للوصول إلى الوحدة 7 والامتحان النهائي.',
-                  [{ text: 'Entendido / فهمت', style: 'cancel' }]
-                );
-              } else {
-                Alert.alert(
-                  'Examen final bloqueado',
-                  'Completa la Unidad 7 y marca "Unidad finalizada" para acceder al examen final.\nأكمل الوحدة 7 واضغط "انتهت الوحدة" للوصول إلى الامتحان النهائي.',
-                  [{ text: 'Entendido / فهمت', style: 'cancel' }]
-                );
-              }
-              return;
-            }
             router.push('/A1_Acceso/clases/ExamenFinal');
           }}
-          disabled={!unitsDone[5] || !unitsDone[6]}
+          disabled={false}
           activeOpacity={0.8}
         >
           <LinearGradient
-            colors={(unitsDone[5] === true && unitsDone[6] === true) ? ['#000', '#000'] : ['#333', '#333']}
+            colors={['#000', '#000']}
             style={styles.examButtonGradient}
           >
             <Ionicons name="school" size={20} color="#FFD700" style={{ marginRight: 8 }} />

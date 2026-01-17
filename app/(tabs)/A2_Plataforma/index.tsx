@@ -39,15 +39,11 @@ export default function A2Plataforma() {
     router.push(`/A2_Plataforma/clases/${encodeURIComponent('Unidad' + n)}` as any);
   };
 
-  // LÓGICA DE DESBLOQUEO RECONSTRUIDA DESDE CERO:
-  // - Solo la unidad 1 (índice 0) está desbloqueada inicialmente
-  // - Las demás unidades se desbloquean cuando completas la anterior
+  // LÓGICA DE DESBLOQUEO:
+  // - Todas las unidades están desbloqueadas
   const isUnitAccessible = useCallback((index: number) => {
-    // Unidad 1 siempre desbloqueada
-    if (index === 0) return true;
-    // Resto de unidades: solo desbloqueadas si completaste la anterior
-    return unitsDone[index - 1] === true;
-  }, [unitsDone]);
+    return true;
+  }, []);
 
   // Verificar y cargar progreso al cargar y refrescar cuando se vuelve a la pantalla
   useFocusEffect(
@@ -159,7 +155,7 @@ export default function A2Plataforma() {
           activeOpacity={0.8}
         >
           <LinearGradient
-            colors={(progress[LEVEL_KEY]?.unitsCompleted?.[9] ?? false) ? ['#000', '#000'] : ['#333', '#333']}
+            colors={['#000', '#000']}
             style={styles.examButtonGradient}
           >
             <Text style={styles.examButtonText}>Examen Final</Text>

@@ -28,8 +28,8 @@ export default function Unidad7() {
         'Has completado todas las unidades. Ahora puedes acceder al Examen Final.\nأكملت جميع الوحدات. يمكنك الآن الوصول إلى الاختبار النهائي.',
         [
           {
-            text: 'Ir al menú',
-            onPress: () => router.replace('/(tabs)/A1_Acceso')
+            text: 'Ir al examen final',
+            onPress: () => router.replace('/A1_Acceso/clases/ExamenFinal')
           },
           {
             text: 'Quedarme aquí',

@@ -63,12 +63,12 @@ export default function SchoolScreen() {
   const { progress, isLoading, resetLevel, unlockLevel } = useUserProgress();
   const { user, firebaseUser, isAuthenticated } = useUser();
 
-  // Estados de desbloqueo de niveles - Inicialmente todos desbloqueados (según configuración actual)
+  // Estados de desbloqueo de niveles - Inicialmente bloqueados
   const [nivelesDesbloqueados, setNivelesDesbloqueados] = React.useState({
-    A1: true,  // Siempre desbloqueado
-    A2: true,  // Siempre desbloqueado
-    B1: true,  // Siempre desbloqueado
-    B2: true   // Siempre desbloqueado
+    A1: false,  // Desbloqueado solo con pago o código
+    A2: false,  // Desbloqueado solo con pago o código
+    B1: false,  // Desbloqueado solo con pago o código
+    B2: false   // Desbloqueado solo con pago o código
   });
   
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -77,6 +77,15 @@ export default function SchoolScreen() {
   // Estados de matrícula
   const [matriculadoA1A2, setMatriculadoA1A2] = React.useState(false);
   const [matriculadoB1B2, setMatriculadoB1B2] = React.useState(false);
+
+  // Estados de códigos de acceso
+  const [accessA1A2, setAccessA1A2] = React.useState(false);
+  const [accessB1B2, setAccessB1B2] = React.useState(false);
+
+  // Estados para modal de código de acceso
+  const [accessModalVisible, setAccessModalVisible] = React.useState(false);
+  const [accessCode, setAccessCode] = React.useState('');
+  const [currentLevel, setCurrentLevel] = React.useState<'A1A2' | 'B1B2' | null>(null);
 
   // Manejar parámetros de navegación
   const params = useLocalSearchParams<{
@@ -92,21 +101,28 @@ export default function SchoolScreen() {
   React.useEffect(() => {
     const loadMatriculas = async () => {
       try {
-        const [a1a2Stored, b1b2Stored] = await Promise.all([
+        const [a1a2Stored, b1b2Stored, a1a2AccessStored, b1b2AccessStored] = await Promise.all([
           AsyncStorage.getItem('matricula_A1A2_completada'),
-          AsyncStorage.getItem('matricula_B1B2_completada')
+          AsyncStorage.getItem('matricula_B1B2_completada'),
+          AsyncStorage.getItem('access_code_A1A2_valid'),
+          AsyncStorage.getItem('access_code_B1B2_valid')
         ]);
         setMatriculadoA1A2(a1a2Stored === 'true');
         setMatriculadoB1B2(b1b2Stored === 'true');
+        setAccessA1A2(a1a2AccessStored === 'true');
+        setAccessB1B2(b1b2AccessStored === 'true');
+        setNivelesDesbloqueados({
+          A1: accessA1A2 || matriculadoA1A2,
+          A2: accessA1A2 || matriculadoA1A2,
+          B1: accessB1B2 || matriculadoB1B2,
+          B2: accessB1B2 || matriculadoB1B2
+        });
       } catch (error) {
-        console.error('Error al cargar estado de matrícula:', error);
-        setMatriculadoA1A2(false);
-        setMatriculadoB1B2(false);
+        console.error('Error cargando matrículas:', error);
       }
     };
-
     loadMatriculas();
-  }, [params?.refresh]);
+  }, []);
 
   // Resetear progreso de niveles si no está matriculado (solo cuando cambia el estado de matrícula)
   React.useEffect(() => {
@@ -145,17 +161,15 @@ export default function SchoolScreen() {
     lastMatriculaState.current = { A1A2: matriculadoA1A2, B1B2: matriculadoB1B2 };
   }, [matriculadoA1A2, matriculadoB1B2, isLoading, progress, resetLevel]);
 
-  // Eliminado: El desbloqueo de niveles ahora se hace automáticamente en UserProgressContext
-
+  // Actualizar niveles desbloqueados cuando cambian matriculado o acceso
   React.useEffect(() => {
-    // Desbloquear todos los niveles automáticamente
     setNivelesDesbloqueados({
-      A1: true, // Siempre desbloqueado
-      A2: true, // Siempre desbloqueado
-      B1: true, // Siempre desbloqueado
-      B2: true  // Siempre desbloqueado
+      A1: matriculadoA1A2 || accessA1A2,
+      A2: matriculadoA1A2 || accessA1A2,
+      B1: matriculadoB1B2 || accessB1B2,
+      B2: matriculadoB1B2 || accessB1B2
     });
-  }, [progress]);
+  }, [matriculadoA1A2, matriculadoB1B2, accessA1A2, accessB1B2]);
 
   React.useEffect(() => {
     if (!params?.matriculado || hasShownWelcome.current) {
@@ -193,12 +207,12 @@ export default function SchoolScreen() {
     setModalVisible(false);
   };
 
-  const canAccessLevel = (level: 'A1' | 'A2' | 'B1' | 'B2') => {
-    return nivelesDesbloqueados[level];
+  const handleEnterAccessCode = (level: 'A1A2' | 'B1B2') => {
+    setCurrentLevel(level);
+    setAccessModalVisible(true);
   };
 
   const handleOpenLevel = (nivel: 'A1' | 'A2' | 'B1' | 'B2', path: string) => {
-    // Todos los niveles están desbloqueados, permitir acceso directo
     router.push(path);
   };
 
@@ -206,250 +220,203 @@ export default function SchoolScreen() {
   // RENDERIZADO PRINCIPAL
   // ---------------------------------------------------------------------------
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View>
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View>
 
-        <View style={styles.headerActions}>
-          <TouchableOpacity
-            style={{ padding: 8 }}
-            onPress={() => router.replace('/')}
-          >
-            <Ionicons name="arrow-back" size={28} color="#9DC3AA" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={{ width: '100%', alignItems: 'center', marginBottom: 24 }}>
-          <Ionicons name="school" size={64} color="#FFD700" style={{ marginBottom: 16 }} />
-          <Text style={styles.title}>Escuela Virtual</Text>
-          <Text style={styles.subtitle}>
-            Bienvenido/a a la escuela virtual de la Academia de Inmigrantes.
-          </Text>
-        </View>
-
-        {/* Botón de Matriculación */}
-        <View style={styles.progressWidget}>
-          <TouchableOpacity
-            style={styles.standardButton}
-            onPress={async () => {
-              // Verificar si ya está matriculado en todos los niveles
-              if (matriculadoA1A2 && matriculadoB1B2) {
-                showModal('Ya estás matriculado en todos los niveles disponibles.');
-                return;
-              }
-
-              // Intentar navegar a MatriculaScreen
-              // Si el usuario está autenticado, pasar sus datos
-              if (isAuthenticated && firebaseUser && user) {
-                // Pasar los datos del usuario a MatriculaScreen
-                router.push({
-                  pathname: '/MatriculaScreen',
-                  params: {
-                    nombre: user.firstName || '',
-                    apellido1: user.lastName || '',
-                    apellido2: user.apellido2 || '',
-                    fechaNacimiento: user.fechaNacimiento || '',
-                    provincia: user.provincia || '',
-                    telefono: user.telefono || '',
-                    tipoDocumento: user.tipoDocumento || 'NIE',
-                    documento: user.documento || '',
-                    email: user.email || '',
-                  }
-                });
-              } else {
-                // Usuario no autenticado: permitir acceso pero sin datos prellenados
-                // El usuario puede registrarse desde MatriculaScreen si lo necesita
-                router.push({
-                  pathname: '/MatriculaScreen'
-                });
-              }
-            }}
-            disabled={false}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={['#000', '#000']}
-              style={styles.standardButtonGradient}
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              style={{ padding: 8 }}
+              onPress={() => router.replace('/')}
             >
-              <Ionicons
-                name="person-add"
-                color="#FFD700"
-                size={24}
-                style={{ marginRight: 12 }}
-              />
-              <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>
-                  {(matriculadoA1A2 && matriculadoB1B2) ? '¡Matriculado en todos los niveles!' : 'Matricúlate'}
-                </Text>
-                {!(matriculadoA1A2 && matriculadoB1B2) && (
-                  <Text style={{
-                    color: '#fff',
-                    fontSize: 16,
-                    fontWeight: '500',
-                    textAlign: 'center',
-                    writingDirection: 'rtl',
-                    fontFamily: 'Arial'
-                  }}>
-                    سجل الآن
-                  </Text>
-                )}
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-          
-          {/* Indicador de niveles matriculados */}
-          {(matriculadoA1A2 || matriculadoB1B2) && (
-            <View style={{ marginTop: 10, alignItems: 'center' }}>
-              <Text style={{ color: '#79A890', fontWeight: '500' }}>
-                {matriculadoA1A2 && '✓ Niveles A1/A2 desbloqueados'}
-                {matriculadoA1A2 && matriculadoB1B2 && '\n'}
-                {matriculadoB1B2 && '✓ Niveles B1/B2 desbloqueados'}
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {/* Botones de niveles */}
-        <View style={styles.progressWidget}>
-          {/* Niveles A1/A2 */}
-          <TouchableOpacity
-            style={styles.nivelButton}
-            onPress={() => handleOpenLevel('A1', '/A1_Acceso')}
-            disabled={!nivelesDesbloqueados.A1}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={nivelesDesbloqueados.A1 ? ['#000', '#000'] : ['#333', '#333']}
-              style={styles.nivelButtonGradient}
-            >
-              <Ionicons 
-                name={nivelesDesbloqueados.A1 ? 'lock-open' : 'lock-closed'} 
-                size={20} 
-                color="#FFD700" 
-                style={{ marginRight: 8 }} 
-              />
-              <Text style={styles.buttonText}>
-                {nivelesDesbloqueados.A1 ? 'Nivel A1 Acceso' : 'Nivel A1 Bloqueado'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.nivelButton}
-            onPress={() => handleOpenLevel('A2', '/A2_Plataforma')}
-            disabled={false}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={nivelesDesbloqueados.A2 ? ['#000', '#000'] : ['#333', '#333']}
-              style={styles.nivelButtonGradient}
-            >
-              <Ionicons 
-                name={nivelesDesbloqueados.A2 ? 'lock-open' : 'lock-closed'} 
-                size={20} 
-                color="#FFD700" 
-                style={{ marginRight: 8 }} 
-              />
-              <Text style={styles.buttonText}>
-                {nivelesDesbloqueados.A2 ? 'Nivel A2 Plataforma' : 'Nivel A2 Bloqueado'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {/* Niveles B1/B2 */}
-          <TouchableOpacity
-            style={styles.nivelButton}
-            onPress={() => handleOpenLevel('B1', '/B1_Umbral')}
-            disabled={false}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={nivelesDesbloqueados.B1 ? ['#000', '#000'] : ['#333', '#333']}
-              style={styles.nivelButtonGradient}
-            >
-              <Ionicons 
-                name={nivelesDesbloqueados.B1 ? 'lock-open' : 'lock-closed'} 
-                size={20} 
-                color="#FFD700" 
-                style={{ marginRight: 8 }} 
-              />
-              <Text style={styles.buttonText}>
-                {nivelesDesbloqueados.B1 ? 'Nivel B1 Umbral' : 'Nivel B1 Bloqueado'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.nivelButton}
-            onPress={() => handleOpenLevel('B2', '/B2_Avanzado')}
-            disabled={false}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={nivelesDesbloqueados.B2 ? ['#000', '#000'] : ['#333', '#333']}
-              style={styles.nivelButtonGradient}
-            >
-              <Ionicons 
-                name={nivelesDesbloqueados.B2 ? 'lock-open' : 'lock-closed'} 
-                size={20} 
-                color="#FFD700" 
-                style={{ marginRight: 8 }} 
-              />
-              <Text style={styles.buttonText}>
-                {nivelesDesbloqueados.B2 ? 'Nivel B2 Avanzado' : 'Nivel B2 Bloqueado'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-
-        {/* Modal */}
-        <Modal 
-          visible={modalVisible} 
-          transparent 
-          animationType="fade" 
-          onRequestClose={closeModal}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalBox}>
-              <Ionicons 
-                name="information-circle-outline" 
-                size={36} 
-                color="#FFD700" 
-                style={{ marginBottom: 12 }} 
-              />
-              <Text style={{ 
-                fontSize: 17, 
-                textAlign: 'center', 
-                marginBottom: 18,
-                lineHeight: 24
-              }}>
-                {modalMsg}
-              </Text>
-              <TouchableOpacity
-                onPress={closeModal}
-                activeOpacity={0.8}
-              >
-                <LinearGradient
-                  colors={['#9DC3AA', '#79A890']}
-                  style={{ 
-                    paddingVertical: 10, 
-                    paddingHorizontal: 22, 
-                    borderRadius: 8 
-                  }}
-                >
-                  <Text style={{ 
-                    color: '#fff', 
-                    fontWeight: 'bold', 
-                    fontSize: 16 
-                  }}>
-                    Cerrar
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
+              <Ionicons name="arrow-back" size={28} color="#9DC3AA" />
+            </TouchableOpacity>
           </View>
-        </Modal>
-      </View>
-    </ScrollView>
+
+          <View style={{ width: '100%', alignItems: 'center', marginBottom: 24 }}>
+            <Ionicons name="school" size={64} color="#FFD700" style={{ marginBottom: 16 }} />
+            <Text style={styles.title}>Escuela Virtual</Text>
+            <Text style={styles.subtitle}>
+              Bienvenido/a a la escuela virtual de la Academia de Inmigrantes.
+            </Text>
+          </View>
+
+          {/* Botón de Matriculación */}
+          <View style={styles.progressWidget}>
+            <TouchableOpacity
+              style={styles.standardButton}
+              onPress={async () => {
+                // Verificar si ya está matriculado en todos los niveles
+                if (matriculadoA1A2 && matriculadoB1B2) {
+                  showModal('Ya estás matriculado en todos los niveles disponibles.');
+                  return;
+                }
+
+                // Intentar navegar a MatriculaScreen
+                // Si el usuario está autenticado, pasar sus datos
+                if (isAuthenticated && firebaseUser && user) {
+                  // Pasar los datos del usuario a MatriculaScreen
+                  router.push({
+                    pathname: '/MatriculaScreen',
+                    params: {
+                      nombre: user.firstName || '',
+                      apellido1: user.lastName || '',
+                      fechaNacimiento: user.fechaNacimiento || '',
+                      provincia: user.provincia || '',
+                      telefono: user.telefono || '',
+                      tipoDocumento: user.tipoDocumento || 'NIE',
+                      documento: user.documento || '',
+                      email: user.email || '',
+                    }
+                  });
+                } else {
+                  // Usuario no autenticado: permitir acceso pero sin datos prellenados
+                  // El usuario puede registrarse desde MatriculaScreen si lo necesita
+                  router.push({
+                    pathname: '/MatriculaScreen'
+                  });
+                }
+              }}
+              disabled={false}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#000', '#000']}
+                style={styles.standardButtonGradient}
+              >
+                <Ionicons
+                  name="person-add"
+                  color="#FFD700"
+                  size={24}
+                  style={{ marginRight: 12 }}
+                />
+                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>
+                    {(matriculadoA1A2 && matriculadoB1B2) ? '¡Matriculado en todos los niveles!' : 'Matricúlate'}
+                  </Text>
+                  {!(matriculadoA1A2 && matriculadoB1B2) && (
+                    <Text style={{
+                      color: '#fff',
+                      fontSize: 16,
+                      fontWeight: '500',
+                      textAlign: 'center',
+                      writingDirection: 'rtl',
+                      fontFamily: 'Arial'
+                    }}>
+                      سجل الآن
+                    </Text>
+                  )}
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+            
+            {/* Indicador de niveles matriculados */}
+            {(matriculadoA1A2 || matriculadoB1B2) && (
+              <View style={{ marginTop: 10, alignItems: 'center' }}>
+                <Text style={{ color: '#79A890', fontWeight: '500' }}>
+                  {matriculadoA1A2 && '✓ Niveles A1/A2 desbloqueados'}
+                  {matriculadoA1A2 && matriculadoB1B2 && '\n'}
+                  {matriculadoB1B2 && '✓ Niveles B1/B2 desbloqueados'}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Botones de niveles */}
+          <View style={styles.progressWidget}>
+            {/* Niveles A1/A2 */}
+            <TouchableOpacity
+              style={styles.nivelButton}
+              onPress={() => handleOpenLevel('A1', '/A1_Acceso')}
+              disabled={!nivelesDesbloqueados.A1}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={nivelesDesbloqueados.A1 ? ['#000', '#000'] : ['#333', '#333']}
+                style={styles.nivelButtonGradient}
+              >
+                <Ionicons 
+                  name={nivelesDesbloqueados.A1 ? 'lock-open' : 'lock-closed'} 
+                  size={20} 
+                  color="#FFD700" 
+                  style={{ marginRight: 8 }} 
+                />
+                <Text style={styles.buttonText}>
+                  {nivelesDesbloqueados.A1 ? 'Nivel A1 Acceso' : 'Nivel A1 Bloqueado'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.nivelButton}
+              onPress={() => handleOpenLevel('A2', '/A2_Plataforma')}
+              disabled={!nivelesDesbloqueados.A2}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={nivelesDesbloqueados.A2 ? ['#000', '#000'] : ['#333', '#333']}
+                style={styles.nivelButtonGradient}
+              >
+                <Ionicons 
+                  name={nivelesDesbloqueados.A2 ? 'lock-open' : 'lock-closed'} 
+                  size={20} 
+                  color="#FFD700" 
+                  style={{ marginRight: 8 }} 
+                />
+                <Text style={styles.buttonText}>
+                  {nivelesDesbloqueados.A2 ? 'Nivel A2 Plataforma' : 'Nivel A2 Bloqueado'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Niveles B1/B2 */}
+            <TouchableOpacity
+              style={styles.nivelButton}
+              onPress={() => handleOpenLevel('B1', '/B1_Umbral')}
+              disabled={!nivelesDesbloqueados.B1}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={nivelesDesbloqueados.B1 ? ['#000', '#000'] : ['#333', '#333']}
+                style={styles.nivelButtonGradient}
+              >
+                <Ionicons 
+                  name={nivelesDesbloqueados.B1 ? 'lock-open' : 'lock-closed'} 
+                  size={20} 
+                  color="#FFD700" 
+                  style={{ marginRight: 8 }} 
+                />
+                <Text style={styles.buttonText}>
+                  {nivelesDesbloqueados.B1 ? 'Nivel B1 Umbral' : 'Nivel B1 Bloqueado'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.nivelButton}
+              onPress={() => handleOpenLevel('B2', '/B2_Avanzado')}
+              disabled={!nivelesDesbloqueados.B2}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={nivelesDesbloqueados.B2 ? ['#000', '#000'] : ['#333', '#333']}
+                style={styles.nivelButtonGradient}
+              >
+                <Ionicons 
+                  name={nivelesDesbloqueados.B2 ? 'lock-open' : 'lock-closed'} 
+                  size={20} 
+                  color="#FFD700" 
+                  style={{ marginRight: 8 }} 
+                />
+                <Text style={styles.buttonText}>
+                  {nivelesDesbloqueados.B2 ? 'Nivel B2 Avanzado' : 'Nivel B2 Bloqueado'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </>
   );
 } // ← FIN DEL COMPONENTE SchoolScreen
 

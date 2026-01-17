@@ -60,7 +60,7 @@ export default function MatriculaScreen() {
   const [paymentMethod, setPaymentMethod] = useState<'payment' | 'code'>('payment');
 
   const priceKey = `MATRICULA_${selectedLevel}` as keyof typeof ENROLLMENT_PRICES;
-  const amount = ENROLLMENT_PRICES[priceKey] || 0;
+  const amount = (ENROLLMENT_PRICES[priceKey] || 0) * 0.5;
   const operationType = `matricula-${selectedLevel.toLowerCase()}` as string;
   const customerName = `${safeFormData.nombre} ${safeFormData.apellido1} ${safeFormData.apellido2}`.trim();
 
@@ -356,66 +356,6 @@ export default function MatriculaScreen() {
             <Text style={styles.optionDescription}>Acceso al nivel B2: Avanzado</Text>
           </TouchableOpacity>
 
-          {/* Paquetes Combinados */}
-          <Text style={styles.sectionSubtitleBlack}>Paquetes Combinados</Text>
-          
-          {/* Matrícula A1+A2 */}
-          <TouchableOpacity 
-            style={[
-              styles.enrollmentOption, 
-              selectedLevel === 'A1A2' && styles.selectedOption
-            ]}
-            onPress={() => handleSelectLevel('A1A2')}
-          >
-            <View style={styles.optionHeader}>
-              <MaterialIcons 
-                name={selectedLevel === 'A1A2' ? 'lock-open' : 'lock-outline'} 
-                size={24} 
-                color={selectedLevel === 'A1A2' ? '#4CAF50' : '#666'} 
-              />
-              <Text style={styles.optionTitle}>Paquete A1 + A2</Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <View style={styles.priceRow}>
-                <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_A1A2}€</Text>
-                <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_A1A2 * 0.5).toFixed(0)}€</Text>
-                  <Text style={styles.ivaText}> + IVA</Text>
-                </View>
-              </View>
-              <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
-            </View>
-            <Text style={styles.optionDescription}>Acceso completo a niveles A1 y A2</Text>
-          </TouchableOpacity>
-
-          {/* Matrícula B1+B2 */}
-          <TouchableOpacity 
-            style={[
-              styles.enrollmentOption, 
-              selectedLevel === 'B1B2' && styles.selectedOption
-            ]}
-            onPress={() => handleSelectLevel('B1B2')}
-          >
-            <View style={styles.optionHeader}>
-              <MaterialIcons 
-                name={selectedLevel === 'B1B2' ? 'lock-open' : 'lock-outline'} 
-                size={24} 
-                color={selectedLevel === 'B1B2' ? '#4CAF50' : '#666'} 
-              />
-              <Text style={styles.optionTitle}>Paquete B1 + B2</Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <View style={styles.priceRow}>
-                <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_B1B2}€</Text>
-                <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_B1B2 * 0.5).toFixed(0)}€</Text>
-                  <Text style={styles.ivaText}> + IVA</Text>
-                </View>
-              </View>
-              <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
-            </View>
-            <Text style={styles.optionDescription}>Acceso completo a niveles B1 y B2</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Método de pago */}
@@ -502,18 +442,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#000',
     padding: 20,
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#666',
+    color: '#FFD700',
   },
   sectionTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -525,12 +465,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   dataContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#111',
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#FFD700',
   },
   dataRow: {
     flexDirection: 'row',
@@ -541,11 +481,11 @@ const styles = StyleSheet.create({
   dataLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#FFD700',
   },
   dataValue: {
     fontSize: 16,
-    color: '#666',
+    color: '#FFD700',
     flex: 1,
     textAlign: 'right',
   },
@@ -553,16 +493,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   enrollmentOption: {
-    backgroundColor: '#fff',
+    backgroundColor: '#111',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: '#333',
   },
   selectedOption: {
-    borderColor: '#4CAF50',
-    backgroundColor: '#f8fff8',
+    borderColor: '#FFD700',
+    backgroundColor: '#222',
   },
   optionHeader: {
     flexDirection: 'row',
@@ -572,12 +512,12 @@ const styles = StyleSheet.create({
   optionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#FFD700',
     marginLeft: 10,
   },
   optionDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#FFD700',
     marginTop: 5,
   },
   priceContainer: {
@@ -601,15 +541,15 @@ const styles = StyleSheet.create({
   discountedPrice: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#FFD700',
   },
   ivaText: {
     fontSize: 12,
-    color: '#666',
+    color: '#FFD700',
   },
   discountBadge: {
     fontSize: 12,
-    color: '#ff6b6b',
+    color: '#FFD700',
     fontWeight: '600',
     marginTop: 5,
   },
@@ -624,22 +564,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#111',
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: '#333',
     alignItems: 'center',
   },
   paymentMethodButtonActive: {
-    borderColor: '#4CAF50',
-    backgroundColor: '#f8fff8',
+    borderColor: '#FFD700',
+    backgroundColor: '#222',
   },
   paymentMethodButtonText: {
     fontSize: 16,
-    color: '#666',
+    color: '#FFD700',
     fontWeight: '600',
   },
   paymentMethodButtonTextActive: {
-    color: '#4CAF50',
+    color: '#FFD700',
   },
   paymentContainer: {
     marginTop: 20,
@@ -652,26 +592,26 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#111',
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: '#333',
     alignItems: 'center',
   },
   paymentProviderButtonActive: {
-    borderColor: '#4CAF50',
-    backgroundColor: '#f8fff8',
+    borderColor: '#FFD700',
+    backgroundColor: '#222',
   },
   paymentProviderText: {
     fontSize: 16,
-    color: '#666',
+    color: '#FFD700',
     fontWeight: '600',
   },
   paymentProviderTextActive: {
-    color: '#4CAF50',
+    color: '#FFD700',
   },
   securityText: {
     textAlign: 'center',
-    color: '#666',
+    color: '#FFD700',
     fontSize: 12,
     marginTop: 10,
   },
@@ -682,13 +622,13 @@ const styles = StyleSheet.create({
   noDataText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ff6b6b',
+    color: '#FFD700',
     textAlign: 'center',
     marginBottom: 10,
   },
   noDataSubtext: {
     fontSize: 14,
-    color: '#666',
+    color: '#FFD700',
     textAlign: 'center',
     marginBottom: 20,
   },

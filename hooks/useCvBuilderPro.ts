@@ -4,6 +4,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type CvTemplate = 'europass' | 'moderno' | 'creativo' | 'ejecutivo';
 
+export interface CvColorScheme {
+  primary: string;
+  secondary: string;
+  accent: string;
+  text: string;
+  background: string;
+}
+
 export interface PersonalInfo {
   foto?: string;
   nombreCompleto: string;
@@ -30,6 +38,7 @@ export interface Experiencia {
   fechaFin: string;
   actualmente: boolean;
   descripcion: string;
+  logros?: { text: string }[];
 }
 
 export interface Formacion {
@@ -40,6 +49,7 @@ export interface Formacion {
   fechaInicio: string;
   fechaFin: string;
   actualmente: boolean;
+  descripcion?: string;
 }
 
 export interface Idioma {
@@ -59,8 +69,9 @@ export interface Competencia {
 export interface Certificacion {
   id: string;
   nombre: string;
-  institucion: string;
-  fecha: string;
+  organismo: string;
+  fechaEmision: string;
+  numeroCredencial?: string;
   url?: string;
 }
 
@@ -68,13 +79,16 @@ export interface Proyecto {
   id: string;
   nombre: string;
   descripcion: string;
-  tecnologias: string;
+  tecnologias: string[];
   url?: string;
-  fecha: string;
+  fechaInicio: string;
+  fechaFin?: string;
 }
 
 export interface Configuracion {
   plantilla: CvTemplate;
+  esquemaColor: CvColorScheme;
+  mostrarFoto: boolean;
 }
 
 export interface CvData {
@@ -112,6 +126,14 @@ const initialCvData: CvData = {
   proyectos: [],
   configuracion: {
     plantilla: 'moderno',
+    esquemaColor: {
+      primary: '#1f4f8b',
+      secondary: '#4a90e2',
+      accent: '#ffd700',
+      text: '#333',
+      background: '#fff',
+    },
+    mostrarFoto: true,
   },
 };
 
@@ -284,8 +306,9 @@ export const useCvBuilderPro = () => {
     const newCert: Certificacion = {
       id: Date.now().toString(),
       nombre: '',
-      institucion: '',
-      fecha: '',
+      organismo: '',
+      fechaEmision: '',
+      numeroCredencial: '',
       url: '',
     };
     setCvData((prev) => ({
@@ -316,9 +339,10 @@ export const useCvBuilderPro = () => {
       id: Date.now().toString(),
       nombre: '',
       descripcion: '',
-      tecnologias: '',
+      tecnologias: [],
       url: '',
-      fecha: '',
+      fechaInicio: '',
+      fechaFin: '',
     };
     setCvData((prev) => ({
       ...prev,
