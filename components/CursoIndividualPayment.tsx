@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Alert, StyleSheet, Modal, ScrollView } from 'react-native';
-import { useStripe } from '@stripe/stripe-react-native';
+import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import FormacionAccessCodeInput from './FormacionAccessCodeInput';
 import { markFormacionCodeAsUsed } from '../utils/accessCodes';
 import { useUser } from '@/contexts/UserContext';
+import { CECABANK_CONFIG, validateCecabankConfig } from '../config/cecabank';
+import { getCecabankDateTime, formatAmount, generateOrderId } from '../utils/cecabank';
 
-const PRECIO_BASE = 0.01; // 0.01 euros para pruebas
+const PRECIO_BASE = 5; // 5 euros para cada curso
 const IVA_RATE = 0.21; // 21% IVA
 
 interface CursoIndividualPaymentProps {
@@ -32,11 +34,13 @@ export default function CursoIndividualPayment({
   onCancel, 
   visible 
 }: CursoIndividualPaymentProps) {
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [metodoAcceso, setMetodoAcceso] = useState<'pago' | 'codigo'>('pago');
+  const [showWebView, setShowWebView] = useState(false);
+  const [webViewHtml, setWebViewHtml] = useState('');
+  const webViewRef = useRef<WebView>(null);
 
   const basePrice = PRECIO_BASE;
   const iva = basePrice * IVA_RATE;
@@ -45,91 +49,123 @@ export default function CursoIndividualPayment({
   const handlePayment = async () => {
     if (loading) return;
     
+    const validation = validateCecabankConfig();
+    if (!validation.isValid) {
+      Alert.alert(
+        'Pago no configurado',
+        `Faltan variables: ${validation.errors.join(', ')}`
+      );
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
 
-      console.log('💳 Iniciando pago para curso:', curso.key);
+      console.log('💳 Iniciando pago con Cecabank para curso:', curso.key);
       console.log('💰 Precio:', { basePrice, iva, totalPrice });
 
-      // 1. Crear Payment Intent
-      const endpoint = 'https://academia-backend-s9np.onrender.com/api/create-payment-intent';
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ 
-          amount: Math.round(totalPrice * 100), // Stripe usa centavos
-          currency: 'eur',
-          description: `Curso: ${curso.label}`,
-          tipo: 'curso-individual',
-          cursoKey: curso.key
-        }),
+      const { fecha, hora } = getCecabankDateTime();
+      const numOperacion = generateOrderId('formacion-profesional');
+      const importe = formatAmount(totalPrice);
+
+      const formData = {
+        MerchantID: CECABANK_CONFIG.merchantId,
+        AcquirerBIN: CECABANK_CONFIG.acquirerBin,
+        TerminalID: CECABANK_CONFIG.terminalId,
+        Num_operacion: numOperacion,
+        Importe: importe,
+        TipoMoneda: CECABANK_CONFIG.tipoMoneda,
+        Exponente: '2',
+        Cifrado: 'SHA2',
+        URL_OK: CECABANK_CONFIG.urlOk,
+        URL_NOK: CECABANK_CONFIG.urlKo,
+        URL_KO: CECABANK_CONFIG.urlKo,
+        Idioma: CECABANK_CONFIG.idioma,
+        Pago_soportado: 'SSL',
+        Descripcion: `Curso: ${curso.label}`,
+        FechaOperacion: fecha,
+        HoraOperacion: hora,
+        Firma: 'PLACEHOLDER',
+        ...(user?.email ? { Email: user.email } : {}),
+        ...(user?.name ? { Nombre: user.name } : {}),
+      };
+
+      console.log('🔗 Cecabank URLs (frontend):', {
+        urlOk: CECABANK_CONFIG.urlOk,
+        urlKo: CECABANK_CONFIG.urlKo,
+        okLength: CECABANK_CONFIG.urlOk?.length || 0,
+        koLength: CECABANK_CONFIG.urlKo?.length || 0,
       });
+
+      const endpointUrl = `${CECABANK_CONFIG.apiUrl}/api/cecabank/redirect-clean`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+      let response;
+      try {
+        response = await fetch(endpointUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams(formData as any).toString(),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+      } catch (fetchError: any) {
+        clearTimeout(timeoutId);
+        throw new Error(
+          fetchError?.name === 'AbortError'
+            ? 'La conexión con el servidor tardó demasiado. Intenta nuevamente.'
+            : `Error de conexión: ${fetchError.message || 'No se pudo conectar'}`
+        );
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Error del servidor: ${response.status}`);
+        throw new Error(`Error ${response.status}: ${errorText || 'Sin detalles'}`);
       }
 
-      const responseData = await response.json();
-      const { clientSecret, paymentIntentId } = responseData;
-      
-      if (!clientSecret) {
-        throw new Error('No se pudo iniciar el proceso de pago.');
+      const formHtml = await response.text();
+      if (!formHtml) {
+        throw new Error('El backend no devolvió HTML válido');
       }
 
-      // 2. Inicializar la hoja de pago
-      const { error: initError } = await initPaymentSheet({
-        paymentIntentClientSecret: clientSecret,
-        merchantDisplayName: 'Academia de Inmigrantes',
-        returnURL: 'academiadeinmigrantes://stripe-redirect',
-      });
-
-      if (initError) {
-        throw initError;
-      }
-
-      // 3. Mostrar la hoja de pago
-      const { error: paymentError } = await presentPaymentSheet();
-      
-      if (paymentError) {
-        if (paymentError.code === 'Canceled') {
-          console.log('⏹️ Pago cancelado por el usuario');
-          return;
+      const scriptRegex = /<script>[\s\S]*?<\/script>/g;
+      const manualScript = `<script>
+        function submitForm() {
+          try {
+            const form = document.getElementById('cecabankForm');
+            if (form) { form.submit(); return true; }
+          } catch (e) {}
+          return false;
         }
-        throw paymentError;
-      }
-
-      // 4. Pago exitoso
-      console.log('✅ Pago exitoso para curso:', curso.key);
-      
-      // Guardar acceso al curso en AsyncStorage
-      const cursoAccessKey = `@curso_${curso.key}_access`;
-      await AsyncStorage.setItem(cursoAccessKey, JSON.stringify({
-        tieneAcceso: true,
-        fechaCompra: new Date().toISOString(),
-        paymentIntentId,
-        cursoKey: curso.key,
-        cursoLabel: curso.label
-      }));
-
-      Alert.alert(
-        '¡Pago Exitoso!',
-        `Has adquirido el curso "${curso.label}". Ya puedes acceder al contenido completo.`,
-        [
-          {
-            text: 'Ver Curso',
-            onPress: () => {
-              onPaymentSuccess(curso.key);
+        console.log('Cecabank form loaded - waiting for manual submit');
+        // Change button text
+        document.addEventListener('DOMContentLoaded', function() {
+          const buttons = document.querySelectorAll('input[type="submit"], button[type="submit"], button');
+          buttons.forEach(button => {
+            if (button.textContent && (button.textContent.includes('Continuar') || button.textContent.includes('continuar'))) {
+              button.textContent = 'Pagar';
             }
-          }
-        ]
-      );
+            // Also check value for inputs
+            if ('value' in button && button.value && (button.value.includes('Continuar') || button.value.includes('continuar'))) {
+              button.value = 'Pagar';
+            }
+          });
+          // Auto-submit after a short delay to load the form directly
+          setTimeout(() => {
+            submitForm();
+          }, 1000);
+        });
+      </script>`;
 
+      let modifiedHtml = formHtml.replace(scriptRegex, manualScript);
+      // No longer adding extra button, just modifying existing one
+
+      setWebViewHtml(modifiedHtml);
+      setShowWebView(true);
     } catch (err: any) {
       console.error('❌ Error en el proceso de pago:', err);
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
@@ -197,16 +233,69 @@ export default function CursoIndividualPayment({
     }
   };
 
+  const cancelPayment = () => {
+    setShowWebView(false);
+    setLoading(false);
+    // onCancel(); // Maybe not call onCancel here, just close WebView
+  };
+
+  const handleWebViewMessage = (event: any) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.type === 'PAYMENT_SUCCESS') {
+        handlePaymentSuccess(data);
+      } else if (data.type === 'PAYMENT_CANCEL') {
+        setShowWebView(false);
+      } else if (data.type === 'PAYMENT_ERROR') {
+        setShowWebView(false);
+        setError(data.error || 'Error en el pago');
+        Alert.alert('Error en el pago', data.error || 'Error desconocido');
+      }
+    } catch {
+      // Ignorar mensajes no válidos
+    }
+  };
+
+  const handlePaymentSuccess = async (paymentInfo: any) => {
+    setShowWebView(false);
+    
+    console.log('✅ Pago exitoso para curso:', curso.key);
+    
+    // Guardar acceso al curso en AsyncStorage
+    const cursoAccessKey = `@curso_${curso.key}_access`;
+    await AsyncStorage.setItem(cursoAccessKey, JSON.stringify({
+      tieneAcceso: true,
+      fechaCompra: new Date().toISOString(),
+      paymentIntentId: paymentInfo.orderId || paymentInfo.numOperacion,
+      cursoKey: curso.key,
+      cursoLabel: curso.label
+    }));
+
+    Alert.alert(
+      '¡Pago Exitoso!',
+      `Has adquirido el curso "${curso.label}". Ya puedes acceder al contenido completo.`,
+      [
+        {
+          text: 'Ver Curso',
+          onPress: () => {
+            onPaymentSuccess(curso.key);
+          }
+        }
+      ]
+    );
+  };
+
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={onCancel}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <ScrollView>
+    <>
+      <Modal
+        visible={visible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={onCancel}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ScrollView>
             {/* Header */}
             <View style={[styles.header, { backgroundColor: curso.color }]}>
               <Ionicons name={curso.icon as any} size={40} color="#fff" />
@@ -243,6 +332,23 @@ export default function CursoIndividualPayment({
                   <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
                   <Text style={styles.benefitText}>Acceso completo al contenido</Text>
                 </View>
+              </View>
+            </View>
+
+            {/* Price breakdown */}
+            <View style={styles.priceBreakdown}>
+              <Text style={styles.priceTitle}>Precio del curso</Text>
+              <View style={styles.priceRow}>
+                <Text style={styles.priceLabel}>Precio base</Text>
+                <Text style={styles.priceValue}>{basePrice.toFixed(2)}€</Text>
+              </View>
+              <View style={styles.priceRow}>
+                <Text style={styles.priceLabel}>IVA (21%)</Text>
+                <Text style={styles.priceValue}>{iva.toFixed(2)}€</Text>
+              </View>
+              <View style={[styles.priceRow, styles.totalRow]}>
+                <Text style={styles.totalLabel}>Total</Text>
+                <Text style={styles.totalValue}>{totalPrice.toFixed(2)}€</Text>
               </View>
             </View>
 
@@ -307,7 +413,7 @@ export default function CursoIndividualPayment({
                     {loading ? (
                       <ActivityIndicator color="#fff" />
                     ) : (
-                      <Text style={styles.payButtonText}>Pagar con Stripe</Text>
+                      <Text style={styles.payButtonText}>Pagar con Cecabank</Text>
                     )}
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -331,6 +437,30 @@ export default function CursoIndividualPayment({
         </View>
       </View>
     </Modal>
+
+    <Modal visible={showWebView} animationType="slide">
+      <View style={styles.webViewContainer}>
+        <View style={styles.webViewHeader}>
+          <Text style={styles.webViewTitle}>Pago</Text>
+          <TouchableOpacity onPress={cancelPayment}>
+            <Ionicons name="close" size={24} color="#333" />
+          </TouchableOpacity>
+        </View>
+        <WebView
+          ref={webViewRef}
+          source={{
+            html: webViewHtml,
+            baseUrl:
+              CECABANK_CONFIG.entorno === 'test'
+                ? 'https://tpv.ceca.es'
+                : 'https://pgw.ceca.es',
+          }}
+          onMessage={handleWebViewMessage}
+          originWhitelist={['*']}
+        />
+      </View>
+    </Modal>
+    </>
   );
 }
 
@@ -515,6 +645,23 @@ const styles = StyleSheet.create({
   codigoContainer: {
     paddingHorizontal: 20,
     marginBottom: 20,
+  },
+  webViewContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  webViewHeader: {
+    height: 56,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  webViewTitle: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

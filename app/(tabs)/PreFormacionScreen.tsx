@@ -1,17 +1,40 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useCallback } from 'react';
+import CursoIndividualPayment from '../../components/CursoIndividualPayment';
 
 const { width } = Dimensions.get('window');
 
 export default function PreFormacionScreen() {
   const router = useRouter();
+  const [selectedCourse, setSelectedCourse] = useState<any>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  const manejarAccesoCurso = (screen: string) => {
-    router.push(screen);
-  };
+  const checkCourseAccess = useCallback(async (cursoKey: string) => {
+    try {
+      const accessKey = `@curso_${cursoKey}_access`;
+      const accessData = await AsyncStorage.getItem(accessKey);
+      return accessData !== null;
+    } catch (error) {
+      console.error('Error checking course access:', error);
+      return false;
+    }
+  }, []);
+
+  const manejarAccesoCurso = useCallback(async (curso: any) => {
+    const hasAccess = await checkCourseAccess(curso.key);
+    if (hasAccess) {
+      router.push(curso.screen);
+    } else {
+      setSelectedCourse(curso);
+      setShowPaymentModal(true);
+    }
+  }, [router, checkCourseAccess]);
+
   
   const cursos = [
     { 
@@ -299,7 +322,7 @@ export default function PreFormacionScreen() {
               <View key={curso.key} style={styles.courseCardContainer}>
                 <TouchableOpacity
                   style={styles.courseCard}
-                  onPress={() => manejarAccesoCurso(curso.screen as any)}
+                  onPress={() => manejarAccesoCurso(curso)}
                 >
                   <LinearGradient
                     colors={['#000', '#000']}
@@ -328,6 +351,30 @@ export default function PreFormacionScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Modal de pago para cursos individuales */}
+      {selectedCourse && (
+        <CursoIndividualPayment
+          curso={selectedCourse}
+          onPaymentSuccess={(cursoKey) => {
+            setShowPaymentModal(false);
+            setSelectedCourse(null);
+            // Navigate to the course
+            const curso = cursos.find(c => c.key === cursoKey);
+            if (curso) {
+              router.push(curso.screen);
+            }
+          }}
+          onCancel={() => {
+            setShowPaymentModal(false);
+            setSelectedCourse(null);
+          }}
+          onPaymentError={(error) => {
+            Alert.alert('Error de pago', error);
+          }}
+          visible={showPaymentModal}
+        />
+      )}
     </View>
   );
 }

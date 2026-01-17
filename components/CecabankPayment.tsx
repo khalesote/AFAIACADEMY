@@ -46,12 +46,13 @@ export default function CecabankPayment({
     const validation = validateCecabankConfig();
     if (!validation.isValid) {
       Alert.alert(
-        'Cecabank no configurado',
+        'Pago no configurado',
         `Faltan variables: ${validation.errors.join(', ')}`
       );
       return;
     }
-    setShowModal(true);
+    // Directly proceed to payment without confirmation modal
+    await confirmPayment();
   };
 
   const confirmPayment = async () => {
@@ -136,13 +137,27 @@ export default function CecabankPayment({
           return false;
         }
         console.log('Cecabank form loaded - waiting for manual submit');
+        // Change button text
+        document.addEventListener('DOMContentLoaded', function() {
+          const buttons = document.querySelectorAll('input[type="submit"], button[type="submit"], button');
+          buttons.forEach(button => {
+            if (button.textContent && (button.textContent.includes('Continuar') || button.textContent.includes('continuar'))) {
+              button.textContent = 'Pagar';
+            }
+            // Also check value for inputs
+            if ('value' in button && button.value && (button.value.includes('Continuar') || button.value.includes('continuar'))) {
+              button.value = 'Pagar';
+            }
+          });
+          // Auto-submit after a short delay to load the form directly
+          setTimeout(() => {
+            submitForm();
+          }, 1000);
+        });
       </script>`;
 
       let modifiedHtml = formHtml.replace(scriptRegex, manualScript);
-      modifiedHtml = modifiedHtml.replace(
-        '<p>Por favor, espera mientras se procesa tu pago.</p>',
-        '<p>Haz clic en "Continuar al Pago" para proceder.</p><button onclick="submitForm()" style="margin-top: 20px; padding: 15px 30px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;">Continuar al Pago</button>'
-      );
+      // No longer adding extra button, just modifying existing one
 
       setWebViewHtml(modifiedHtml);
       setShowWebView(true);
@@ -192,7 +207,7 @@ export default function CecabankPayment({
         ) : (
           <>
             <MaterialIcons name="payment" size={20} color="#fff" />
-            <Text style={styles.payButtonText}>Pagar con Cecabank</Text>
+            <Text style={styles.payButtonText}>Pagar</Text>
           </>
         )}
       </TouchableOpacity>
@@ -219,7 +234,7 @@ export default function CecabankPayment({
       <Modal visible={showWebView} animationType="slide">
         <View style={styles.webViewContainer}>
           <View style={styles.webViewHeader}>
-            <Text style={styles.webViewTitle}>Pago Cecabank</Text>
+            <Text style={styles.webViewTitle}>Pago</Text>
             <TouchableOpacity onPress={cancelPayment}>
               <MaterialIcons name="close" size={24} color="#333" />
             </TouchableOpacity>

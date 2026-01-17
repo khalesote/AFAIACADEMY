@@ -134,8 +134,8 @@ const VALID_ACCESS_CODES: AccessCodeInfo[] = [
   { code: 'ACADEMIA2024-028', level: 'B2', used: false },
   { code: 'ACADEMIA2024-029', level: 'A1', used: false },
   { code: 'ACADEMIA2024-030', level: 'A2', used: false },
-  // Código especial para administrador (acceso a todos los niveles)
-  { code: 'ADMIN-2024-ALL', level: 'ALL', used: false },
+  // Código especial para pruebas (temporal)
+  { code: 'TEST-ACCESS-2024', level: 'A1', used: false },
 ];
 
 /**

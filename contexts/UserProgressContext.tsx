@@ -90,10 +90,17 @@ const UserProgressContext = createContext<UserProgressContextType | undefined>(u
 export const UserProgressProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [progress, setProgress] = useState<UserProgress>(createDefaultProgress());
   const [isLoading, setIsLoading] = useState(true);
-  const [hasUnlockedLevels, setHasUnlockedLevels] = useState(false);
 
   const loadProgress = useCallback(async () => {
     try {
+      if (__DEV__) {
+        // En modo desarrollo, resetear progreso en cada carga para testing
+        console.log('📂 [DEV] Reseteando progreso a valores por defecto');
+        const defaultProgress = createDefaultProgress();
+        setProgress(defaultProgress);
+        return defaultProgress;
+      }
+
       const stored = await AsyncStorage.getItem(USER_PROGRESS_KEY);
       console.log('📂 Cargando progreso desde AsyncStorage');
       if (stored) {
@@ -127,6 +134,15 @@ export const UserProgressProvider: React.FC<{ children: React.ReactNode }> = ({ 
     await loadProgress();
   }, [loadProgress]);
 
+  const persistProgress = useCallback(async (nextState: UserProgress) => {
+    try {
+      await AsyncStorage.setItem(USER_PROGRESS_KEY, JSON.stringify(nextState));
+      console.log('💾 Progreso persistido en AsyncStorage');
+    } catch (error) {
+      console.error('❌ Error al persistir el progreso:', error);
+    }
+  }, []);
+
   // NO guardar automáticamente aquí porque markUnitCompleted ya guarda directamente
   // Esto evitaba condiciones de carrera donde el useEffect guardaba un estado viejo
 
@@ -134,22 +150,15 @@ export const UserProgressProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setProgress((prev) => {
       const current = ensureLevelShape(prev[level], LEVEL_CONFIG[level].units);
       const updated = ensureLevelShape(updater(current), LEVEL_CONFIG[level].units);
+      const nextLevel = LEVEL_ADVANCEMENTS[level];
       const nextState: UserProgress = {
         ...prev,
-        [level]: updated
+        [level]: updated,
+        ...(nextLevel && updated.diplomaReady ? { [nextLevel]: { ...prev[nextLevel], unlocked: true } } : {})
       };
-
-      const nextLevel = LEVEL_ADVANCEMENTS[level];
-      if (nextLevel && updated.diplomaReady) {
-        nextState[nextLevel] = {
-          ...ensureLevelShape(prev[nextLevel], LEVEL_CONFIG[nextLevel].units),
-          unlocked: true
-        };
-      }
-
       return nextState;
     });
-  }, []);
+  }, [persistProgress]);
 
   const unlockLevel = useCallback((level: LevelKey) => {
     applyLevelUpdate(level, (prevLevel) => ({
@@ -255,40 +264,6 @@ export const UserProgressProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const resetAll = useCallback(() => {
     setProgress(createDefaultProgress());
   }, []);
-
-  // Desbloquear todos los niveles automáticamente solo una vez al cargar
-  // IMPORTANTE: Este efecto debe preservar el progreso de unidades completadas
-  useEffect(() => {
-    if (isLoading || hasUnlockedLevels) {
-      return;
-    }
-
-    // Desbloquear todos los niveles automáticamente solo si no están ya desbloqueados
-    // PRESERVAR el progreso existente de unidades completadas
-    setProgress((prev) => {
-      const levelsToUnlock: LevelKey[] = ['A1', 'A2', 'B1', 'B2'];
-      let needsUpdate = false;
-      const updated = { ...prev };
-      
-      levelsToUnlock.forEach((level) => {
-        if (!prev[level].unlocked) {
-          // IMPORTANTE: Preservar unitsCompleted existente usando ensureLevelShape que ya lo hace
-          updated[level] = {
-            ...ensureLevelShape(prev[level], LEVEL_CONFIG[level].units),
-            unlocked: true
-          };
-          needsUpdate = true;
-        }
-      });
-      
-      // Solo retornar nuevo objeto si realmente hubo cambios
-      if (needsUpdate) {
-        console.log('🔓 Desbloqueando niveles, preservando progreso:', updated);
-        setHasUnlockedLevels(true);
-      }
-      return needsUpdate ? updated : prev;
-    });
-  }, [isLoading, hasUnlockedLevels]); // Solo ejecutar cuando isLoading cambia (una vez)
 
   const value = useMemo<UserProgressContextType>(() => ({
     progress,

@@ -147,13 +147,6 @@ export default function A1Acceso() {
         <Text style={styles.backButtonText}>← Regresar al Menú Principal</Text>
       </TouchableOpacity>
       
-      {/* Botón temporal para resetear progreso - Solo para pruebas */}
-      <TouchableOpacity 
-        style={[styles.backButton, { backgroundColor: '#ff4444', marginTop: 8 }]} 
-        onPress={resetA1Progress}
-      >
-        <Text style={[styles.backButtonText, { color: '#fff' }]}>🔄 Resetear Progreso A1 (Prueba)</Text>
-      </TouchableOpacity>
       
       <Text style={styles.title}>A1: Acceso</Text>
       <Text style={styles.titleAr}>A1: الوصول</Text>

@@ -191,12 +191,13 @@ export async function clearAllDevelopmentData(): Promise<{ success: boolean; err
       console.log('ℹ️ No hay claves para eliminar');
     }
     
-    // 7. En desarrollo, limpiar TODO AsyncStorage para asegurar que no quede nada
-    if (__DEV__) {
-      console.log('🧹 [DEV] Limpiando TODO AsyncStorage para desarrollo...');
-      await AsyncStorage.clear();
-      console.log('✅ [DEV] AsyncStorage completamente limpiado');
-    }
+    // 7. En desarrollo, NO limpiar TODO AsyncStorage para evitar perder sesiones de Firebase
+    // Comentar esta línea para mantener persistencia en desarrollo
+    // if (__DEV__) {
+    //   console.log('🧹 [DEV] Limpiando TODO AsyncStorage para desarrollo...');
+    //   await AsyncStorage.clear();
+    //   console.log('✅ [DEV] AsyncStorage completamente limpiado');
+    // }
     
     console.log('✅ Limpieza de datos de desarrollo completada');
     return { success: true };
