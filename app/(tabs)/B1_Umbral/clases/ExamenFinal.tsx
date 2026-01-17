@@ -1,74 +1,3 @@
-  // Gate oral: frases cortas a leer (B1)
-  const oralGatePrompts: string[] = [
-    'Me gusta estudiar español todos los días.',
-    'El trabajo en equipo es muy importante.',
-    'La tecnología ayuda en la vida diaria.',
-    'Viajar es una experiencia enriquecedora.',
-    'La salud es lo más importante en la vida.'
-  ];
-
-  const buildWebSpeechHTML = (promptText: string) => `
-    <!DOCTYPE html>
-    <html lang="es">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <style>
-          body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 16px; }
-          .btn { padding: 10px 14px; border-radius: 8px; color: #fff; border: 0; margin-right: 8px; }
-          .start { background: #9DC3AA; }
-          .stop { background: #e53935; }
-          .box { background: #f5f5f5; padding: 12px; border-radius: 8px; margin-top: 12px; }
-          .prompt { background: #fff3e0; border-left: 4px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
-        </style>
-      </head>
-      <body>
-        <h3>Lectura en voz alta (Reconocimiento web)</h3>
-        <div class="prompt">
-          <div style="font-weight:600; color:#333; margin-bottom:6px;">Texto a leer</div>
-          <div id="target">${(promptText || '').replace(/</g,'&lt;')}</div>
-        </div>
-        <button class="btn start" id="start">Hablar</button>
-        <button class="btn stop" id="stop">Detener</button>
-        <div class="box"><div id="status">Listo</div><div id="out" style="margin-top:8px"></div></div>
-        <div style="text-align:center; margin-top:12px;"><div id="pct" style="font-size:56px; font-weight:bold; color:#9DC3AA;">0%</div></div>
-        <script>
-          (function(){
-            const RN = window.ReactNativeWebView;
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            let rec = null;
-            const status = document.getElementById('status');
-            const out = document.getElementById('out');
-            const pctEl = document.getElementById('pct');
-            const norm = (s) => (s||'').toLowerCase().normalize('NFC').replace(/[^a-záéíóúüñ\s]/g,'').trim();
-            const target = norm(${JSON.stringify(''+(typeof promptText==='string'?promptText:''))});
-            function scoreSimilarity(user, model){
-              const u = norm(user).split(/\s+/).filter(Boolean);
-              const m = norm(model).split(/\s+/).filter(Boolean);
-              if (m.length === 0) return 0;
-              const setU = new Set(u); let hits = 0; for (const w of m) if (setU.has(w)) hits++;
-              return Math.min(100, Math.round((hits / m.length) * 100));
-            }
-            function send(type, payload){ try { RN.postMessage(JSON.stringify({ type, payload })); } catch(e) {} }
-            if (!SR) { status.textContent = 'Web Speech no disponible'; send('error','no-sr'); }
-            else {
-              rec = new SR(); rec.lang='es-ES'; rec.interimResults=true; rec.maxAlternatives=1;
-              rec.onstart=()=>{ status.textContent='Grabando...'; send('status','start'); };
-              rec.onend=()=>{ status.textContent='Detenido'; send('status','end'); };
-              rec.onerror=(e)=>{ status.textContent='Error: '+(e.error||''); send('error',e.error||'error'); };
-              rec.onresult=(e)=>{ let txt=''; for(let i=e.resultIndex;i<e.results.length;i++){ txt += e.results[i][0].transcript+' '; }
-                out.textContent=txt.trim(); const p=scoreSimilarity(txt.trim(), target); 
-                pctEl.style.color = p >= 80 ? '#9DC3AA' : p >= 60 ? '#333' : '#333';
-                pctEl.textContent=p+'%'; send('result',{ text: txt.trim(), percent: p }); };
-            }
-            document.getElementById('start').onclick=()=>{ try{ rec && rec.start(); }catch(e){} };
-            document.getElementById('stop').onclick=()=>{ try{ rec && rec.stop(); }catch(e){} };
-            setTimeout(()=>{ try{ rec && rec.start(); }catch(e){} }, 300);
-          })();
-        </script>
-      </body>
-    </html>
-  `;
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing, Alert, AppState, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -206,7 +135,7 @@ const preguntasBase: Pregunta[] = [
 
 const EXAM_LIMIT = 30;
 const MIN_GRAMMAR = 10; // asegurar al menos 10 de gramática por intento (ajustado para 30 preguntas)
-const REQUIRED_CORRECT = 16; // Aprobado con 16/30
+const REQUIRED_CORRECT = Math.ceil(EXAM_LIMIT * 0.7); // 70% de aciertos
 
 const barajar = <T,>(arr: T[]) => arr.slice().sort(() => Math.random() - 0.5);
 
@@ -302,21 +231,8 @@ export default function ExamenFinal() {
   const writtenPassedFromContext = levelProgress?.writtenPassed ?? false;
 
   useEffect(() => {
-    if (!unitsCompleted.length) {
-      return;
-    }
-    const allCompleted = unitsCompleted.every(Boolean);
-    if (!allCompleted) {
-      Alert.alert(
-        'Examen bloqueado',
-        'Completa todas las unidades de B1 antes de realizar el Examen Final.',
-        [
-          { text: 'Ir a B1', onPress: () => router.replace('/(tabs)/B1_Umbral') },
-          { text: 'Cancelar', style: 'cancel', onPress: () => router.replace('/(tabs)/B1_Umbral') }
-        ]
-      );
-    }
-  }, [unitsCompleted, router]);
+    // Examen siempre disponible: no bloquear por unidades completadas.
+  }, []);
 
   const [iniciado, setIniciado] = useState(false);
   const [terminado, setTerminado] = useState(false);
@@ -342,13 +258,13 @@ export default function ExamenFinal() {
     setOralGatePassed(oralPassedFromContext);
   }, [oralPassedFromContext]);
 
-  // Gate oral: frases cortas a leer (B1)
+  // Gate oral: frases largas a leer (B1)
   const oralGatePrompts: string[] = [
-    'Me gusta estudiar español todos los días.',
-    'El trabajo en equipo es muy importante.',
-    'La tecnología ayuda en la vida diaria.',
-    'Viajar es una experiencia enriquecedora.',
-    'La salud es lo más importante en la vida.'
+    'Aunque trabajo muchas horas durante la semana, intento estudiar español cada noche para mejorar mi pronunciación y mi vocabulario.',
+    'Cuando tengo tiempo libre, prefiero leer noticias en español porque así practico la comprensión y aprendo palabras nuevas.',
+    'En mi país la familia es muy importante, por eso llamo a mis padres todas las semanas para saber cómo están.',
+    'El transporte público es cómodo y económico, pero a veces llega tarde y necesito salir de casa con suficiente antelación.',
+    'Si tuviera más vacaciones, me gustaría viajar por varias ciudades de España para conocer su cultura y su historia.'
   ];
 
   const buildWebSpeechHTML = (promptText: string) => `
@@ -531,14 +447,6 @@ export default function ExamenFinal() {
   const normalizar = (s: string) => (s || '').trim().toLowerCase().normalize('NFD');
 
   const empezar = () => {
-    if (!oralGatePassed) {
-      Alert.alert(
-        'Examen Bloqueado',
-        'Debes aprobar primero el examen oral antes de realizar el examen escrito.',
-        [{ text: 'Entendido' }]
-      );
-      return;
-    }
     setIniciado(true);
     setExamStopped(false);
     setPreguntaActual(0);
@@ -683,7 +591,7 @@ export default function ExamenFinal() {
             <Text style={styles.cardText}>15 segundos por pregunta</Text>
             <Text style={styles.cardText}>{preguntas.length} preguntas en total</Text>
             <Text style={styles.cardText}>Necesitas {requerido}/{total} para aprobar</Text>
-            <Text style={styles.cardText}>Estado del examen oral: {oralGatePassed ? 'Aprobado ✅' : 'Pendiente 🔒'}</Text>
+          <Text style={styles.cardText}>Estado del examen oral: {oralGatePassed ? 'Aprobado ✅' : 'Pendiente'}</Text>
           </View>
           <View style={{ backgroundColor: 'rgba(255, 152, 0, 0.3)', padding: 12, borderRadius: 12, width: '90%', borderWidth: 2, borderColor: '#FF9800' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
@@ -698,18 +606,14 @@ export default function ExamenFinal() {
             </Text>
           </View>
           <TouchableOpacity
-            style={[
-              styles.cta,
-              { backgroundColor: oralGatePassed ? '#fff' : 'rgba(255,255,255,0.6)' }
-            ]}
+            style={[styles.cta, { backgroundColor: '#fff' }]}
             onPress={empezar}
-            disabled={!oralGatePassed}
           >
             <Text style={[
               styles.ctaText,
-              { color: oralGatePassed ? '#1976d2' : '#666' }
+              { color: '#1976d2' }
             ]}>
-              {oralGatePassed ? 'Comenzar Examen' : 'Examen Bloqueado (Oral Pendiente)'}
+              Comenzar Examen
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.cta, { backgroundColor: '#fff', marginTop: 10 }]} onPress={handleStartOralGate}>
@@ -777,11 +681,16 @@ export default function ExamenFinal() {
           <Text style={styles.subtitle}>{correctas}/{total}</Text>
           <View style={{ height: 12 }} />
           {correctas >= requerido && (
-            <ExamenPresencialForm nivel="B1" />
+            <>
+              <ExamenPresencialForm nivel="B1" />
+              <Text style={styles.resultHint}>¿Quieres obtener tu certificado? Apúntate al examen presencial.</Text>
+            </>
           )}
-          <TouchableOpacity style={styles.secondaryBtn} onPress={finalizar}>
-            <Text style={styles.secondaryBtnText}>{correctas >= requerido ? 'Guardar y continuar' : 'Intentarlo de nuevo'}</Text>
-          </TouchableOpacity>
+          {correctas < requerido && (
+            <TouchableOpacity style={styles.secondaryBtn} onPress={finalizar}>
+              <Text style={styles.secondaryBtnText}>Intentarlo de nuevo</Text>
+            </TouchableOpacity>
+          )}
           <View style={{ height: 8 }} />
           <TouchableOpacity style={styles.ghostBtn} onPress={() => router.replace('/B1_Umbral')}>
             <Text style={styles.ghostBtnText}>Volver a B1</Text>
@@ -821,7 +730,7 @@ export default function ExamenFinal() {
             const isSelected = seleccionIdx === idx;
             const show = mostrarCorreccion;
             const btnStyle = [styles.option, show && isCorrect ? styles.optionCorrect : undefined, show && isSelected && !isCorrect ? styles.optionWrong : undefined];
-            const txtStyle = [styles.optionText, show && (isCorrect || (isSelected && !isCorrect)) ? { color: '#fff' } : undefined];
+            const txtStyle = [styles.optionText, show && (isCorrect || (isSelected && !isCorrect)) ? { color: '#000' } : undefined];
             return (
               <TouchableOpacity key={idx} style={btnStyle} disabled={show} onPress={() => seleccionarOpcion(idx)}>
                 <Text style={txtStyle}>{op}</Text>
@@ -843,6 +752,7 @@ const styles = StyleSheet.create({
   centerBox: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20, gap: 16 },
   title: { fontSize: 28, fontWeight: 'bold', color: '#FFD700', textAlign: 'center' },
   subtitle: { fontSize: 18, color: '#e3f2fd', textAlign: 'center' },
+  resultHint: { color: '#e3f2fd', textAlign: 'center', marginTop: 6 },
   card: { backgroundColor: 'rgba(255,255,255,0.15)', padding: 16, borderRadius: 12, width: '90%' },
   cardTitle: { color: '#fff', fontWeight: 'bold', marginBottom: 6, fontSize: 16 },
   cardText: { color: '#FFD700' },
@@ -856,7 +766,7 @@ const styles = StyleSheet.create({
   scroll: { padding: 20, alignItems: 'center' },
   question: { color: '#FFD700', fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 16 },
   option: { backgroundColor: 'rgba(255,255,255,0.9)', padding: 16, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  optionText: { color: '#9DC3AA', fontSize: 16, fontWeight: '600' },
+  optionText: { color: '#000', fontSize: 16, fontWeight: '600' },
   optionCorrect: { backgroundColor: '#4caf50' },
   optionWrong: { backgroundColor: '#f44336' },
   secondaryBtn: { backgroundColor: '#fff', paddingVertical: 12, paddingHorizontal: 28, borderRadius: 24 },

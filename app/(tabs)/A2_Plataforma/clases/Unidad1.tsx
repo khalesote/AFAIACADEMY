@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import AudioButton from '../../../components/AudioButton';
-import EjerciciosInteractivos from '../../../components/EjerciciosInteractivos';
+import AudioButton from '@/app/components/AudioButton';
+import EjerciciosInteractivos from '@/app/components/EjerciciosInteractivos';
 import { useUserProgress } from '@/contexts/UserProgressContext';
 import { LinearGradient } from 'expo-linear-gradient';
 

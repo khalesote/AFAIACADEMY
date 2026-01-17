@@ -163,15 +163,14 @@ export default function B2Avanzado() {
           </LinearGradient>
         </TouchableOpacity>
         
-        {/* Examen Final B2 */}
+        {/* Examen Final B2 - siempre accesible */}
         <TouchableOpacity
           style={styles.examButton}
-          onPress={() => allUnitsCompleted && router.push('/B2_Avanzado/clases/ExamenFinal')}
-          disabled={!allUnitsCompleted}
+          onPress={() => router.push('/(tabs)/B2_Avanzado/clases/ExamenFinal')}
           activeOpacity={0.8}
         >
           <LinearGradient
-            colors={allUnitsCompleted ? ['#000', '#000'] : ['#333', '#333']}
+            colors={['#000', '#000']}
             style={styles.examButtonGradient}
           >
             <View style={styles.unitButtonContent}>

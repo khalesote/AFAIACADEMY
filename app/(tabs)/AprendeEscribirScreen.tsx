@@ -17,14 +17,26 @@ type Exercise = {
 };
 
 const EXERCISES: Exercise[] = [
-  { id: 'letra-a', titleEs: 'Letra', titleAr: 'حرف', targetText: 'A', speakAr: 'اكتب الحرف A بالإسبانية' },
-  { id: 'letra-e', titleEs: 'Letra', titleAr: 'حرف', targetText: 'E', speakAr: 'اكتب الحرف E بالإسبانية' },
-  { id: 'silaba-pa', titleEs: 'Sílabas', titleAr: 'مقاطع', targetText: 'PA', speakAr: 'اكتب المقطع PA بالإسبانية' },
-  { id: 'silaba-pe', titleEs: 'Sílabas', titleAr: 'مقاطع', targetText: 'PE', speakAr: 'اكتب المقطع PE بالإسبانية' },
-  { id: 'palabra-casa', titleEs: 'Palabras', titleAr: 'كلمات', targetText: 'casa', speakAr: 'اكتب كلمة casa بالإسبانية' },
-  { id: 'palabra-amigo', titleEs: 'Palabras', titleAr: 'كلمات', targetText: 'amigo', speakAr: 'اكتب كلمة amigo بالإسبانية' },
-  { id: 'frase-1', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Me llamo Ana', speakAr: 'اكتب الجملة: Me llamo Ana' },
-  { id: 'frase-2', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Vivo en Madrid', speakAr: 'اكتب الجملة: Vivo en Madrid' },
+  { id: 'frase-1', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Yo vivo en Madrid', speakAr: 'اكتب الجملة: Yo vivo en Madrid' },
+  { id: 'frase-2', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Me llamo Ana', speakAr: 'اكتب الجملة: Me llamo Ana' },
+  { id: 'frase-3', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Tengo una casa pequeña', speakAr: 'اكتب الجملة: Tengo una casa pequeña' },
+  { id: 'frase-4', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mi amigo trabaja hoy', speakAr: 'اكتب الجملة: Mi amigo trabaja hoy' },
+  { id: 'frase-5', titleEs: 'Frases', titleAr: 'جمل', targetText: 'El niño juega en el parque', speakAr: 'اكتب الجملة: El niño juega en el parque' },
+  { id: 'frase-6', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Voy al médico por la mañana', speakAr: 'اكتب الجملة: Voy al médico por la mañana' },
+  { id: 'frase-7', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Necesito una cita para hoy', speakAr: 'اكتب الجملة: Necesito una cita para hoy' },
+  { id: 'frase-8', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mi hermana vive en Sevilla', speakAr: 'اكتب الجملة: Mi hermana vive en Sevilla' },
+  { id: 'frase-9', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Tenemos clase a las nueve', speakAr: 'اكتب الجملة: Tenemos clase a las nueve' },
+  { id: 'frase-10', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Quiero aprender español', speakAr: 'اكتب الجملة: Quiero aprender español' },
+  { id: 'frase-11', titleEs: 'Frases', titleAr: 'جمل', targetText: 'La tienda está abierta', speakAr: 'اكتب الجملة: La tienda está abierta' },
+  { id: 'frase-12', titleEs: 'Frases', titleAr: 'جمل', targetText: 'El autobús llega tarde', speakAr: 'اكتب الجملة: El autobús llega tarde' },
+  { id: 'frase-13', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Necesito comprar pan', speakAr: 'اكتب الجملة: Necesito comprar pan' },
+  { id: 'frase-14', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mi familia es muy grande', speakAr: 'اكتب الجملة: Mi familia es muy grande' },
+  { id: 'frase-15', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Me gusta escuchar música', speakAr: 'اكتب الجملة: Me gusta escuchar música' },
+  { id: 'frase-16', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Hoy hace mucho frío', speakAr: 'اكتب الجملة: Hoy hace mucho frío' },
+  { id: 'frase-17', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Busco trabajo en Madrid', speakAr: 'اكتب الجملة: Busco trabajo en Madrid' },
+  { id: 'frase-18', titleEs: 'Frases', titleAr: 'جمل', targetText: 'El profesor es muy amable', speakAr: 'اكتب الجملة: El profesor es muy amable' },
+  { id: 'frase-19', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Quiero un café con leche', speakAr: 'اكتب الجملة: Quiero un café con leche' },
+  { id: 'frase-20', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mañana vamos al mercado', speakAr: 'اكتب الجملة: Mañana vamos al mercado' },
 ];
 
 const normalizeText = (text: string) => (text || '')
@@ -35,12 +47,51 @@ const normalizeText = (text: string) => (text || '')
   .replace(/\s+/g, ' ')
   .trim();
 
+const calcSimilarityPercent = (a: string, b: string) => {
+  if (!a && !b) return 100;
+  if (!a || !b) return 0;
+  const s1 = a;
+  const s2 = b;
+  const m = s1.length;
+  const n = s2.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i += 1) dp[i][0] = i;
+  for (let j = 0; j <= n; j += 1) dp[0][j] = j;
+  for (let i = 1; i <= m; i += 1) {
+    for (let j = 1; j <= n; j += 1) {
+      const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + cost
+      );
+    }
+  }
+  const distance = dp[m][n];
+  const maxLen = Math.max(m, n) || 1;
+  return Math.max(0, Math.round(((maxLen - distance) / maxLen) * 100));
+};
+
+const getInstructionByType = (titleEs: string) => {
+  if (titleEs === 'Letra') {
+    return 'Escribe la letra grande y separada. No la pegues a otras letras.';
+  }
+  if (titleEs === 'Sílabas') {
+    return 'Escribe la sílaba en mayúsculas y bien separada.';
+  }
+  if (titleEs === 'Palabras') {
+    return 'Escribe la palabra completa en una sola línea y con letras claras.';
+  }
+  return 'Escribe la frase completa con espacios entre palabras.';
+};
+
 export default function AprendeEscribirScreen() {
   const router = useRouter();
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [lastResult, setLastResult] = useState<string | null>(null);
   const [matched, setMatched] = useState<boolean | null>(null);
+  const [similarity, setSimilarity] = useState<number | null>(null);
 
   const current = useMemo(() => EXERCISES[index], [index]);
 
@@ -49,9 +100,24 @@ export default function AprendeEscribirScreen() {
     Speech.speak(text, { language: 'ar-SA', rate: 0.9 });
   };
 
+  const getIntroArabic = (titleEs: string, targetText: string) => {
+    if (titleEs === 'Letra') {
+      return `من فضلك اكتب الحرف ${targetText} كبيراً وبشكل منفصل، ولا تكتبه ملاصقاً لحروف أخرى.`;
+    }
+    if (titleEs === 'Sílabas') {
+      return `من فضلك اكتب المقطع ${targetText} بحروف كبيرة وواضحة.`;
+    }
+    if (titleEs === 'Palabras') {
+      return `من فضلك اكتب كلمة ${targetText} كاملة في سطر واحد وبحروف واضحة.`;
+    }
+    return `من فضلك اكتب الجملة التالية كاملة مع ترك مسافة بين الكلمات: ${targetText}.`;
+  };
+
   const handleStart = () => {
-    speakArabic('من فضلك خذ ورقة وقلم وابدأ بالكتابة');
-    setTimeout(() => speakArabic(current.speakAr), 1200);
+    const intro =
+      'من فضلك خذ ورقة من الدفتر، اكتب الجملة التي تراها مع احترام الخطوط، ثم التقط صورة وأرسلها للتقييم.';
+    speakArabic(intro);
+    setTimeout(() => speakArabic(current.speakAr), 1500);
   };
 
   const handleTakePhoto = async () => {
@@ -65,6 +131,7 @@ export default function AprendeEscribirScreen() {
       setBusy(true);
       setLastResult(null);
       setMatched(null);
+      setSimilarity(null);
 
       const result = await ImagePicker.launchCameraAsync({
         quality: 0.3,
@@ -112,9 +179,11 @@ export default function AprendeEscribirScreen() {
       const fallbackMatched = normalizedExpected
         ? normalizedDetected.includes(normalizedExpected)
         : null;
+      const similarityValue = calcSimilarityPercent(normalizedDetected, normalizedExpected);
 
       setLastResult(detectedText || 'No se detectó texto en la imagen.');
       setMatched(matchedResult ?? fallbackMatched);
+      setSimilarity(similarityValue);
 
       if (matchedResult ?? fallbackMatched) {
         speakArabic('أحسنت! استمر');
@@ -134,6 +203,7 @@ export default function AprendeEscribirScreen() {
       setIndex(prev => prev + 1);
       setLastResult(null);
       setMatched(null);
+      setSimilarity(null);
       handleStart();
       return;
     }
@@ -142,6 +212,10 @@ export default function AprendeEscribirScreen() {
       { text: 'OK', onPress: () => router.back() }
     ]);
   };
+
+  React.useEffect(() => {
+    handleStart();
+  }, [current.id]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -155,10 +229,24 @@ export default function AprendeEscribirScreen() {
       <Text style={styles.subtitle}>التعلّم على الكتابة</Text>
 
       <View style={styles.card}>
-        <Text style={styles.cardLabel}>{current.titleEs}</Text>
-        <Text style={styles.cardLabelAr}>{current.titleAr}</Text>
-        <Text style={styles.targetText}>{current.targetText}</Text>
-        <Text style={styles.helperText}>Escribe el texto en papel y toma una foto.</Text>
+        <View pointerEvents="none" style={styles.linedPaper}>
+          {Array.from({ length: 3 }).map((_, groupIndex) => {
+            const baseTop = 48 + groupIndex * 96;
+            const gap = 8;
+            return (
+              <View key={`group-${groupIndex}`}>
+                <View style={[styles.linedThin, { top: baseTop - gap * 3 }]} />
+                <View style={[styles.linedThin, { top: baseTop - gap * 2 }]} />
+                <View style={[styles.linedThin, { top: baseTop - gap }]} />
+                <View style={[styles.linedThick, { top: baseTop }]} />
+                <View style={[styles.linedThin, { top: baseTop + gap }]} />
+                <View style={[styles.linedThin, { top: baseTop + gap * 2 }]} />
+                <View style={[styles.linedThin, { top: baseTop + gap * 3 }]} />
+              </View>
+            );
+          })}
+          <Text style={styles.sampleText}>{current.targetText}</Text>
+        </View>
       </View>
 
       <View style={styles.actions}>
@@ -176,6 +264,9 @@ export default function AprendeEscribirScreen() {
         <View style={styles.resultCard}>
           <Text style={styles.resultTitle}>Texto detectado:</Text>
           <Text style={styles.resultText}>{lastResult}</Text>
+          {typeof similarity === 'number' && (
+            <Text style={styles.precisionText}>Precisión estimada: {similarity}%</Text>
+          )}
           {matched !== null && (
             <Text style={[styles.feedback, matched ? styles.ok : styles.fail]}>
               {matched ? '✅ Bien hecho' : '❌ Inténtalo de nuevo'}
@@ -221,12 +312,15 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    backgroundColor: '#111',
+    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
     borderColor: '#FFD700',
     marginBottom: 18,
+    position: 'relative',
+    overflow: 'hidden',
+    minHeight: 320,
   },
   cardLabel: {
     color: '#FFD700',
@@ -247,6 +341,37 @@ const styles = StyleSheet.create({
   },
   helperText: {
     color: '#d0d0d0',
+  },
+  linedPaper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 12,
+  },
+  linedThin: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: '#cfcfcf',
+  },
+  linedThick: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: '#7ecbff',
+  },
+  sampleText: {
+    position: 'absolute',
+    left: 8,
+    right: 8,
+    top: 48 - 18,
+    color: '#000',
+    fontSize: 16,
+    lineHeight: 22,
   },
   actions: {
     width: '100%',
@@ -280,6 +405,11 @@ const styles = StyleSheet.create({
   },
   resultText: {
     color: '#fff',
+  },
+  precisionText: {
+    color: '#FFD700',
+    marginTop: 8,
+    fontWeight: '600',
   },
   feedback: {
     marginTop: 10,

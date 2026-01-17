@@ -145,7 +145,7 @@ const preguntasBase: Pregunta[] = [
 
 const EXAM_LIMIT = 30;
 const MIN_GRAMMAR = 10;
-const REQUIRED_CORRECT = 16; // Aprobado con 16/30
+const REQUIRED_CORRECT = Math.ceil(EXAM_LIMIT * 0.7); // 70% de aciertos
 
 const barajar = <T,>(arr: T[]) => arr.slice().sort(() => Math.random() - 0.5);
 
@@ -329,19 +329,31 @@ export default function ExamenFinal() {
   const [webPercent, setWebPercent] = useState<number | null>(null);
 
   useEffect(() => {
-    setOralGatePassed(oralPassedFromContext);
+    if (oralPassedFromContext) {
+      setOralGatePassed(true);
+    }
   }, [oralPassedFromContext]);
+
+  useEffect(() => {
+    const passedCount = oralGateScores.filter((v: number) => v >= 85).length;
+    if (passedCount >= 3) {
+      setOralGatePassed(true);
+    }
+  }, [oralGateScores]);
 
   const handleStartOral = async () => {
     try {
       const granted = await requestMicrophonePermission();
-      if (!granted) { Alert.alert('Permiso requerido', 'Concede acceso al micrófono para realizar el Examen Oral.'); return; }
-      setOralGatePassed(false);
+      if (!granted) {
+        Alert.alert('Permiso requerido', 'Concede acceso al micrófono para realizar el Examen Oral.');
+        return;
+      }
       setOralGateIndex(0);
       setOralGateScores([0,0,0,0,0]);
       setWebPercent(null);
       setWebPromptText(oralGatePrompts[0]);
       setWebMode(true);
+      Alert.alert('Examen Oral', 'Se abrió el Examen Oral. Si no ves el modal, recarga la pantalla.');
     } catch (e) { Alert.alert('Micrófono', 'No se pudo iniciar el reconocimiento.'); }
   };
 
@@ -455,7 +467,7 @@ export default function ExamenFinal() {
     if (!oralGatePassed) {
       Alert.alert(
         'Examen oral pendiente',
-        'Completa el examen oral (3 lecturas con al menos 85%) antes de iniciar el examen escrito.',
+        'Primero completa el examen oral (3 de 5 lecturas con 85% o más) para desbloquear el examen escrito.',
         [{ text: 'Entendido' }]
       );
       return;
@@ -594,7 +606,7 @@ export default function ExamenFinal() {
       <LinearGradient colors={['#000', '#000']} style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/(tabs)/B2_Avanzado')}>
-            <Ionicons name="arrow-back" size={24} color="#000" />
+            <Ionicons name="arrow-back" size={24} color="#FFD700" />
           </TouchableOpacity>
           <Ionicons name="school" size={64} color="#FFD700" />
         </View>
@@ -623,17 +635,11 @@ export default function ExamenFinal() {
           <TouchableOpacity
             style={[styles.cta, { backgroundColor: oralGatePassed ? '#fff' : 'rgba(255,255,255,0.6)' }]}
             onPress={empezar}
-            disabled={!oralGatePassed}
           >
             <Text style={[styles.ctaText, { color: '#FFD700' }]}>Comenzar Examen Escrito</Text>
           </TouchableOpacity>
 
-          <View style={[styles.card, { paddingVertical: 16, marginTop: 10, marginBottom: 16 }]}>
-            <Text style={styles.cardTitle}>🎤 Examen Oral</Text>
-            <Text style={styles.cardText}>• 5 párrafos • Reconocimiento automático</Text>
-            <Text style={styles.cardText}>• Objetivo: 3 de 5 con 85%+ precisión</Text>
-          </View>
-          <TouchableOpacity style={[styles.cta, { backgroundColor: 'rgba(255,255,255,0.6)' }]} onPress={handleStartOral}>
+          <TouchableOpacity style={[styles.cta, { backgroundColor: 'rgba(255,255,255,0.6)', marginTop: 12 }]} onPress={handleStartOral}>
             <Text style={[styles.ctaText, { color: '#FFD700' }]}>Comenzar Examen Oral</Text>
           </TouchableOpacity>
         </View>
@@ -685,68 +691,14 @@ export default function ExamenFinal() {
     );
   }
 
-  // Mostrar modal oral si está activo
-  if (webMode) {
-    return (
-      <LinearGradient colors={['#000', '#000']} style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => setWebMode(false)}>
-            <Ionicons name="arrow-back" size={24} color="#000" />
-          </TouchableOpacity>
-          <Ionicons name="school" size={64} color="#FFD700" />
-        </View>
-
-        <Modal visible transparent animationType="fade" onRequestClose={() => setWebMode(false)}>
-          <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.5)', justifyContent:'center', alignItems:'center' }}>
-            <View style={{ backgroundColor:'#fff', borderRadius:12, width:'92%', maxHeight:'86%', overflow:'hidden' }}>
-              <View style={{ padding:12, backgroundColor:'#1976d2' }}>
-                <Text style={{ color:'#fff', fontWeight:'bold', textAlign:'center' }}>Examen Oral B2 - Párrafo {oralGateIndex + 1}/5</Text>
-              </View>
-              <View style={{ height: 420 }}>
-                <WebView
-                  originWhitelist={["*"]}
-                  source={{ html: buildWebSpeechHTML(webPromptText) }}
-                  onMessage={(event) => {
-                    try {
-                      const data = JSON.parse(event.nativeEvent.data);
-                      if (data?.type === 'result' && typeof data?.payload?.percent === 'number') {
-                        setWebPercent(Math.round(data.payload.percent));
-                      }
-                    } catch {}
-                  }}
-                />
-              </View>
-              <View style={{ padding:12 }}>
-                <Text style={{ textAlign:'center', marginBottom:8 }}>Lecturas con 85%+: {oralGateScores.filter(s => s >= 85).length} / 5</Text>
-                <View style={{ flexDirection:'row', justifyContent:'space-between' }}>
-                  <TouchableOpacity style={[styles.cta, { backgroundColor:'#e0e0e0', flex:1, marginRight:6 }]} onPress={() => {
-                    if (oralGateIndex > 0) {
-                      const prev = oralGateIndex - 1; setOralGateIndex(prev); setWebPromptText(oralGatePrompts[prev]); setWebPercent(null);
-                    }
-                  }}>
-                    <Text style={[styles.ctaText, { color:'#333' }]}>Anterior</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[styles.cta, { backgroundColor:'#1976d2', flex:1, marginLeft:6 }]} onPress={handleOralNext}>
-                    <Text style={styles.ctaText}>{oralGateIndex < oralGatePrompts.length - 1 ? 'Siguiente' : 'Finalizar'}</Text>
-                  </TouchableOpacity>
-                </View>
-                <TouchableOpacity onPress={() => setWebMode(false)} style={{ marginTop:8, alignSelf:'center' }}>
-                  <Text style={{ color:'#1976d2' }}>Cerrar</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      </LinearGradient>
-    );
-  }
+  // Modal oral se maneja dentro de la pantalla inicial
 
   if (terminado) {
     const porcentaje = Math.round((correctas / total) * 100);
     const aprobado = correctas >= requerido;
 
     return (
-      <LinearGradient colors={aprobado ? ['#4caf50', '#66bb6a'] : ['#f44336', '#ef5350']} style={styles.container}>
+      <LinearGradient colors={aprobado ? ['#000', '#000'] : ['#f44336', '#ef5350']} style={styles.container}>
         <View style={styles.centerBox}>
           <Ionicons name={aprobado ? "checkmark-circle" : "close-circle"} size={80} color="#fff" />
           <Text style={styles.title}>{aprobado ? '¡Aprobado!' : 'No Aprobado'}</Text>
@@ -757,7 +709,10 @@ export default function ExamenFinal() {
             <Text style={styles.cardText}>Requerido: {requerido}/{total} ({Math.round((requerido/total)*100)}%)</Text>
           </View>
           {aprobado && (
-            <ExamenPresencialForm nivel="B2" />
+            <>
+              <ExamenPresencialForm nivel="B2" />
+              <Text style={styles.resultHint}>¿Quieres obtener tu certificado? Apúntate al examen presencial.</Text>
+            </>
           )}
           <TouchableOpacity style={styles.cta} onPress={finalizar}>
             <Text style={styles.ctaText}>{aprobado ? 'Continuar' : 'Ver opciones'}</Text>
@@ -771,7 +726,7 @@ export default function ExamenFinal() {
   if (!pregunta) return null;
 
   return (
-    <LinearGradient colors={['#1976d2', '#42a5f5']} style={styles.container}>
+    <LinearGradient colors={['#000', '#000']} style={styles.container}>
 
       <View style={styles.header}>
         <View style={styles.progressContainer}>
@@ -792,7 +747,7 @@ export default function ExamenFinal() {
         <View style={styles.optionsContainer}>
           {pregunta.opciones.map((opcion, idx) => {
             let bgColor = '#fff';
-            let textColor = '#333';
+            let textColor = '#000';
             let borderColor = '#e0e0e0';
             
             if (mostrarCorreccion) {
@@ -830,11 +785,12 @@ const styles = StyleSheet.create({
   backButton: { position: 'absolute', left: 20, top: 50, zIndex: 1, padding: 8 },
   centerBox: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
   title: { fontSize: 32, fontWeight: 'bold', color: '#FFD700', marginBottom: 20, textAlign: 'center' },
-  card: { backgroundColor: '#fff', borderRadius: 16, padding: 24, marginBottom: 30, width: '100%', maxWidth: 400 },
-  cardTitle: { fontSize: 20, fontWeight: 'bold', color: '#333', marginBottom: 16, textAlign: 'center' },
-  cardText: { fontSize: 16, color: '#666', marginBottom: 8, textAlign: 'center' },
+  card: { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 16, padding: 24, marginBottom: 30, width: '100%', maxWidth: 400 },
+  cardTitle: { fontSize: 20, fontWeight: 'bold', color: '#FFD700', marginBottom: 16, textAlign: 'center' },
+  cardText: { fontSize: 16, color: '#FFD700', marginBottom: 8, textAlign: 'center' },
+  resultHint: { fontSize: 14, color: '#FFD700', textAlign: 'center', marginTop: 6 },
   cta: { backgroundColor: '#fff', borderRadius: 12, paddingVertical: 16, paddingHorizontal: 32, minWidth: 200 },
-  ctaText: { fontSize: 18, fontWeight: 'bold', color: '#1976d2', textAlign: 'center' },
+  ctaText: { fontSize: 18, fontWeight: 'bold', color: '#FFD700', textAlign: 'center' },
   progressContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   progressText: { fontSize: 16, fontWeight: 'bold', color: '#FFD700', minWidth: 50 },
   progressBar: { flex: 1, height: 8, backgroundColor: 'rgba(255,215,0,0.3)', borderRadius: 4, marginHorizontal: 16 },
@@ -842,8 +798,8 @@ const styles = StyleSheet.create({
   timerText: { fontSize: 16, fontWeight: 'bold', color: '#FFD700', minWidth: 40, textAlign: 'right' },
   content: { flex: 1, paddingHorizontal: 20 },
   questionCard: { backgroundColor: '#fff', borderRadius: 16, padding: 24, marginBottom: 20 },
-  unitText: { fontSize: 14, fontWeight: 'bold', color: '#1976d2', marginBottom: 8, textTransform: 'uppercase' },
-  questionText: { fontSize: 18, color: '#333', lineHeight: 24 },
+  unitText: { fontSize: 14, fontWeight: 'bold', color: '#FFD700', marginBottom: 8, textTransform: 'uppercase' },
+  questionText: { fontSize: 18, color: '#000', lineHeight: 24 },
   optionsContainer: { paddingBottom: 40 },
   option: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 12, borderWidth: 2 },
   optionText: { fontSize: 16, textAlign: 'center', lineHeight: 20 },

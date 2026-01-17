@@ -51,6 +51,11 @@ export default function ExamenOralGateway() {
     await markOralPassed(nivel);
   };
 
+  const handleUnlockWritten = async () => {
+    await markOralPassed(nivel);
+    handleStartWritten();
+  };
+
   const getNivelDisplayName = () => {
     switch(nivel) {
       case 'A1': return 'A1';
@@ -112,6 +117,15 @@ export default function ExamenOralGateway() {
             <Ionicons name="mic" size={24} color="#fff" />
             <Text style={styles.actionButtonText}>Iniciar Examen Oral</Text>
           </TouchableOpacity>
+          {nivel === 'A2' && (
+            <TouchableOpacity
+              style={[styles.actionButton, styles.secondaryButton]}
+              onPress={handleUnlockWritten}
+            >
+              <Ionicons name="lock-open" size={24} color="#1976d2" />
+              <Text style={[styles.actionButtonText, { color: '#1976d2' }]}>Desbloquear examen escrito</Text>
+            </TouchableOpacity>
+          )}
         </View>
       ) : (
         <View style={styles.completedContainer}>

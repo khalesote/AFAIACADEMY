@@ -760,8 +760,8 @@ const ExamenScreen = () => {
   const [oralApproved, setOralApproved] = useState(oralPassedFromContext);
 
   useEffect(() => {
-    setOralGatePassed(oralPassedFromContext);
-    setOralApproved(oralPassedFromContext);
+    setOralGatePassed((prev) => prev || oralPassedFromContext);
+    setOralApproved((prev) => prev || oralPassedFromContext);
   }, [oralPassedFromContext]);
 
   useEffect(() => {
@@ -783,6 +783,8 @@ const ExamenScreen = () => {
   }, [rotation]);
 
   const correct = shuffledQuestions.filter((q, idx) => q.type === 'choice' && answers[idx] === q.answer).length;
+  const totalChoice = shuffledQuestions.filter((q) => q.type === 'choice').length;
+  const minimoAprobar = Math.ceil(totalChoice * 0.7);
 
   // Detectar cuando la app pasa a segundo plano durante el examen
   useEffect(() => {
@@ -838,7 +840,7 @@ const ExamenScreen = () => {
 
     // No navegar automáticamente - dejar que el usuario presione el botón
     // Esto permite que el usuario vea su resultado antes de ir al diploma
-    if (showResult && correct >= 16 && oralGatePassed) {
+    if (showResult && correct >= minimoAprobar && oralGatePassed) {
       setTestPassed(true);
     }
 
@@ -1373,6 +1375,11 @@ const ExamenScreen = () => {
                 setOralScore(aprobadas ? 100 : 0);
                 setOralFinished(true);
                 setOralScores(scores);
+                if (aprobadas) {
+                  setOralApproved(true);
+                  setOralGatePassed(true);
+                  try { markOralPassed('A2'); } catch {}
+                }
               }}>
                 <Text style={{ color: '#FFD700', fontWeight: 'bold' }}>Finalizar</Text>
               </TouchableOpacity>
@@ -1417,8 +1424,10 @@ const ExamenScreen = () => {
     );
   }
 
+  const resultPassed = showResult && correct >= minimoAprobar;
+
   return (
-    <LinearGradient colors={['#1976d2', '#42a5f5']} style={styles.background}>
+    <LinearGradient colors={resultPassed ? ['#000', '#000'] : ['#1976d2', '#42a5f5']} style={styles.background}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -1466,38 +1475,33 @@ const ExamenScreen = () => {
         </>
       ) : (
         <View style={styles.resultadoContainer}>
-          <Ionicons
-            name={correct >= 16 ? 'trophy' : 'checkmark-circle'}
-            size={80}
-            color={correct >= 16 ? 'gold' : 'green'}
-            style={{ marginBottom: 20 }}
-          />
-          <Text style={styles.resultadoTexto}>
-            Has respondido correctamente {correct} de {shuffledQuestions.length} preguntas.
-          </Text>
-          {(correct >= 16 && oralGatePassed) ? (
-            <View style={{ alignItems: 'center', width: '100%', marginTop: 20 }}>
-              <ExamenPresencialForm nivel="A2" />
-              <TouchableOpacity
-                style={[styles.compartirBtn, { backgroundColor: '#79A890', marginBottom: 15, paddingVertical: 16, paddingHorizontal: 32 }]}
-                onPress={async () => {
-                  try {
-                    await markWrittenPassed('A2');
-                    router.replace({
-                      pathname: '/(tabs)/DiplomaGeneradoScreen',
-                      params: { nivel: 'A2' }
-                    });
-                  } catch (error) {
-                    console.error('Error al actualizar progreso A2:', error);
-                    Alert.alert('Error', 'No se pudo actualizar el estado del examen. Intenta nuevamente.');
-                  }
-                }}
-              >
-                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 18 }}>🎉 Felicidades, obtén tu diploma</Text>
-              </TouchableOpacity>
-            </View>
+          {resultPassed ? (
+            <>
+              <Ionicons name="checkmark-circle" size={100} color="#fff" />
+              <Text style={styles.resultadoTextoAprobado}>¡Aprobado!</Text>
+              <Text style={styles.scoreText}>{correct}/{shuffledQuestions.length}</Text>
+              <View style={styles.resultButtons}>
+                <ExamenPresencialForm nivel="A2" />
+                <Text style={styles.resultHintAprobado}>¿Quieres obtener tu certificado? Apúntate al examen presencial.</Text>
+                <TouchableOpacity
+                  style={styles.menuButton}
+                  onPress={() => router.replace('/(tabs)/SchoolScreen')}
+                >
+                  <Text style={styles.menuButtonText}>Menú Principal</Text>
+                </TouchableOpacity>
+              </View>
+            </>
           ) : (
             <>
+              <Ionicons
+                name={correct >= minimoAprobar ? 'trophy' : 'checkmark-circle'}
+                size={80}
+                color={correct >= minimoAprobar ? 'gold' : 'green'}
+                style={{ marginBottom: 20 }}
+              />
+              <Text style={styles.resultadoTexto}>
+                Has respondido correctamente {correct} de {shuffledQuestions.length} preguntas.
+              </Text>
               <TouchableOpacity style={styles.botonReiniciar} onPress={resetExam}>
                 <Text style={styles.botonReiniciarTexto}>Reintentar</Text>
               </TouchableOpacity>
@@ -1570,6 +1574,49 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#222',
     marginBottom: 20,
+    textAlign: 'center',
+  },
+  resultadoTextoAprobado: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 20,
+    marginBottom: 8,
+  },
+  scoreText: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 30,
+  },
+  resultHint: {
+    color: '#222',
+    textAlign: 'center',
+    marginTop: -6,
+    marginBottom: 12,
+  },
+  resultHintAprobado: {
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: -10,
+    marginBottom: 10,
+  },
+  resultButtons: {
+    width: '100%',
+    gap: 15,
+  },
+  menuButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    elevation: 3,
+  },
+  menuButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
     textAlign: 'center',
   },
   botonReiniciar: {

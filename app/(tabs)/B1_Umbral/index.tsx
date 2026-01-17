@@ -172,21 +172,16 @@ export default function B1Umbral() {
           </LinearGradient>
         </TouchableOpacity>
         
-        {/* Examen Final - Solo accesible si todas las unidades están completadas */}
+        {/* Examen Final - siempre accesible */}
         <TouchableOpacity
           style={styles.examButton}
           onPress={() => {
-            const todasCompletadas = localProgress.every(Boolean);
-            if (!todasCompletadas) {
-              return;
-            }
             router.push('/B1_Umbral/clases/ExamenFinal');
           }}
-          disabled={!allUnitsCompleted}
           activeOpacity={0.8}
         >
           <LinearGradient
-            colors={allUnitsCompleted ? ['#000', '#000'] : ['#333', '#333']}
+            colors={['#000', '#000']}
             style={styles.examButtonGradient}
           >
             <View style={styles.unitButtonContent}>

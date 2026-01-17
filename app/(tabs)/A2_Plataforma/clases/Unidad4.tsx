@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Text, TextInput, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import AudioButton from '../../../components/AudioButton';
-import EjerciciosInteractivos from '../../../components/EjerciciosInteractivos';
+import AudioButton from '@/app/components/AudioButton';
+import EjerciciosInteractivos from '@/app/components/EjerciciosInteractivos';
 import { useRouter } from 'expo-router';
 import UnidadCard from './UnidadCard';
 import { useUserProgress } from '@/contexts/UserProgressContext';

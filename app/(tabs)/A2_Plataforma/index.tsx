@@ -139,14 +139,14 @@ export default function A2Plataforma() {
 
         <TouchableOpacity
           style={styles.unitButton}
-          onPress={() => router.push(`/A2_Plataforma/clases/${encodeURIComponent('ExpresionOral')}` as any)}
+          onPress={() => router.push('/A2_Plataforma/clases/ExpresionOral')}
           activeOpacity={0.8}
         >
           <LinearGradient
             colors={['#000', '#000']}
             style={styles.unitButtonGradient}
           >
-            <Text style={styles.unitButtonText}>Expresión Oral{oralPassed ? ' ✓' : ''}</Text>
+            <Text style={styles.unitButtonText}>Expresión Oral</Text>
             <Text style={styles.unitButtonTextAr}>التعبير الشفوي</Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -154,16 +154,6 @@ export default function A2Plataforma() {
         <TouchableOpacity
           style={styles.examButton}
           onPress={() => {
-            const currentLevelProgress = progress[LEVEL_KEY];
-            const currentUnitsDone = currentLevelProgress?.unitsCompleted ?? Array(10).fill(false);
-            if (!currentUnitsDone[9]) {
-              Alert.alert(
-                'Examen final bloqueado',
-                'Completa la Unidad 10 y marca "Unidad finalizada" para acceder al examen final A2.\nأكمل الوحدة 10 واضغط "انتهت الوحدة" للوصول إلى الامتحان النهائي A2.',
-                [{ text: 'Entendido / فهمت', style: 'cancel' }]
-              );
-              return;
-            }
             router.push('/A2_Plataforma/clases/ExamenFinal');
           }}
           activeOpacity={0.8}

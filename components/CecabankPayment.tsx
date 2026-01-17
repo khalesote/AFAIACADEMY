@@ -71,10 +71,12 @@ export default function CecabankPayment({
         Importe: importe,
         TipoMoneda: CECABANK_CONFIG.tipoMoneda,
         Exponente: '2',
-        Cifrado: 'HMAC_SHA256',
+        Cifrado: 'SHA2',
         URL_OK: CECABANK_CONFIG.urlOk,
+        URL_NOK: CECABANK_CONFIG.urlKo,
         URL_KO: CECABANK_CONFIG.urlKo,
         Idioma: CECABANK_CONFIG.idioma,
+        Pago_soportado: 'SSL',
         Descripcion: description || `Matrícula ${operationType}`,
         FechaOperacion: fecha,
         HoraOperacion: hora,
@@ -83,7 +85,14 @@ export default function CecabankPayment({
         ...(customerName ? { Nombre: customerName } : {}),
       };
 
-      const endpointUrl = `${CECABANK_CONFIG.apiUrl}/api/cecabank/redirect`;
+      console.log('🔗 Cecabank URLs (frontend):', {
+        urlOk: CECABANK_CONFIG.urlOk,
+        urlKo: CECABANK_CONFIG.urlKo,
+        okLength: CECABANK_CONFIG.urlOk?.length || 0,
+        koLength: CECABANK_CONFIG.urlKo?.length || 0,
+      });
+
+      const endpointUrl = `${CECABANK_CONFIG.apiUrl}/api/cecabank/redirect-clean`;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
 
@@ -217,7 +226,13 @@ export default function CecabankPayment({
           </View>
           <WebView
             ref={webViewRef}
-            source={{ html: webViewHtml }}
+            source={{
+              html: webViewHtml,
+              baseUrl:
+                CECABANK_CONFIG.entorno === 'test'
+                  ? 'https://tpv.ceca.es'
+                  : 'https://pgw.ceca.es',
+            }}
             onMessage={handleWebViewMessage}
             originWhitelist={['*']}
           />

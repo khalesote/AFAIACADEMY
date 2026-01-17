@@ -14,7 +14,7 @@ import { useUserProgress } from '@/contexts/UserProgressContext';
 import { useUser } from '@/contexts/UserContext';
 import AccessCodeInput from '../../components/AccessCodeInput';
 import CecabankPayment from '../../components/CecabankPayment';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { markAccessCodeAsUsed, initializeAccessCodes } from '../../utils/accessCodes';
 import { CECABANK_PRICES } from '../../config/cecabank';
 import { UserService } from '../../services/userService';
@@ -209,6 +209,11 @@ export default function MatriculaScreen() {
   return (
     <View style={styles.container}>
       <ScrollView>
+        <View style={styles.topBar}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/SchoolScreen')}>
+            <Ionicons name="arrow-back" size={24} color="#333" />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.sectionTitle}>Selecciona tu matrícula</Text>
         
         <View style={styles.dataContainer}>
@@ -228,22 +233,7 @@ export default function MatriculaScreen() {
                 </Text>
               </View>
             </>
-          ) : (
-            <View style={styles.noDataContainer}>
-              <Text style={styles.noDataText}>
-                ⚠️ No se encontraron datos del formulario.
-              </Text>
-              <Text style={styles.noDataSubtext}>
-                Por favor, completa el formulario de matrícula primero.
-              </Text>
-              <TouchableOpacity
-                style={styles.formButton}
-                onPress={() => router.push('/')}
-              >
-                <Text style={styles.formButtonText}>Ir al Formulario</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          ) : null}
         </View>
         
         {/* Opciones de matrícula */}
@@ -499,6 +489,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
     padding: 20,
+  },
+  topBar: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  backButton: {
+    padding: 6,
+    alignSelf: 'flex-start',
   },
   loadingContainer: {
     flex: 1,

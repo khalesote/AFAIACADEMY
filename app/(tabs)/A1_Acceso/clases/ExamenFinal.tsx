@@ -1540,7 +1540,7 @@ export default function ExamenFinal() {
   };
 
   const totalPreguntas = preguntas.length;
-  const minimoAprobar = Math.ceil(totalPreguntas * 0.75);
+  const minimoAprobar = Math.ceil(totalPreguntas * 0.7);
 
   // Función para manejar selección en preguntas de relacionar
   const handleRelacionarSelection = (lado: 'izquierda' | 'derecha', idx: number) => {
@@ -1874,7 +1874,7 @@ export default function ExamenFinal() {
     setPuntuacion(puntos);
 
     // Guardar preguntas usadas si el usuario falla (menos de 16/30 correctas)
-    const REQUIRED_CORRECT = 16;
+    const REQUIRED_CORRECT = minimoAprobar;
     if (puntos < REQUIRED_CORRECT) {
       try {
         const currentIndicesStr = await AsyncStorage.getItem('A1_examen_preguntas_actuales');
@@ -2181,7 +2181,7 @@ export default function ExamenFinal() {
   if (examenTerminado) {
     return (
       <LinearGradient
-        colors={puntuacion >= minimoAprobar ? ['#4caf50', '#66bb6a'] : ['#f44336', '#ef5350']}
+        colors={puntuacion >= minimoAprobar ? ['#000', '#000'] : ['#f44336', '#ef5350']}
         style={styles.background}
       >
         <View style={styles.resultadoContainer}>
@@ -2199,6 +2199,9 @@ export default function ExamenFinal() {
 
           <View style={styles.resultButtons}>
             <ExamenPresencialForm nivel="A1" />
+            {puntuacion >= minimoAprobar && (
+              <Text style={styles.resultHint}>¿Quieres obtener tu certificado? Apúntate al examen presencial.</Text>
+            )}
             {puntuacion >= minimoAprobar ? (
               <TouchableOpacity
                 style={styles.menuButton}
@@ -2676,7 +2679,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     marginBottom: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFD700',
     textAlign: 'center',
   },
   optionsContainer: {
@@ -2722,6 +2725,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 30,
+  },
+  resultHint: {
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: -10,
+    marginBottom: 10,
   },
   resultButtons: {
     width: '100%',

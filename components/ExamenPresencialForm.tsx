@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '@/contexts/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ExamenPresencialFormProps {
   nivel: 'A1' | 'A2' | 'B1' | 'B2';
@@ -22,6 +23,37 @@ export default function ExamenPresencialForm({
   const { user, firebaseUser, isAuthenticated } = useUser();
   const [loading, setLoading] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [fallbackPhone, setFallbackPhone] = useState('');
+
+  const extractPhone = (data: any) => {
+    if (!data) return '';
+    const candidates = [
+      data.telefono,
+      data.phone,
+      data.phoneNumber,
+      data.movil,
+      data.mobile,
+    ];
+    const found = candidates.find(value => String(value || '').trim());
+    return String(found || '').trim();
+  };
+
+  useEffect(() => {
+    const loadFallbackPhone = async () => {
+      try {
+        const raw = await AsyncStorage.getItem('matriculaFormData');
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        const phone = extractPhone(parsed);
+        if (phone) {
+          setFallbackPhone(phone);
+        }
+      } catch (error) {
+        console.warn('No se pudo cargar teléfono de matrícula:', error);
+      }
+    };
+    loadFallbackPhone();
+  }, []);
 
   const postSolicitud = async (payload: {
     nombre: string;
@@ -135,7 +167,16 @@ export default function ExamenPresencialForm({
     }
     
     const email = user.email || firebaseUser?.email || '';
-    const telefono = user.phone || '';
+    const telefono =
+      String(
+        user.phone ||
+          (user as any).telefono ||
+          (user as any).phoneNumber ||
+          (user as any).movil ||
+          (user as any).mobile ||
+          fallbackPhone ||
+          ''
+      ).trim();
 
     if (!email) {
       Alert.alert('Error', 'No se encontró un email asociado a tu cuenta. Por favor, completa tu perfil.');
@@ -156,10 +197,23 @@ export default function ExamenPresencialForm({
     setLoading(true);
 
     try {
+      let telefonoPayload = telefono;
+      if (!telefonoPayload) {
+        try {
+          const raw = await AsyncStorage.getItem('matriculaFormData');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            telefonoPayload = extractPhone(parsed);
+          }
+        } catch (error) {
+          console.warn('No se pudo recargar teléfono de matrícula:', error);
+        }
+      }
+
       const payload = {
         nombre,
         email,
-        telefono: telefono || '',
+        telefono: telefonoPayload || '',
         nivel,
         mensaje: 'ME APUNTO EN EXAMEN PRESENCIAL',
       };
