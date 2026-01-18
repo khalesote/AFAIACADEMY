@@ -37,8 +37,26 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import * as FileSystem from 'expo-file-system';
 import { WebView } from 'react-native-webview';
+import * as Notifications from 'expo-notifications';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
+async function registerForPushNotificationsAsync() {
+  let token;
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+  if (finalStatus !== 'granted') {
+    alert('Failed to get push token for push notification!');
+    return;
+  }
+  token = (await Notifications.getExpoPushTokenAsync()).data;
+  console.log('Push token:', token);
+  return token;
+}
 
 export function HomeScreenContent() {
   const videoRef = useRef<any>(null);
@@ -48,7 +66,6 @@ export function HomeScreenContent() {
   const [promoContentWidth, setPromoContentWidth] = useState<number>(0);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [newsLoading, setNewsLoading] = useState(false);
   const [newsError, setNewsError] = useState<string | null>(null);
@@ -67,7 +84,18 @@ export function HomeScreenContent() {
   const [prayerTimesLoading, setPrayerTimesLoading] = useState(true);
 
   // Obtener estado de autenticación desde UserContext
-  const { user, firebaseUser, isAuthenticated, loading: userLoading } = useUser();
+  const { user, firebaseUser, isAuthenticated, loading: userLoading, isAdmin, updateUser } = useUser();
+
+  // Set up notification handler
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
 
   // Mapeo de provincias a coordenadas (lat, lon)
   const PROVINCE_COORDINATES: Record<string, { lat: number; lon: number }> = {
@@ -178,6 +206,7 @@ export function HomeScreenContent() {
     '📄 Modelos oficiales de extranjería - Ministerio del Interior',
     '🏢 Localiza oficinas para trámites de inmigración',
     '📋 Impresos descargables para todos los trámites',
+    '💬 Únete al chat de la comunidad para conocerte y intercambiar ideas',
   ];
   const promoPhrasesAr = [
     '🎓 تعلّم الإسبانية خطوة بخطوة',
@@ -188,6 +217,7 @@ export function HomeScreenContent() {
     '📄 نماذج رسمية لشؤون الأجانب - وزارة الداخلية',
     '🏢 حدد موقع المكاتب لإجراءات الهجرة',
     '📋 طلبات قابلة للتحميل لجميع الإجراءات',
+    '💬 انضم إلى دردشة المجتمع للتعرف عليك وتبادل الأفكار',
   ];
   const promoPhrases = [...promoPhrasesEs, ...promoPhrasesAr];
 
@@ -230,18 +260,10 @@ export function HomeScreenContent() {
     })();
   }, []);
 
-  // Cargar usuario actual y verificar permisos de administrador
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const user = await userStorage.getCurrentUser();
-        setCurrentUser(user);
-
-        // Verificar si el usuario es el administrador específico
-        if (user?.email) {
-          const adminStatus = user.email === 'admin@academiadeinmigrantes.es';
-          setIsAdmin(adminStatus);
-        }
+        // No longer needed - isAdmin comes from useUser context
       } catch (error) {
         console.error('Error cargando usuario:', error);
       } finally {
@@ -464,7 +486,7 @@ export function HomeScreenContent() {
     const totalWidth = Math.max(prayerTimesContentWidth / 2, 1);
     prayerTimesScrollPosition.current = 0;
 
-    const stepPx = 1;
+    const stepPx = 2;
     const intervalMs = 20; // Velocidad del scroll
 
     const intervalId = setInterval(() => {
@@ -506,17 +528,28 @@ export function HomeScreenContent() {
           <View style={styles.profileSection}>
             {isAuthenticated && firebaseUser ? (
               // Usuario autenticado: mostrar nombre (usar perfil original)
-              <TouchableOpacity
-                style={styles.profileDisplay}
-                onPress={() => router.push("/UserProfileScreen")}
-              >
-                <Ionicons name="person-circle" size={20} color="#007AFF" />
-                <Text style={styles.userNameText}>
-                  {user?.firstName && user?.lastName
-                    ? `${user.firstName} ${user.lastName}`
-                    : firebaseUser.displayName || user?.email || firebaseUser.email || 'Usuario'}
-                </Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {isAdmin && (
+                  <TouchableOpacity
+                    style={styles.adminButton}
+                    onPress={() => router.push('/(tabs)/AdminScreen')}
+                  >
+                    <Ionicons name="settings" size={20} color="#FFD700" />
+                    <Text style={styles.adminButtonText}>Admin</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  style={styles.profileDisplay}
+                  onPress={() => router.push("/UserProfileScreen")}
+                >
+                  <Ionicons name="person-circle" size={20} color="#007AFF" />
+                  <Text style={styles.userNameText}>
+                    {user?.firstName && user?.lastName
+                      ? `${user.firstName} ${user.lastName}`
+                      : firebaseUser.displayName || user?.email || firebaseUser.email || 'Usuario'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             ) : (
               // Usuario NO autenticado: mostrar botón de registro
               <TouchableOpacity
@@ -551,6 +584,9 @@ export function HomeScreenContent() {
                       else if (p.includes('B2')) router.push('/(tabs)/B2_Avanzado');
                       else if (p.includes('Ministerio') || p.includes('oficinas') || p.includes('Impresos') || p.includes('نماذج') || p.includes('مكاتب') || p.includes('قابلة')) {
                         router.push('/(tabs)/NoticiasInmigracionScreen');
+                      }
+                      else if (p.includes('chat') || p.includes('دردشة')) {
+                        router.push('/(tabs)/ChatScreen');
                       }
                     }}
                   >
@@ -874,6 +910,23 @@ export function HomeScreenContent() {
               </LinearGradient>
             </TouchableOpacity>
 
+            {/* Chat Comunidad */}
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/ChatScreen"))}
+            >
+              <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="chatbubble-ellipses" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Chat Comunidad</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>دردشة المجتمع</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Conversaciones</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>محادثات</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
             {/* Aprende a Escribir */}
             <TouchableOpacity
               style={styles.categoryCard}
@@ -973,6 +1026,23 @@ export function HomeScreenContent() {
                 <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>دليل المهاجر</Text>
                 <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Guía práctica</Text>
                 <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>دليل عملي</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Notificaciones */}
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/NotificationsScreen"))}
+            >
+              <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="notifications" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Notificaciones</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>إشعارات</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Mensajes</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>رسائل</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -1786,11 +1856,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   adminButton: {
-    marginLeft: 8,
-    backgroundColor: '#000',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1976d2',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginRight: 10,
   },
   adminButtonText: {
     color: '#FFD700',
+    marginLeft: 4,
+    fontSize: 12,
+    fontWeight: '600',
   },
   newBadge: {
     width: 45,

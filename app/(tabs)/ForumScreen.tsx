@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -15,8 +15,11 @@ import { collection, addDoc, getDocs, query, orderBy, where, Timestamp, onSnapsh
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import { firestore, storage } from '../../config/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../../contexts/UserContext';
 import { Image } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 
 interface ForumPost {
   id: string;
@@ -56,8 +59,8 @@ export default function ForumScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
-  const [newPostImageUri, setNewPostImageUri] = useState<string | null>(null);
-  const [uploadingImage, setUploadingImage] = useState(false);
+  // const [newPostImageUri, setNewPostImageUri] = useState<string | null>(null);
+  // const [uploadingImage, setUploadingImage] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('general');
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
   const [commentModalVisible, setCommentModalVisible] = useState(false);
@@ -65,16 +68,37 @@ export default function ForumScreen() {
   const [newCommentContent, setNewCommentContent] = useState('');
   const { user, profileImage } = useUser();
   const [commentUnsubscribers, setCommentUnsubscribers] = useState<{ [postId: string]: () => void }>({});
+  const [showNewPostsBanner, setShowNewPostsBanner] = useState(false);
+  const [lastViewedTimestamp, setLastViewedTimestamp] = useState(0);
+  const router = useRouter();
+
+  useFocusEffect(
+    useCallback(() => {
+      const updateViewed = async () => {
+        const now = Date.now();
+        await AsyncStorage.setItem('@forum_last_viewed', now.toString());
+        setLastViewedTimestamp(now);
+        setShowNewPostsBanner(false);
+      };
+      updateViewed();
+    }, [])
+  );
 
   useEffect(() => {
-    const unsubscribePosts = loadPosts();
-    return () => {
-      if (unsubscribePosts) unsubscribePosts();
-      Object.values(commentUnsubscribers).forEach(unsub => unsub());
+    const init = async () => {
+      const last = await AsyncStorage.getItem('@forum_last_viewed');
+      const ts = last ? parseInt(last) : 0;
+      setLastViewedTimestamp(ts);
+      const unsubscribePosts = loadPosts(ts);
+      return () => {
+        if (unsubscribePosts) unsubscribePosts();
+        Object.values(commentUnsubscribers).forEach(unsub => unsub());
+      };
     };
+    init();
   }, []);
 
-  const loadPosts = () => {
+  const loadPosts = (lastViewed: number) => {
     if (!firestore) {
       console.error('Firestore not available');
       Alert.alert('Error', 'Servicio de base de datos no disponible');
@@ -90,13 +114,21 @@ export default function ForumScreen() {
     const unsubscribe = onSnapshot(postsQuery, (querySnapshot) => {
       const postsData: ForumPost[] = [];
       querySnapshot.forEach((doc) => {
-        postsData.push({ id: doc.id, ...doc.data() } as ForumPost);
+        const post = { id: doc.id, ...doc.data() } as ForumPost;
+        postsData.push(post);
+        // Load comments for posts that have comments
+        if (post.commentsCount && post.commentsCount > 0) {
+          loadComments(post.id);
+        }
       });
       setPosts(postsData);
       setLoading(false);
+
+      // Check for new posts
+      const hasNew = postsData.some(p => p.createdAt.toMillis() > lastViewed);
+      setShowNewPostsBanner(hasNew);
     }, (error) => {
       console.error('Error loading posts:', error);
-      Alert.alert('Error', 'No se pudieron cargar las publicaciones del foro');
       setLoading(false);
     });
 
@@ -107,6 +139,7 @@ export default function ForumScreen() {
     if (!firestore) return;
     if (commentUnsubscribers[postId]) return; // already listening
 
+    console.log('📥 Loading comments for post:', postId);
     const commentsQuery = query(
       collection(firestore, 'forum_comments'),
       where('postId', '==', postId)
@@ -122,45 +155,13 @@ export default function ForumScreen() {
         const bTime = b.createdAt?.toMillis?.() ?? 0;
         return aTime - bTime;
       });
+      console.log(`📡 Comments updated for post ${postId}: ${commentsData.length} comments`);
       setComments(prev => ({ ...prev, [postId]: commentsData }));
     }, (error) => {
-      console.error('Error loading comments:', error);
+      console.error('❌ Error loading comments:', error);
     });
 
     setCommentUnsubscribers(prev => ({ ...prev, [postId]: unsubscribe }));
-  };
-
-  const pickPostImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert('Permiso requerido', 'Necesitamos acceso a tu galería para subir una imagen.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets?.length) {
-      setNewPostImageUri(result.assets[0].uri);
-    }
-  };
-
-  const uploadPostImage = async (userId: string, imageUri: string) => {
-    if (!storage) {
-      console.warn('Firebase Storage no disponible');
-      return null;
-    }
-
-    const response = await fetch(imageUri);
-    const blob = await response.blob();
-    const filename = `forum_images/${userId}/${Date.now()}.jpg`;
-    const storageRef = ref(storage, filename);
-
-    const uploadTask = await uploadBytes(storageRef, blob);
-    return getDownloadURL(uploadTask.ref);
   };
 
   const createPost = async () => {
@@ -181,26 +182,13 @@ export default function ForumScreen() {
     }
 
     try {
-      let imageUrl: string | null = null;
-      if (newPostImageUri) {
-        setUploadingImage(true);
-        try {
-          imageUrl = await uploadPostImage(user.id, newPostImageUri);
-        } catch (uploadError) {
-          console.error('Error uploading post image:', uploadError);
-          Alert.alert('Error', 'No se pudo subir la imagen. Publicaremos sin imagen.');
-        } finally {
-          setUploadingImage(false);
-        }
-      }
-
       await addDoc(collection(firestore, 'forum_posts'), {
         title: newPostTitle.trim(),
         content: newPostContent.trim(),
         author: user.name || user.email,
         authorId: user.id,
         authorPhoto: profileImage || null,
-        imageUrl: imageUrl || null,
+        imageUrl: null,
         createdAt: Timestamp.now(),
         category: selectedCategory,
         commentsCount: 0,
@@ -209,7 +197,6 @@ export default function ForumScreen() {
       setModalVisible(false);
       setNewPostTitle('');
       setNewPostContent('');
-      setNewPostImageUri(null);
       setSelectedCategory('general');
       Alert.alert('Éxito', 'Publicación creada correctamente');
     } catch (error) {
@@ -220,10 +207,12 @@ export default function ForumScreen() {
 
   const createComment = async () => {
     if (!newCommentContent.trim() || !selectedPostId || !user || !firestore) {
+      console.log('❌ Comment creation failed: missing data', { newCommentContent: !!newCommentContent.trim(), selectedPostId, user: !!user, firestore: !!firestore });
       return;
     }
 
     try {
+      console.log('📝 Creating comment for post:', selectedPostId);
       await addDoc(collection(firestore, 'forum_comments'), {
         postId: selectedPostId,
         content: newCommentContent.trim(),
@@ -239,13 +228,14 @@ export default function ForumScreen() {
         commentsCount: increment(1)
       });
 
+      console.log('✅ Comment created successfully');
       setCommentModalVisible(false);
       setNewCommentContent('');
       setSelectedPostId(null);
 
       Alert.alert('Éxito', 'Comentario agregado correctamente');
     } catch (error) {
-      console.error('Error creating comment:', error);
+      console.error('❌ Error creating comment:', error);
       Alert.alert('Error', 'No se pudo agregar el comentario');
     }
   };
@@ -397,15 +387,27 @@ export default function ForumScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
+          <Ionicons name="arrow-back" size={28} color="#FFD700" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Foro de la Comunidad</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => setModalVisible(true)}
         >
           <Ionicons name="add-circle" size={24} color="#FFD700" />
-          <Text style={styles.addButtonText}>Nueva Publicación</Text>
+          <Text style={styles.addButtonText}>Publicar</Text>
         </TouchableOpacity>
       </View>
+
+      {showNewPostsBanner && (
+        <View style={styles.newPostsBanner}>
+          <Text style={styles.newPostsBannerText}>Hay nuevas publicaciones</Text>
+          <TouchableOpacity onPress={() => setShowNewPostsBanner(false)}>
+            <Ionicons name="close" size={20} color="#666" />
+          </TouchableOpacity>
+        </View>
+      )}
 
       <FlatList
         data={posts}
@@ -463,32 +465,6 @@ export default function ForumScreen() {
                 ))}
               </ScrollView>
 
-              <Text style={styles.inputLabel}>Imagen (opcional)</Text>
-              <TouchableOpacity style={styles.imagePickerButton} onPress={pickPostImage}>
-                <Ionicons name="image-outline" size={20} color="#1976d2" />
-                <Text style={styles.imagePickerText}>Elegir imagen</Text>
-              </TouchableOpacity>
-              {newPostImageUri ? (
-                <View style={styles.imagePreviewContainer}>
-                  <Image source={{ uri: newPostImageUri }} style={styles.imagePreview} />
-                  <TouchableOpacity
-                    style={styles.removeImageButton}
-                    onPress={() => setNewPostImageUri(null)}
-                  >
-                    <Ionicons name="close" size={18} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              ) : null}
-
-              <Text style={styles.inputLabel}>Título</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Escribe el título de tu publicación..."
-                value={newPostTitle}
-                onChangeText={setNewPostTitle}
-                maxLength={100}
-              />
-
               <Text style={styles.inputLabel}>Contenido</Text>
               <TextInput
                 style={[styles.textInput, styles.contentInput]}
@@ -509,12 +485,11 @@ export default function ForumScreen() {
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.submitButton, uploadingImage && styles.submitButtonDisabled]}
+                style={styles.submitButton}
                 onPress={createPost}
-                disabled={uploadingImage}
               >
                 <Text style={styles.submitButtonText}>
-                  {uploadingImage ? 'Subiendo...' : 'Publicar'}
+                  Publicar
                 </Text>
               </TouchableOpacity>
             </View>
@@ -591,10 +566,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 10,
     backgroundColor: '#1a1a1a',
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+  },
+  backButton: {
+    marginRight: 10,
   },
   headerTitle: {
     fontSize: 20,
@@ -608,11 +586,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
+    marginTop: 5,
   },
   addButtonText: {
     color: '#fff',
     marginLeft: 5,
     fontWeight: '600',
+  },
+  newPostsBanner: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#e3f2fd',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#bbdefb',
+  },
+  newPostsBannerText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1976d2',
   },
   postsList: {
     padding: 15,

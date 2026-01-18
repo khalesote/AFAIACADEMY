@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import SchoolScreen from './(tabs)/SchoolScreen';
 import MatriculaScreen from './(tabs)/MatriculaScreen';
 import AgendaScreen from './AgendaScreen';
+// import ChatScreen from './ChatScreen';
 // import B2AvanzadoScreen from './(tabs)/B2AvanzadoScreen';
 
 export type RootStackParamList = {

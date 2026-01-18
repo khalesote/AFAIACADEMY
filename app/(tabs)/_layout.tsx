@@ -1,7 +1,12 @@
 import { Tabs } from "expo-router";
-import React from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useEffect } from "react";
+import { View, StyleSheet, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
+const db = getFirestore();
+const auth = getAuth();
 
 const styles = StyleSheet.create({
   sceneContainer: {
@@ -26,6 +31,29 @@ const styles = StyleSheet.create({
 });
 
 export default function TabLayout() {
+  // Global notification listener
+  useEffect(() => {
+    if (auth.currentUser) {
+      const q = query(
+        collection(db, 'notifications'),
+        where('toUserId', '==', auth.currentUser.uid),
+        where('read', '==', false)
+      );
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        querySnapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            const data = change.doc.data();
+            Alert.alert('Nueva notificación', data.message);
+            // Mark as read
+            updateDoc(change.doc.ref, { read: true });
+          }
+        });
+      });
+
+      return unsubscribe;
+    }
+  }, []);
+
   return (
     <Tabs
       screenOptions={{
@@ -116,6 +144,14 @@ export default function TabLayout() {
           title: "Foro",
           tabBarIcon: ({ color }) => <Ionicons name="chatbubbles" size={28} color={color} />,
           tabBarStyle: { display: 'none' }, // Hide tab bar for forum screen
+        }}
+      />
+      <Tabs.Screen
+        name="ChatScreen"
+        options={{
+          title: "Chat",
+          tabBarIcon: ({ color }) => <Ionicons name="chatbubble-ellipses" size={28} color={color} />,
+          tabBarStyle: { display: 'none' }, // Hide tab bar for chat screen
         }}
       />
     </Tabs>

@@ -14,6 +14,7 @@ interface UserContextType {
   refreshUser: () => Promise<User | null>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
+  isAdmin: boolean;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -24,6 +25,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const adminEmails = ['admin@academiadeinmigrantes.es', 'somos@afaiacademiadeinmigrantes.com'];
 
   const loadUserData = async () => {
     try {
@@ -214,7 +217,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       updateUser,
       refreshUser,
       logout,
-      isAuthenticated
+      isAuthenticated,
+      isAdmin: user ? adminEmails.includes(user.email) : false
     }}>
       {children}
     </UserContext.Provider>

@@ -13,30 +13,30 @@ type Exercise = {
   titleEs: string;
   titleAr: string;
   targetText: string;
-  speakAr: string;
+  speakEs: string;
 };
 
 const EXERCISES: Exercise[] = [
-  { id: 'frase-1', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Yo vivo en Madrid', speakAr: 'اكتب الجملة: Yo vivo en Madrid' },
-  { id: 'frase-2', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Me llamo Ana', speakAr: 'اكتب الجملة: Me llamo Ana' },
-  { id: 'frase-3', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Tengo una casa pequeña', speakAr: 'اكتب الجملة: Tengo una casa pequeña' },
-  { id: 'frase-4', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mi amigo trabaja hoy', speakAr: 'اكتب الجملة: Mi amigo trabaja hoy' },
-  { id: 'frase-5', titleEs: 'Frases', titleAr: 'جمل', targetText: 'El niño juega en el parque', speakAr: 'اكتب الجملة: El niño juega en el parque' },
-  { id: 'frase-6', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Voy al médico por la mañana', speakAr: 'اكتب الجملة: Voy al médico por la mañana' },
-  { id: 'frase-7', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Necesito una cita para hoy', speakAr: 'اكتب الجملة: Necesito una cita para hoy' },
-  { id: 'frase-8', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mi hermana vive en Sevilla', speakAr: 'اكتب الجملة: Mi hermana vive en Sevilla' },
-  { id: 'frase-9', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Tenemos clase a las nueve', speakAr: 'اكتب الجملة: Tenemos clase a las nueve' },
-  { id: 'frase-10', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Quiero aprender español', speakAr: 'اكتب الجملة: Quiero aprender español' },
-  { id: 'frase-11', titleEs: 'Frases', titleAr: 'جمل', targetText: 'La tienda está abierta', speakAr: 'اكتب الجملة: La tienda está abierta' },
-  { id: 'frase-12', titleEs: 'Frases', titleAr: 'جمل', targetText: 'El autobús llega tarde', speakAr: 'اكتب الجملة: El autobús llega tarde' },
-  { id: 'frase-13', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Necesito comprar pan', speakAr: 'اكتب الجملة: Necesito comprar pan' },
-  { id: 'frase-14', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mi familia es muy grande', speakAr: 'اكتب الجملة: Mi familia es muy grande' },
-  { id: 'frase-15', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Me gusta escuchar música', speakAr: 'اكتب الجملة: Me gusta escuchar música' },
-  { id: 'frase-16', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Hoy hace mucho frío', speakAr: 'اكتب الجملة: Hoy hace mucho frío' },
-  { id: 'frase-17', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Busco trabajo en Madrid', speakAr: 'اكتب الجملة: Busco trabajo en Madrid' },
-  { id: 'frase-18', titleEs: 'Frases', titleAr: 'جمل', targetText: 'El profesor es muy amable', speakAr: 'اكتب الجملة: El profesor es muy amable' },
-  { id: 'frase-19', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Quiero un café con leche', speakAr: 'اكتب الجملة: Quiero un café con leche' },
-  { id: 'frase-20', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mañana vamos al mercado', speakAr: 'اكتب الجملة: Mañana vamos al mercado' },
+  { id: 'frase-1', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Yo vivo en Madrid', speakEs: 'Escribe la frase: Yo vivo en Madrid' },
+  { id: 'frase-2', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Me llamo Ana', speakEs: 'Escribe la frase: Me llamo Ana' },
+  { id: 'frase-3', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Tengo una casa pequeña', speakEs: 'Escribe la frase: Tengo una casa pequeña' },
+  { id: 'frase-4', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mi amigo trabaja hoy', speakEs: 'Escribe la frase: Mi amigo trabaja hoy' },
+  { id: 'frase-5', titleEs: 'Frases', titleAr: 'جمل', targetText: 'El niño juega en el parque', speakEs: 'Escribe la frase: El niño juega en el parque' },
+  { id: 'frase-6', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Voy al médico por la mañana', speakEs: 'Escribe la frase: Voy al médico por la mañana' },
+  { id: 'frase-7', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Necesito una cita para hoy', speakEs: 'Escribe la frase: Necesito una cita para hoy' },
+  { id: 'frase-8', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mi hermana vive en Sevilla', speakEs: 'Escribe la frase: Mi hermana vive en Sevilla' },
+  { id: 'frase-9', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Tenemos clase a las nueve', speakEs: 'Escribe la frase: Tenemos clase a las nueve' },
+  { id: 'frase-10', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Quiero aprender español', speakEs: 'Escribe la frase: Quiero aprender español' },
+  { id: 'frase-11', titleEs: 'Frases', titleAr: 'جمل', targetText: 'La tienda está abierta', speakEs: 'Escribe la frase: La tienda está abierta' },
+  { id: 'frase-12', titleEs: 'Frases', titleAr: 'جمل', targetText: 'El autobús llega tarde', speakEs: 'Escribe la frase: El autobús llega tarde' },
+  { id: 'frase-13', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Necesito comprar pan', speakEs: 'Escribe la frase: Necesito comprar pan' },
+  { id: 'frase-14', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mi familia es muy grande', speakEs: 'Escribe la frase: Mi familia es muy grande' },
+  { id: 'frase-15', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Me gusta escuchar música', speakEs: 'Escribe la frase: Me gusta escuchar música' },
+  { id: 'frase-16', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Hoy hace mucho frío', speakEs: 'Escribe la frase: Hoy hace mucho frío' },
+  { id: 'frase-17', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Busco trabajo en Madrid', speakEs: 'Escribe la frase: Busco trabajo en Madrid' },
+  { id: 'frase-18', titleEs: 'Frases', titleAr: 'جمل', targetText: 'El profesor es muy amable', speakEs: 'Escribe la frase: El profesor es muy amable' },
+  { id: 'frase-19', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Quiero un café con leche', speakEs: 'Escribe la frase: Quiero un café con leche' },
+  { id: 'frase-20', titleEs: 'Frases', titleAr: 'جمل', targetText: 'Mañana vamos al mercado', speakEs: 'Escribe la frase: Mañana vamos al mercado' },
 ];
 
 const normalizeText = (text: string) => (text || '')
@@ -95,29 +95,28 @@ export default function AprendeEscribirScreen() {
 
   const current = useMemo(() => EXERCISES[index], [index]);
 
-  const speakArabic = (text: string) => {
+  const speakSpanish = (text: string) => {
     Speech.stop();
-    Speech.speak(text, { language: 'ar-SA', rate: 0.9 });
+    Speech.speak(text, { language: 'es-ES', rate: 0.9 });
   };
 
-  const getIntroArabic = (titleEs: string, targetText: string) => {
+  const getIntroSpanish = (titleEs: string, targetText: string) => {
     if (titleEs === 'Letra') {
-      return `من فضلك اكتب الحرف ${targetText} كبيراً وبشكل منفصل، ولا تكتبه ملاصقاً لحروف أخرى.`;
+      return `Por favor escribe la letra ${targetText} grande y separada. No la pegues a otras letras.`;
     }
     if (titleEs === 'Sílabas') {
-      return `من فضلك اكتب المقطع ${targetText} بحروف كبيرة وواضحة.`;
+      return `Por favor escribe la sílaba ${targetText} en mayúsculas y bien separada.`;
     }
     if (titleEs === 'Palabras') {
-      return `من فضلك اكتب كلمة ${targetText} كاملة في سطر واحد وبحروف واضحة.`;
+      return `Por favor escribe la palabra ${targetText} completa en una sola línea y con letras claras.`;
     }
-    return `من فضلك اكتب الجملة التالية كاملة مع ترك مسافة بين الكلمات: ${targetText}.`;
+    return `Por favor escribe la frase completa con espacios entre palabras: ${targetText}.`;
   };
 
   const handleStart = () => {
     const intro =
-      'من فضلك خذ ورقة من الدفتر، اكتب الجملة التي تراها مع احترام الخطوط، ثم التقط صورة وأرسلها للتقييم.';
-    speakArabic(intro);
-    setTimeout(() => speakArabic(current.speakAr), 1500);
+      'porfavor coge un papel de un cuaderno con las linea, sigue el ejemplo,toma una foto y enviarla para su evaluacion';
+    speakSpanish(intro);
   };
 
   const handleTakePhoto = async () => {
@@ -186,9 +185,9 @@ export default function AprendeEscribirScreen() {
       setSimilarity(similarityValue);
 
       if (matchedResult ?? fallbackMatched) {
-        speakArabic('أحسنت! استمر');
+        speakSpanish('¡Bien hecho! Continúa');
       } else {
-        speakArabic('حاول مرة أخرى');
+        speakSpanish('Inténtalo de nuevo');
       }
     } catch (error) {
       console.error('OCR error:', error);
@@ -204,18 +203,13 @@ export default function AprendeEscribirScreen() {
       setLastResult(null);
       setMatched(null);
       setSimilarity(null);
-      handleStart();
       return;
     }
-    speakArabic('ممتاز! لقد أنهيت هذا المستوى. استمر في التقدم');
+    speakSpanish('¡Excelente! Has terminado este nivel. Sigue avanzando');
     Alert.alert('¡Muy bien!', 'Has completado este nivel. ¡Sigue con el siguiente!', [
       { text: 'OK', onPress: () => router.back() }
     ]);
   };
-
-  React.useEffect(() => {
-    handleStart();
-  }, [current.id]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -276,12 +270,12 @@ export default function AprendeEscribirScreen() {
       )}
 
       <TouchableOpacity
-        style={[styles.nextButton, matched ? styles.nextButtonEnabled : styles.nextButtonDisabled]}
+        style={[styles.nextButton, styles.nextButtonEnabled]}
         onPress={handleNext}
-        disabled={!matched}
       >
         <Text style={styles.nextButtonText}>Siguiente nivel</Text>
       </TouchableOpacity>
+      <Text style={styles.arabicInstruction}>من فضلك خذ ورقة من دفتر، اكتب الجملة المثال، اضغط على زر التقاط الصورة أرسلها وانتظر النتيجة</Text>
     </ScrollView>
   );
 }
@@ -437,5 +431,12 @@ const styles = StyleSheet.create({
   nextButtonText: {
     color: '#000',
     fontWeight: '600',
+  },
+  arabicInstruction: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'right',
+    marginTop: 10,
+    paddingHorizontal: 20,
   },
 });

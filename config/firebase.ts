@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { initializeAuth, getAuth } from 'firebase/auth';
+import { getAuth, setPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -47,7 +47,6 @@ let authInstance: ReturnType<typeof getAuth> | null = null;
 
 if (firebaseInitialized && firebaseApp) {
   try {
-    // Initialize Firebase Auth with default persistence
     authInstance = getAuth(firebaseApp);
     console.log('🔐 Firebase Auth inicializado con persistencia por defecto');
   } catch (error: any) {

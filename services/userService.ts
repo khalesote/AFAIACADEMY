@@ -27,6 +27,7 @@ export interface User {
   fechaNacimiento?: string;
   createdAt?: any;
   fechaMatricula?: string;
+  pushToken?: string;
 }
 
 export interface LoginResponse {

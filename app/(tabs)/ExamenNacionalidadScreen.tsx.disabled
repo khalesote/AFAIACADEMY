@@ -13,9 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ExamenNacionalidadPayment from '../../components/ExamenNacionalidadPayment';
 import ExamenNacionalidadAccessCodeInput from '../../components/ExamenNacionalidadAccessCodeInput';
-import { getExamenNacionalidadTotalPrice } from '../../config/stripeExamenNacionalidad';
 import { markExamenNacionalidadCodeAsUsed } from '../../utils/accessCodes';
 import { useUser } from '@/contexts/UserContext';
 
@@ -49,7 +47,7 @@ export default function ExamenNacionalidadScreen() {
   const [preguntaExplicacion, setPreguntaExplicacion] = useState<Pregunta | null>(null);
   const [tieneAcceso, setTieneAcceso] = useState(false);
   const [verificandoAcceso, setVerificandoAcceso] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState<'payment' | 'code'>('payment');
+  const [modalVisible, setModalVisible] = useState(false);
   const { user } = useUser();
 
   useEffect(() => {
@@ -98,11 +96,7 @@ export default function ExamenNacionalidadScreen() {
 
   const iniciarExamen = () => {
     if (!tieneAcceso) {
-      Alert.alert(
-        'Acceso requerido',
-        'Debes pagar para acceder al examen de nacionalidad.',
-        [{ text: 'OK' }]
-      );
+      setModalVisible(true);
       return;
     }
 
@@ -118,15 +112,6 @@ export default function ExamenNacionalidadScreen() {
     setExamenCompletado(false);
     setMostrarResultados(false);
     setTiempoRestante(45 * 60);
-  };
-
-  const handlePaymentSuccess = () => {
-    setTieneAcceso(true);
-    Alert.alert(
-      '¡Pago exitoso!',
-      'Ya puedes acceder al examen de nacionalidad.',
-      [{ text: 'OK' }]
-    );
   };
 
   const handleCodeValid = async (code: string) => {
@@ -303,75 +288,17 @@ export default function ExamenNacionalidadScreen() {
           <Text style={styles.categoryItemAr}>• المجتمع الإسباني (5 أسئلة)</Text>
         </View>
 
-        {!tieneAcceso ? (
+        {!tieneAcceso && (
           <View style={styles.paymentSection}>
             <View style={styles.paymentInfoCard}>
-              <Ionicons name="lock-closed" size={48} color="#9DC3AA" />
+              <Ionicons name="lock-closed" size={40} color="#9DC3AA" />
               <Text style={styles.paymentInfoTitle}>Acceso al Examen</Text>
-              <Text style={styles.paymentInfoText}>
-                Para acceder al examen de nacionalidad CCSE, necesitas realizar el pago de {getExamenNacionalidadTotalPrice().toFixed(2)}€ o usar un código de acceso
-              </Text>
+              <Text style={styles.paymentInfoText}>Para acceder al examen, utiliza un código de acceso.</Text>
             </View>
-
-            {/* Selector de método: Pago o Código */}
-            <View style={styles.paymentMethodSelector}>
-              <TouchableOpacity
-                style={[
-                  styles.paymentMethodButton,
-                  paymentMethod === 'payment' && styles.paymentMethodButtonActive
-                ]}
-                onPress={() => setPaymentMethod('payment')}
-              >
-                <Ionicons 
-                  name="card" 
-                  size={20} 
-                  color={paymentMethod === 'payment' ? '#fff' : '#666'} 
-                  style={{ marginRight: 8 }}
-                />
-                <Text style={[
-                  styles.paymentMethodText,
-                  paymentMethod === 'payment' && styles.paymentMethodTextActive
-                ]}>
-                  Pagar
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.paymentMethodButton,
-                  paymentMethod === 'code' && styles.paymentMethodButtonActive
-                ]}
-                onPress={() => setPaymentMethod('code')}
-              >
-                <Ionicons 
-                  name="key" 
-                  size={20} 
-                  color={paymentMethod === 'code' ? '#fff' : '#666'} 
-                  style={{ marginRight: 8 }}
-                />
-                <Text style={[
-                  styles.paymentMethodText,
-                  paymentMethod === 'code' && styles.paymentMethodTextActive
-                ]}>
-                  Código de acceso
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Mostrar pago o código según selección */}
-            {paymentMethod === 'payment' ? (
-              <ExamenNacionalidadPayment
-                onPaymentSuccess={handlePaymentSuccess}
-                onPaymentCancel={() => {}}
-              />
-            ) : (
-              <ExamenNacionalidadAccessCodeInput
-                documento={user?.documento}
-                onCodeValid={handleCodeValid}
-                onCancel={() => setPaymentMethod('payment')}
-              />
-            )}
           </View>
-        ) : (
+        )}
+
+        {tieneAcceso && (
           <TouchableOpacity
             style={styles.startButton}
             onPress={iniciarExamen}
@@ -387,6 +314,23 @@ export default function ExamenNacionalidadScreen() {
           </TouchableOpacity>
         )}
       </ScrollView>
+
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <ExamenNacionalidadAccessCodeInput
+              documento={user?.documento}
+              onCodeValid={handleCodeValid}
+              onCancel={() => setModalVisible(false)}
+            />
+          </View>
+        </View>
+      </Modal>
     );
   }
 

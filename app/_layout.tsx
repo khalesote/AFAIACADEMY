@@ -7,8 +7,6 @@ import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StripeProvider } from '@stripe/stripe-react-native';
-import { STRIPE_CONFIG } from '@/config/stripe';
 import { UserProgressProvider, useUserProgress } from '@/contexts/UserProgressContext';
 import { UserProvider } from '@/contexts/UserContext';
 import * as Font from 'expo-font';
@@ -50,19 +48,14 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StripeProvider
-        publishableKey={STRIPE_CONFIG.PUBLISHABLE_KEY}
-        merchantIdentifier={STRIPE_CONFIG.MERCHANT_ID}
-      >
-        <UserProvider>
-          <UserProgressProvider>
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-              <Slot />
-            </ThemeProvider>
-          </UserProgressProvider>
-        </UserProvider>
-      </StripeProvider>
+      <UserProvider>
+        <UserProgressProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+            <Slot />
+          </ThemeProvider>
+        </UserProgressProvider>
+      </UserProvider>
     </GestureHandlerRootView>
   );
 }
