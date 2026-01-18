@@ -33,6 +33,10 @@
             "com.google.android.googlequicksearchbox"
           ]
         }
+      ],
+      [
+        "@react-native-community/datetimepicker",
+        false
       ]
     ],
     "ios": {

@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User as FirebaseUser } from 'firebase/auth';
 import { UserService, User } from '../services/userService';
 import { auth } from '../config/firebase';
+import { View, Text, ActivityIndicator } from 'react-native';
 
 interface UserContextType {
   user: User | null;
@@ -220,7 +221,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       isAuthenticated,
       isAdmin: user ? adminEmails.includes(user.email) : false
     }}>
-      {children}
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+          <ActivityIndicator size="large" color="#9DC3AA" />
+          <Text style={{ marginTop: 16, color: '#666' }}>Cargando...</Text>
+        </View>
+      ) : (
+        children
+      )}
     </UserContext.Provider>
   );
 };

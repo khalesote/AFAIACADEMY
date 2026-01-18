@@ -83,19 +83,31 @@ export function HomeScreenContent() {
   }>>([]);
   const [prayerTimesLoading, setPrayerTimesLoading] = useState(true);
 
+  // Push notifications
+  const [pushToken, setPushToken] = useState<string | null>(null);
+
+  // Register for push notifications on mount
+  useEffect(() => {
+    const register = async () => {
+      const token = await registerForPushNotificationsAsync();
+      if (token) setPushToken(token);
+    };
+    register();
+  }, []);
+
   // Obtener estado de autenticación desde UserContext
   const { user, firebaseUser, isAuthenticated, loading: userLoading, isAdmin, updateUser } = useUser();
 
   // Set up notification handler
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-      shouldShowBanner: true,
-      shouldShowList: true,
-    }),
-  });
+  // Notifications.setNotificationHandler({
+  //   handleNotification: async () => ({
+  //     shouldShowAlert: true,
+  //     shouldPlaySound: true,
+  //     shouldSetBadge: false,
+  //     shouldShowBanner: true,
+  //     shouldShowList: true,
+  //   }),
+  // });
 
   // Mapeo de provincias a coordenadas (lat, lon)
   const PROVINCE_COORDINATES: Record<string, { lat: number; lon: number }> = {
@@ -238,27 +250,26 @@ export function HomeScreenContent() {
     return () => clearInterval(timer);
   }, [promoContentWidth]);
 
-  // Inicializar progreso unificado y sincronizar claves legacy (una vez al arrancar)
-  useEffect(() => {
-    (async () => {
-      try {
-        // Test AsyncStorage first
-        console.log('🚀 Iniciando test de AsyncStorage...');
-        const asyncStorageWorking = await testAsyncStorage();
-        if (!asyncStorageWorking) {
-          console.error('❌ AsyncStorage no está funcionando correctamente');
-          // You could show an alert or handle this error
-        } else {
-          console.log('✅ AsyncStorage funcionando correctamente');
-        }
-        
-        await initializeB1Progress();
-        await syncA1A2FromLegacy();
-      } catch (e) {
-        console.warn('No se pudo inicializar/sincronizar progreso:', e);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       // Test AsyncStorage first
+  //       console.log('🚀 Iniciando test de AsyncStorage...');
+  //       const asyncStorageWorking = await testAsyncStorage();
+  //       if (!asyncStorageWorking) {
+  //         console.error('❌ AsyncStorage no está funcionando correctamente');
+  //         // You could show an alert or handle this error
+  //       } else {
+  //         console.log('✅ AsyncStorage funcionando correctamente');
+  //       }
+  //       
+  //       await initializeB1Progress();
+  //       await syncA1A2FromLegacy();
+  //     } catch (e) {
+  //       console.warn('No se pudo inicializar/sincronizar progreso:', e);
+  //     }
+  //   })();
+  // }, []);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -302,155 +313,48 @@ export function HomeScreenContent() {
     };
   }, []);
 
-  // Cargar horarios de oración para todas las provincias
   useEffect(() => {
-    let isMounted = true;
-    const loadPrayerTimes = async () => {
+    const fetchPrayerTimes = async () => {
       try {
-        console.log('🕌 Iniciando carga de horarios de oración...');
         setPrayerTimesLoading(true);
-        
-        // No usar fecha específica, la API devolverá la fecha actual automáticamente
-        console.log('📅 Usando fecha actual de la API');
-        
-        // Lista de provincias principales (usando nombres exactos del mapeo)
-        const provinces = [
-          'Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Málaga', 
-          'Vizcaya', 'Zaragoza', 'Murcia', 'Islas Baleares', 'Las Palmas',
-          'Santa Cruz de Tenerife', 'Córdoba', 'Valladolid', 'Alicante', 'Pontevedra'
-        ];
-        
-        console.log('📍 Provincias a cargar:', provinces.length);
-        
-        const prayerTimesData: Array<{province: string; prayers: Array<{nameAr: string, time: string}>}> = [];
-        
-        // Cargar horarios para cada provincia secuencialmente con delay para evitar rate limiting
-        const results: Array<{province: string; prayers: Array<{nameAr: string, time: string}>} | null> = [];
-        
-        for (let i = 0; i < provinces.length; i++) {
-          const province = provinces[i];
-          try {
-            const coordinates = PROVINCE_COORDINATES[province];
-            if (!coordinates) {
-              console.warn(`⚠️ No se encontraron coordenadas para ${province}`);
-              results.push(null);
-              continue;
-            }
-            
-            console.log(`🔄 Cargando ${province} (${i + 1}/${provinces.length})...`);
-            // Usar endpoint sin fecha para obtener la fecha actual automáticamente
-            const url = `https://api.aladhan.com/v1/timings?latitude=${coordinates.lat}&longitude=${coordinates.lon}&method=2`;
-            console.log(`🔗 URL: ${url}`);
-            
-            const response = await fetch(url, { 
-              method: 'GET',
-              headers: { 'Accept': 'application/json' }
-            });
-            
-            console.log(`📡 Respuesta para ${province}:`, response.status, response.statusText);
-            
-            if (!response.ok) {
-              const errorText = await response.text().catch(() => 'No se pudo leer el error');
-              console.warn(`❌ Error HTTP para ${province}: ${response.status} - ${errorText.substring(0, 100)}`);
-              results.push(null);
-              continue;
-            }
-            
-            const data = await response.json();
-            const timings = data.data?.timings;
-            
-            if (timings) {
-              const prayers = [
-                { nameAr: 'الفجر', time: timings.Fajr?.substring(0, 5) || '05:30' },
-                { nameAr: 'الظهر', time: timings.Dhuhr?.substring(0, 5) || '13:00' },
-                { nameAr: 'العصر', time: timings.Asr?.substring(0, 5) || '16:30' },
-                { nameAr: 'المغرب', time: timings.Maghrib?.substring(0, 5) || '19:00' },
-                { nameAr: 'العشاء', time: timings.Isha?.substring(0, 5) || '20:30' },
-              ];
-              console.log(`✅ ${province} cargada correctamente`);
-              results.push({ province, prayers });
-            } else {
-              console.warn(`⚠️ No se encontraron timings para ${province}`);
-              results.push(null);
-            }
-            
-            // Pequeño delay entre peticiones para evitar rate limiting (excepto en la última)
-            if (i < provinces.length - 1) {
-              await new Promise(resolve => setTimeout(resolve, 200));
-            }
-          } catch (error) {
-            console.error(`❌ Error cargando horarios para ${province}:`, error);
-            results.push(null);
-          }
+        const provinceEntries = Object.entries(PROVINCE_COORDINATES);
+        const grouped: Array<{ province: string; prayers: Array<{ nameAr: string; time: string }> }> = [];
+
+        for (const [province, coords] of provinceEntries) {
+          const response = await fetch(
+            `https://api.aladhan.com/v1/timings?latitude=${coords.lat}&longitude=${coords.lon}&method=3`
+          );
+          const data = await response.json();
+          const timings = data?.data?.timings;
+          if (!timings) continue;
+
+          const mappedPrayers = [
+            { key: 'Fajr', nameAr: 'الفجر' },
+            { key: 'Dhuhr', nameAr: 'الظهر' },
+            { key: 'Asr', nameAr: 'العصر' },
+            { key: 'Maghrib', nameAr: 'المغرب' },
+            { key: 'Isha', nameAr: 'العشاء' },
+          ]
+            .map(({ key, nameAr }) => ({
+              nameAr,
+              time: timings[key] ?? '--:--',
+            }))
+            .filter((p) => !!p.time);
+
+          grouped.push({ province, prayers: mappedPrayers });
         }
-        console.log('📊 Resultados recibidos:', results.length);
-        
-        results.forEach(result => {
-          if (result) {
-            prayerTimesData.push(result);
-          }
-        });
-        
-        console.log('✅ Provincias cargadas exitosamente:', prayerTimesData.length);
-        console.log('📍 Provincias:', prayerTimesData.map(p => p.province).join(', '));
-        
-        if (isMounted) {
-          // Si no se cargaron datos, usar datos por defecto
-          if (prayerTimesData.length === 0) {
-            console.warn('⚠️ No se cargaron provincias, usando Madrid por defecto');
-            setPrayerTimesByProvince([
-              {
-                province: 'Madrid',
-                prayers: [
-                  { nameAr: 'الفجر', time: '05:30' },
-                  { nameAr: 'الظهر', time: '13:00' },
-                  { nameAr: 'العصر', time: '16:30' },
-                  { nameAr: 'المغرب', time: '19:00' },
-                  { nameAr: 'العشاء', time: '20:30' },
-                ]
-              }
-            ]);
-          } else {
-            console.log('✅ Estableciendo provincias en el estado');
-            setPrayerTimesByProvince(prayerTimesData);
-          }
-        }
+
+        setPrayerTimesByProvince(grouped);
       } catch (error) {
-        console.error('❌ Error cargando horarios de oración:', error);
-        // En caso de error, usar horarios por defecto
-        if (isMounted) {
-          setPrayerTimesByProvince([
-            {
-              province: 'Madrid',
-              prayers: [
-                { nameAr: 'الفجر', time: '05:30' },
-                { nameAr: 'الظهر', time: '13:00' },
-                { nameAr: 'العصر', time: '16:30' },
-                { nameAr: 'المغرب', time: '19:00' },
-                { nameAr: 'العشاء', time: '20:30' },
-              ]
-            }
-          ]);
-        }
+        console.error('Error cargando horarios de oración:', error);
       } finally {
-        if (isMounted) {
-          setPrayerTimesLoading(false);
-        }
+        setPrayerTimesLoading(false);
       }
     };
-    
-    loadPrayerTimes();
-    
-    return () => {
-      isMounted = false;
-    };
+
+    fetchPrayerTimes();
   }, []);
-
   useEffect(() => {
-    if (!newsScrollRef.current || newsItems.length <= 1) {
-      return undefined;
-    }
-
     const stepPx = 1;
     const intervalMs = 24;
     const totalWidth = newsContentWidth;
@@ -479,7 +383,7 @@ export function HomeScreenContent() {
   // Scroll automático para horarios de oración
   useEffect(() => {
     if (!prayerTimesScrollRef.current || prayerTimesContentWidth <= 0 || prayerTimesByProvince.length === 0) {
-      return undefined;
+      return;
     }
 
     // El contenido está duplicado; usar la mitad del ancho para un loop suave.
@@ -509,6 +413,30 @@ export function HomeScreenContent() {
       clearInterval(intervalId);
     };
   }, [prayerTimesContentWidth, prayerTimesByProvince.length]);
+
+  // Send push token to backend when authenticated
+  useEffect(() => {
+    if (isAuthenticated && pushToken && firebaseUser) {
+      sendPushToken(pushToken, firebaseUser.uid);
+    }
+  }, [isAuthenticated, pushToken, firebaseUser]);
+
+  const sendPushToken = async (token: string, userId: string) => {
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/user/push-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, pushToken: token }),
+      });
+      if (response.ok) {
+        console.log('Push token sent to backend successfully');
+      } else {
+        console.error('Error sending push token to backend:', response.status);
+      }
+    } catch (error) {
+      console.error('Error sending push token:', error);
+    }
+  };
 
   const newsTickerContent = newsItems.length > 0 
     ? "¡Oferta especial! 50% descuento en todas las matrículas de la Escuela Virtual - عرض خاص! خصم 50% على جميع التسجيلات في المدرسة الافتراضية   •   La Academia ofrece servicios de asesoramiento y acompañamiento, consultas en temas administrativos y de extranjería. Solicita cita previa en la sección Asesoría y Acompañamiento - تقدم الأكاديمية خدمات الاستشارة والمرافقة، استشارات في المواضيع الإدارية والأجانب. اطلب موعدًا مسبقًا في قسم الاستشارة والمرافقة   •   Si tienes dudas sobre aprendizaje de español o trámites administrativos/extranjería, publica en Foro Comunidad para resolverlas - إذا كان لديك أسئلة حول تعلم الإسبانية أو الإجراءات الإدارية/الأجانب، انشر في منتدى المجتمع لحلها   •   " + newsItems
@@ -859,23 +787,6 @@ export function HomeScreenContent() {
           <Text style={styles.sectionTitle}>Categorías Principales</Text>
 
           <View style={styles.categoriesGrid}>
-            {/* Examen Nacionalidad */}
-            <TouchableOpacity
-              style={styles.categoryCard}
-              onPress={() => handleMenuPress(() => router.push("/(tabs)/ExamenNacionalidadScreen"))}
-            >
-              <LinearGradient
-                colors={['#1a1a1a', '#000000']}
-                style={styles.categoryGradient}
-              >
-                <Ionicons name="document" size={32} color="#FFD700" />
-                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Examen Nacionalidad</Text>
-                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>امتحان الجنسية</Text>
-                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>CCSE</Text>
-                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>امتحان الجنسية</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
             {/* Asesoría */}
              <TouchableOpacity
               style={styles.categoryCard}
