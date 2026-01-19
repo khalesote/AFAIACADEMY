@@ -8,8 +8,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, Timestamp, where, updateDoc, doc } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
+import { useUser } from '../../contexts/UserContext';
 
 interface Notification {
   id: string;
@@ -23,9 +24,10 @@ interface Notification {
 export default function NotificationsScreen() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useUser();
 
   useEffect(() => {
-    if (!firestore) {
+    if (!firestore || !user) {
       console.error('Firestore not available');
       setLoading(false);
       return;
@@ -33,6 +35,7 @@ export default function NotificationsScreen() {
 
     const notificationsQuery = query(
       collection(firestore, 'notifications'),
+      where('toUserId', '==', user.id),
       orderBy('createdAt', 'desc')
     );
 
@@ -43,13 +46,22 @@ export default function NotificationsScreen() {
       });
       setNotifications(notificationsData);
       setLoading(false);
+
+      // Mark unread notifications as read now that the user has viewed the list
+      const unread = notificationsData.filter((n: any) => n.read === false);
+      unread.forEach((notification) => {
+        const notificationRef = doc(firestore, 'notifications', notification.id);
+        updateDoc(notificationRef, { read: true }).catch((err) =>
+          console.error('Failed to mark notification as read:', err)
+        );
+      });
     }, (error) => {
       console.error('Error loading notifications:', error);
       setLoading(false);
     });
 
     return unsubscribe;
-  }, []);
+  }, [user]);
 
   const formatDate = (timestamp: Timestamp) => {
     const date = timestamp.toDate();

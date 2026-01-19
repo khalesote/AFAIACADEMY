@@ -14,9 +14,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, Timestamp, doc, updateDoc, setDoc, where } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { collection, addDoc, onSnapshot, query, orderBy, Timestamp, doc, updateDoc, setDoc, where, getDoc } from 'firebase/firestore';
+import { firestore, auth } from '../../config/firebase';
 import { useUser } from '../../contexts/UserContext';
+import { useRouter } from 'expo-router';
 
 interface Message {
   id: string;
@@ -32,16 +33,17 @@ interface User {
   online: boolean;
 }
 
-const db = getFirestore();
-const auth = getAuth();
+const db = firestore;
 
 export default function ChatScreen() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showPublishModal, setShowPublishModal] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [connectedUsers, setConnectedUsers] = useState<User[]>([]);
   const flatListRef = useRef<FlatList>(null);
   const { profileImage } = useUser();
+  const router = useRouter();
 
   const emojis = [
     '😊', '😂', '❤️', '👍', '👋', '🎉', '😢', '😍', '🤔', '🙌',
@@ -152,25 +154,67 @@ export default function ChatScreen() {
 
   const requestPrivateChat = async (targetUserId: string) => {
     const user = auth.currentUser;
-    if (user) {
-      try {
-        const targetUser = connectedUsers.find(u => u.id === targetUserId);
-        if (targetUser) {
-          await addDoc(collection(db, 'notifications'), {
-            toUserId: targetUserId,
-            fromUserId: user.uid,
-            fromUserName: user.displayName || user.email,
-            type: 'private_chat_request',
-            message: `Solicitud de chat privado de ${user.displayName || user.email}`,
-            timestamp: Timestamp.now(),
-            read: false,
-          });
-          Alert.alert('Solicitud enviada', `Has enviado una solicitud de chat privado a ${targetUser.name}`);
-        }
-      } catch (error) {
-        Alert.alert('Error', 'No se pudo enviar la solicitud');
-        console.error('Error sending notification:', error);
+    if (!user) {
+      return;
+    }
+
+    if (targetUserId === user.uid) {
+      Alert.alert('Aviso', 'No puedes iniciar un chat privado contigo mismo.');
+      return;
+    }
+
+    try {
+      const targetUser = connectedUsers.find(u => u.id === targetUserId);
+      if (!targetUser) {
+        Alert.alert('Usuario no disponible', 'No pudimos encontrar a este usuario. Intenta nuevamente.');
+        return;
       }
+
+      const sortedIds = [user.uid, targetUserId].sort();
+      const chatId = `private_${sortedIds.join('_')}`;
+      const chatRef = doc(db, 'privateChats', chatId);
+      const chatSnapshot = await getDoc(chatRef);
+
+      if (chatSnapshot.exists()) {
+        const chatData = chatSnapshot.data();
+        if (chatData.status === 'active') {
+          router.push({ pathname: '/(tabs)/PrivateChatScreen', params: { chatId } });
+          return;
+        }
+
+        if (chatData.status === 'pending' && chatData.initiatorId === user.uid) {
+          Alert.alert('Solicitud pendiente', 'Ya enviaste una solicitud de chat privado. Espera a que el usuario responda.');
+          return;
+        }
+      }
+
+      await setDoc(chatRef, {
+        participants: sortedIds,
+        participantNames: {
+          [user.uid]: user.displayName || user.email || 'Usuario',
+          [targetUserId]: targetUser.name,
+        },
+        status: 'pending',
+        initiatorId: user.uid,
+        recipientId: targetUserId,
+        createdAt: Timestamp.now(),
+      }, { merge: true });
+
+      await addDoc(collection(db, 'notifications'), {
+        toUserId: targetUserId,
+        fromUserId: user.uid,
+        fromUserName: user.displayName || user.email,
+        type: 'private_chat_request',
+        chatId,
+        message: `Solicitud de chat privado de ${user.displayName || user.email}`,
+        timestamp: Timestamp.now(),
+        read: false,
+      });
+
+      Alert.alert('Solicitud enviada', `Has enviado una solicitud de chat privado a ${targetUser.name}`);
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo enviar la solicitud');
+      console.error('Error sending notification:', error);
     }
   };
 
@@ -208,7 +252,7 @@ export default function ChatScreen() {
           <Text style={styles.headerTitle}>Chat en Vivo</Text>
           <TouchableOpacity
             style={styles.addButton}
-            onPress={() => setModalVisible(true)}
+            onPress={() => setShowPublishModal(true)}
           >
             <Ionicons name="add-circle" size={24} color="#FFD700" />
             <Text style={styles.addButtonText}>Publicar</Text>
@@ -254,6 +298,29 @@ export default function ChatScreen() {
             />
           </View>
         </View>
+
+        {/* Publicar Modal */}
+        <Modal
+          visible={showPublishModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowPublishModal(false)}
+        >
+          <View style={styles.publishModalOverlay}>
+            <View style={styles.publishModalContent}>
+              <Text style={styles.publishModalTitle}>Publicar anuncio</Text>
+              <Text style={styles.publishModalDescription}>
+                Próximamente podrás compartir anuncios destacados desde aquí.
+              </Text>
+              <TouchableOpacity
+                style={styles.publishModalButton}
+                onPress={() => setShowPublishModal(false)}
+              >
+                <Text style={styles.publishModalButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         {/* Emoji Picker Modal */}
         <Modal
@@ -311,6 +378,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  addButtonText: {
+    color: '#FFD700',
+    fontWeight: '600',
   },
   content: {
     flex: 1,
@@ -454,22 +534,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 15,
-    color: '#333',
+    marginBottom: 10,
   },
   emojiGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
   },
   emojiItem: {
-    width: 50,
+    width: '20%',
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
     margin: 5,
     borderRadius: 10,
-    backgroundColor: '#f0f0f0',
   },
   emojiText: {
     fontSize: 30,
@@ -483,7 +561,40 @@ const styles = StyleSheet.create({
   },
   closeEmojiText: {
     color: '#fff',
-    fontSize: 16,
     fontWeight: 'bold',
+  },
+  publishModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  publishModalContent: {
+    backgroundColor: '#fff',
+    padding: 24,
+    borderRadius: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  publishModalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 8,
+    color: '#1a1a1a',
+  },
+  publishModalDescription: {
+    textAlign: 'center',
+    color: '#4a4a4a',
+    marginBottom: 16,
+  },
+  publishModalButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  publishModalButtonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });

@@ -1,12 +1,11 @@
-import { Tabs } from "expo-router";
-import React, { useEffect } from "react";
+import { Tabs, useRouter } from "expo-router";
+import React, { useEffect, useCallback } from "react";
 import { View, StyleSheet, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { collection, query, where, onSnapshot, doc, updateDoc, DocumentReference, Timestamp } from 'firebase/firestore';
+import { firestore, auth } from '../../config/firebase';
 
-const db = getFirestore();
-const auth = getAuth();
+const db = firestore;
 
 const styles = StyleSheet.create({
   sceneContainer: {
@@ -31,6 +30,43 @@ const styles = StyleSheet.create({
 });
 
 export default function TabLayout() {
+  const router = useRouter();
+
+  const handlePrivateChatResponse = useCallback(async (
+    notificationRef: DocumentReference,
+    chatId: string,
+    accept: boolean
+  ) => {
+    if (!chatId) {
+      return;
+    }
+    try {
+      const chatRef = doc(db, 'privateChats', chatId);
+      const chatUpdates: Record<string, Timestamp | string> = {
+        status: accept ? 'active' : 'declined',
+        lastActivity: Timestamp.now(),
+      };
+
+      if (accept) {
+        chatUpdates['activatedAt'] = Timestamp.now();
+      } else {
+        chatUpdates['declinedAt'] = Timestamp.now();
+      }
+
+      await updateDoc(chatRef, chatUpdates);
+      await updateDoc(notificationRef, {
+        read: true,
+        respondedAt: Timestamp.now(),
+      });
+
+      if (accept) {
+        router.push({ pathname: '/(tabs)/PrivateChatScreen', params: { chatId } });
+      }
+    } catch (error) {
+      console.error('Error handling private chat response:', error);
+    }
+  }, [router]);
+
   // Global notification listener
   useEffect(() => {
     if (auth.currentUser) {
@@ -43,16 +79,34 @@ export default function TabLayout() {
         querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             const data = change.doc.data();
-            Alert.alert('Nueva notificación', data.message);
-            // Mark as read
-            updateDoc(change.doc.ref, { read: true });
+            if (data.type === 'private_chat_request' && data.chatId) {
+              Alert.alert(
+                'Solicitud de chat privado',
+                data.message,
+                [
+                  {
+                    text: 'Rechazar',
+                    style: 'cancel',
+                    onPress: () => handlePrivateChatResponse(change.doc.ref, data.chatId, false),
+                  },
+                  {
+                    text: 'Aceptar',
+                    onPress: () => handlePrivateChatResponse(change.doc.ref, data.chatId, true),
+                  },
+                ],
+                { cancelable: false }
+              );
+            } else {
+              Alert.alert('Nueva notificación', data.message);
+              updateDoc(change.doc.ref, { read: true });
+            }
           }
         });
       });
 
       return unsubscribe;
     }
-  }, []);
+  }, [handlePrivateChatResponse]);
 
   return (
     <Tabs
@@ -152,6 +206,14 @@ export default function TabLayout() {
           title: "Chat",
           tabBarIcon: ({ color }) => <Ionicons name="chatbubble-ellipses" size={28} color={color} />,
           tabBarStyle: { display: 'none' }, // Hide tab bar for chat screen
+        }}
+      />
+      <Tabs.Screen
+        name="PrivateChatScreen"
+        options={{
+          title: "Chat Privado",
+          tabBarIcon: ({ color }) => <Ionicons name="chatbubble" size={28} color={color} />,
+          tabBarStyle: { display: 'none' },
         }}
       />
     </Tabs>

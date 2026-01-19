@@ -116,10 +116,8 @@ export default function ForumScreen() {
       querySnapshot.forEach((doc) => {
         const post = { id: doc.id, ...doc.data() } as ForumPost;
         postsData.push(post);
-        // Load comments for posts that have comments
-        if (post.commentsCount && post.commentsCount > 0) {
-          loadComments(post.id);
-        }
+        // Always subscribe to comment updates so new comments appear in real time
+        loadComments(post.id);
       });
       setPosts(postsData);
       setLoading(false);
@@ -142,7 +140,8 @@ export default function ForumScreen() {
     console.log('📥 Loading comments for post:', postId);
     const commentsQuery = query(
       collection(firestore, 'forum_comments'),
-      where('postId', '==', postId)
+      where('postId', '==', postId),
+      orderBy('createdAt', 'asc')
     );
 
     const unsubscribe = onSnapshot(commentsQuery, (querySnapshot) => {
@@ -464,6 +463,15 @@ export default function ForumScreen() {
                   </TouchableOpacity>
                 ))}
               </ScrollView>
+
+              <Text style={styles.inputLabel}>Título</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Escribe un título llamativo"
+                value={newPostTitle}
+                onChangeText={setNewPostTitle}
+                maxLength={120}
+              />
 
               <Text style={styles.inputLabel}>Contenido</Text>
               <TextInput

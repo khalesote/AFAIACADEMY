@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, addDoc, getDocs, query, where, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, Timestamp } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
 import { useUser } from '../../contexts/UserContext';
 
@@ -62,43 +62,55 @@ export default function AdminScreen() {
 
     try {
       setSending(true);
-      await addDoc(collection(firestore, 'notifications'), {
-        title: title.trim(),
-        message: message.trim(),
-        sentBy: user.name || user.email,
-        sentByEmail: user.email,
-        createdAt: Timestamp.now(),
+
+      const usersSnapshot = await getDocs(collection(firestore, 'users'));
+      if (usersSnapshot.empty) {
+        Alert.alert('Aviso', 'No se encontraron usuarios para notificar.');
+        setSending(false);
+        return;
+      }
+
+      const trimmedTitle = title.trim();
+      const trimmedMessage = message.trim();
+      const createdAt = Timestamp.now();
+      const notificationPromises: Promise<any>[] = [];
+      const tokens: string[] = [];
+
+      usersSnapshot.forEach((docSnapshot) => {
+        const userData = docSnapshot.data();
+
+        notificationPromises.push(addDoc(collection(firestore, 'notifications'), {
+          title: trimmedTitle,
+          message: trimmedMessage,
+          sentBy: user.name || user.email,
+          sentByEmail: user.email,
+          sentById: user.id,
+          toUserId: docSnapshot.id,
+          read: false,
+          type: 'admin_broadcast',
+          createdAt,
+        }));
+
+        if (userData.pushToken) {
+          tokens.push(userData.pushToken);
+        }
       });
+
+      await Promise.all(notificationPromises);
 
       Alert.alert('Éxito', 'Notificación enviada a todos los usuarios');
       setTitle('');
       setMessage('');
-    } catch (error) {
-      console.error('Error sending notification:', error);
-      Alert.alert('Error', 'No se pudo enviar la notificación');
-    } finally {
-      setSending(false);
-    }
 
-    // Send push notifications
-    try {
-      const usersQuery = query(collection(firestore, 'users'), where('pushToken', '!=', null));
-      const usersSnapshot = await getDocs(usersQuery);
-      const tokens: string[] = [];
-      usersSnapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.pushToken) tokens.push(data.pushToken);
-      });
-
+      // Send push notifications
       if (tokens.length > 0) {
         const messages = tokens.map(token => ({
           to: token,
-          title: title.trim(),
-          body: message.trim(),
+          title: trimmedTitle,
+          body: trimmedMessage,
           data: { type: 'admin_notification' },
         }));
 
-        // Send in batches of 100 (Expo limit)
         const batchSize = 100;
         for (let i = 0; i < messages.length; i += batchSize) {
           const batch = messages.slice(i, i + batchSize);
@@ -110,15 +122,18 @@ export default function AdminScreen() {
             },
             body: JSON.stringify(batch),
           });
+
           if (!response.ok) {
             console.error('Failed to send push batch:', i / batchSize);
           }
         }
         console.log('Push notifications sent to', tokens.length, 'users');
       }
-    } catch (pushError) {
-      console.error('Error sending push notifications:', pushError);
-      // Don't show alert for push failure, as in-app notification was sent
+    } catch (error) {
+      console.error('Error sending notification:', error);
+      Alert.alert('Error', 'No se pudo enviar la notificación');
+    } finally {
+      setSending(false);
     }
   };
 
