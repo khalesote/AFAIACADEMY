@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const vision = require('@google-cloud/vision');
 const Tesseract = require('tesseract.js');
 const admin = require('firebase-admin');
+const { Expo } = require('expo-server-sdk');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -87,6 +88,109 @@ const initGoogleClients = () => {
   storageBucket = bucketName ? admin.storage().bucket(bucketName) : null;
 };
 
+// Expo Push Notifications
+const expo = new Expo();
+
+const sendPushNotification = async (pushToken, title, body, data = {}) => {
+  if (!Expo.isExpoPushToken(pushToken)) {
+    console.log(`⚠️ Token no válido: ${pushToken}`);
+    return null;
+  }
+
+  const message = {
+    to: pushToken,
+    sound: 'default',
+    title,
+    body,
+    data,
+  };
+
+  try {
+    const ticket = await expo.sendPushNotificationsAsync([message]);
+    console.log('✅ Push notification enviada:', ticket);
+    return ticket;
+  } catch (error) {
+    console.error('❌ Error enviando push notification:', error);
+    return null;
+  }
+};
+
+const sendPushToUser = async (userId, title, body, data = {}) => {
+  if (!firestore) {
+    console.log('⚠️ Firestore no inicializado');
+    return;
+  }
+
+  try {
+    const userDoc = await firestore.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      console.log(`⚠️ Usuario ${userId} no encontrado`);
+      return;
+    }
+
+    const userData = userDoc.data();
+    const pushToken = userData.pushToken;
+    
+    if (pushToken) {
+      await sendPushNotification(pushToken, title, body, data);
+    }
+  } catch (error) {
+    console.error('❌ Error obteniendo push token del usuario:', error);
+  }
+};
+
+// Listener para nuevas notificaciones (se activa cuando se inicializa Firestore)
+let notificationListenerActive = false;
+
+const startNotificationListener = () => {
+  if (notificationListenerActive || !firestore) return;
+  
+  notificationListenerActive = true;
+  console.log('📡 Iniciando listener de notificaciones...');
+
+  firestore.collection('notifications')
+    .where('read', '==', false)
+    .onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach(async (change) => {
+        if (change.type === 'added') {
+          const notif = change.doc.data();
+          const toUserId = notif.toUserId;
+          
+          let title = 'Nueva notificación';
+          let body = notif.message || '';
+          
+          switch (notif.type) {
+            case 'private_chat_request':
+              title = '💬 Solicitud de chat';
+              body = `${notif.fromUserName} quiere chatear contigo`;
+              break;
+            case 'new_message':
+              title = '✉️ Nuevo mensaje';
+              body = `${notif.fromUserName}: ${notif.message}`;
+              break;
+            case 'chat_accepted':
+              title = '✅ Chat aceptado';
+              body = notif.message;
+              break;
+            case 'chat_rejected':
+              title = '❌ Chat rechazado';
+              body = notif.message;
+              break;
+          }
+
+          await sendPushToUser(toUserId, title, body, {
+            type: notif.type,
+            chatId: notif.chatId,
+            fromUserId: notif.fromUserId,
+          });
+        }
+      });
+    }, (error) => {
+      console.error('❌ Error en listener de notificaciones:', error);
+      notificationListenerActive = false;
+    });
+};
+
 const normalizeText = (text = '') => text
   .toLowerCase()
   .normalize('NFD')
@@ -127,6 +231,55 @@ app.use((req, res, next) => {
 // ENDPOINTS CECABANK (TPV VIRTUAL)
 // ============================================
 
+const recentPayments = new Map();
+const PAYMENT_TTL_MS = 10 * 60 * 1000;
+
+const storeRecentPayment = (orderId, payload) => {
+  if (!orderId) return;
+  recentPayments.set(orderId, { ...payload, updatedAt: Date.now() });
+  setTimeout(() => {
+    const stored = recentPayments.get(orderId);
+    if (stored && Date.now() - stored.updatedAt >= PAYMENT_TTL_MS) {
+      recentPayments.delete(orderId);
+    }
+  }, PAYMENT_TTL_MS);
+};
+
+// Endpoint para registrar push token del usuario
+app.post('/api/user/push-token', async (req, res) => {
+  try {
+    const { userId, pushToken } = req.body;
+    
+    if (!userId || !pushToken) {
+      return res.status(400).json({ ok: false, error: 'userId y pushToken requeridos' });
+    }
+
+    if (!Expo.isExpoPushToken(pushToken)) {
+      return res.status(400).json({ ok: false, error: 'Token de push no válido' });
+    }
+
+    initGoogleClients();
+    
+    if (!firestore) {
+      return res.status(500).json({ ok: false, error: 'Firestore no disponible' });
+    }
+
+    await firestore.collection('users').doc(userId).set({
+      pushToken,
+      pushTokenUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    // Iniciar listener de notificaciones si no está activo
+    startNotificationListener();
+
+    console.log(`✅ Push token guardado para usuario ${userId}`);
+    res.json({ ok: true, message: 'Token guardado correctamente' });
+  } catch (error) {
+    console.error('❌ Error guardando push token:', error);
+    res.status(500).json({ ok: false, error: error.message });
+  }
+});
+
 app.get('/api/cecabank/ok', (req, res) => {
   try {
     console.log('✅ Cecabank OK recibido (GET)');
@@ -147,6 +300,12 @@ app.get('/api/cecabank/ok', (req, res) => {
       levelUnlocked = 'B2';
     }
     
+    storeRecentPayment(String(Num_operacion || ''), {
+      status: 'ok',
+      orderId: String(Num_operacion || ''),
+      levelUnlocked,
+      importe: String(Importe || ''),
+    });
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -202,6 +361,12 @@ app.post('/api/cecabank/ok', express.urlencoded({ extended: true }), (req, res) 
       levelUnlocked = 'B2';
     }
     
+    storeRecentPayment(String(Num_operacion || ''), {
+      status: 'ok',
+      orderId: String(Num_operacion || ''),
+      levelUnlocked,
+      importe: String(Importe || ''),
+    });
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -240,6 +405,13 @@ app.post('/api/cecabank/ok', express.urlencoded({ extended: true }), (req, res) 
 app.get('/api/cecabank/ko', (req, res) => {
   try {
     console.log('❌ Cecabank KO recibido (GET)');
+    const orderId = String(req.query.Num_operacion || req.query.num_operacion || '');
+    storeRecentPayment(orderId, {
+      status: 'ko',
+      orderId,
+      levelUnlocked: null,
+      importe: String(req.query.Importe || req.query.importe || ''),
+    });
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -260,6 +432,13 @@ app.get('/api/cecabank/ko', (req, res) => {
 app.post('/api/cecabank/ko', express.urlencoded({ extended: true }), (req, res) => {
   try {
     console.log('❌ Cecabank KO recibido');
+    const orderId = String(req.body.Num_operacion || req.body.num_operacion || '');
+    storeRecentPayment(orderId, {
+      status: 'ko',
+      orderId,
+      levelUnlocked: null,
+      importe: String(req.body.Importe || req.body.importe || ''),
+    });
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -274,6 +453,23 @@ app.post('/api/cecabank/ko', express.urlencoded({ extended: true }), (req, res) 
   } catch (error) {
     console.error('❌ Error en Cecabank KO:', error);
     res.status(500).send('Error procesando pago');
+  }
+});
+
+app.get('/api/cecabank/payment-status', (req, res) => {
+  try {
+    const orderId = String(req.query.orderId || '').trim();
+    if (!orderId) {
+      return res.status(400).json({ ok: false, error: 'orderId requerido' });
+    }
+    const data = recentPayments.get(orderId);
+    if (!data) {
+      return res.json({ ok: true, status: 'pending' });
+    }
+    return res.json({ ok: true, ...data });
+  } catch (error) {
+    console.error('❌ Error en payment-status:', error);
+    return res.status(500).json({ ok: false, error: 'Error interno' });
   }
 });
 
@@ -1037,4 +1233,15 @@ app.listen(PORT, () => {
   console.log('🔗 URL: http://localhost:' + PORT);
   console.log('💳 Stripe configurado:', !!process.env.STRIPE_SECRET_KEY);
   console.log('📧 Email configurado:', !!transporter);
+  
+  // Inicializar Firebase y listener de notificaciones
+  try {
+    initGoogleClients();
+    if (firestore) {
+      startNotificationListener();
+      console.log('📡 Listener de push notifications activado');
+    }
+  } catch (error) {
+    console.warn('⚠️ No se pudo iniciar listener de notificaciones:', error.message);
+  }
 });
