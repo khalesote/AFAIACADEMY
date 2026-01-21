@@ -76,10 +76,18 @@ async function getValidAccessCodeFromFirestore(code: string): Promise<AccessCode
 }
 
 /**
- * Lista de códigos de acceso válidos para formación profesional
+ * Lista de códigos de acceso válidos para formación profesional y preformación
  * IMPORTANTE: Cada código está vinculado a UN SOLO documento, usuario y dispositivo
- * Total: 30 códigos para formación profesional
+ * Total: 30 códigos de formación profesional + 1000 códigos de preformación
  */
+const VALID_PREFORMACION_CODES: string[] = (() => {
+  const codes: string[] = [];
+  for (let i = 1; i <= 1000; i += 1) {
+    codes.push(`PRE-${String(i).padStart(3, '0')}`);
+  }
+  return codes;
+})();
+
 const VALID_FORMACION_CODES = [
   'FORMACION2024-001',
   'FORMACION2024-002',
@@ -111,6 +119,7 @@ const VALID_FORMACION_CODES = [
   'FORMACION2024-028',
   'FORMACION2024-029',
   'FORMACION2024-030',
+  ...VALID_PREFORMACION_CODES,
 ];
 
 /**
@@ -639,7 +648,12 @@ export async function getValidFormacionCodes(): Promise<string[]> {
   try {
     const stored = await AsyncStorage.getItem('formacion_codes_valid');
     if (stored) {
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored) as string[];
+      const merged = Array.from(new Set([...(parsed || []), ...VALID_FORMACION_CODES]));
+      if (merged.length !== parsed.length) {
+        await AsyncStorage.setItem('formacion_codes_valid', JSON.stringify(merged));
+      }
+      return merged;
     }
     // Inicializar con los códigos por defecto
     await AsyncStorage.setItem('formacion_codes_valid', JSON.stringify(VALID_FORMACION_CODES));
@@ -722,5 +736,90 @@ export async function validateFormacionCode(code: string, documento: string): Pr
  * @param documento - El documento del usuario
  */
 export async function markFormacionCodeAsUsed(code: string, documento: string): Promise<void> {
-  return markAccessCodeAsUsed(code, 'ALL', documento);
+  try {
+    const normalizedCode = code.trim().toUpperCase();
+    const currentUserId = getCurrentUserId();
+    const now = new Date();
+
+    if (!currentUserId) {
+      throw new Error('Debes iniciar sesión para usar un código de acceso');
+    }
+
+    const validCodes = await getValidFormacionCodes();
+    if (!validCodes.includes(normalizedCode)) {
+      throw new Error('Código no válido');
+    }
+
+    if (firestore) {
+      try {
+        const codeDocRef = doc(firestore, FIRESTORE_COLLECTION, normalizedCode);
+        const codeDoc = await getDoc(codeDocRef);
+
+        if (codeDoc.exists()) {
+          const data = codeDoc.data();
+          const storedUserId = data.userId || data.usedBy?.userId;
+
+          if (storedUserId && storedUserId !== currentUserId) {
+            throw new Error('Este código de acceso ya ha sido utilizado por otro usuario');
+          }
+
+          if (data.used === true || data.usedBy) {
+            console.log(`✅ Código ${normalizedCode} ya estaba marcado para este usuario`);
+            return;
+          }
+        }
+
+        await setDoc(codeDocRef, {
+          code: normalizedCode,
+          level: 'FORMACION',
+          usedLevel: 'FORMACION',
+          used: true,
+          userId: currentUserId,
+          usedBy: {
+            documento: documento || '',
+            userId: currentUserId,
+            usedAt: serverTimestamp(),
+          },
+          createdAt: serverTimestamp(),
+        }, { merge: true });
+
+        console.log(`✅ Código ${normalizedCode} marcado como usado en Firebase para formación/preformación`);
+      } catch (firebaseError: any) {
+        if (firebaseError.code === 'permission-denied') {
+          throw new Error('No tienes permisos para marcar este código como usado');
+        }
+
+        if (firebaseError.message) {
+          throw firebaseError;
+        }
+
+        console.error('Error guardando código en Firebase:', firebaseError);
+        throw new Error('Error al guardar el código en el servidor. Por favor, inténtalo de nuevo.');
+      }
+    }
+
+    try {
+      const usedCodes = await getUsedAccessCodes();
+      usedCodes[normalizedCode] = JSON.stringify({
+        code: normalizedCode,
+        level: 'FORMACION',
+        usedLevel: 'FORMACION',
+        used: true,
+        userId: currentUserId,
+        usedBy: {
+          documento: documento || '',
+          userId: currentUserId,
+          usedAt: now.toISOString(),
+        },
+      });
+
+      await AsyncStorage.setItem(USED_CODES_KEY, JSON.stringify(usedCodes));
+      console.log(`✅ Código ${normalizedCode} guardado en caché local para formación/preformación`);
+    } catch (storageError) {
+      console.warn('Error guardando en AsyncStorage (no crítico):', storageError);
+    }
+  } catch (error) {
+    console.error('Error marcando código de formación:', error);
+    throw error;
+  }
 }

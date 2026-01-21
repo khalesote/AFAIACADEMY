@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useState, useCallback } from 'react';
 import CursoIndividualPayment from '../../components/CursoIndividualPayment';
 
 const { width } = Dimensions.get('window');
@@ -13,6 +13,7 @@ export default function PreFormacionScreen() {
   const router = useRouter();
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [courseAccess, setCourseAccess] = useState<Record<string, boolean>>({});
 
   const checkCourseAccess = useCallback(async (cursoKey: string) => {
     try {
@@ -36,7 +37,7 @@ export default function PreFormacionScreen() {
   }, [router, checkCourseAccess]);
 
   
-  const cursos = [
+  const cursos = useMemo(() => ([
     { 
       key: 'CuidadoMayores', 
       label: 'Cuidado de Personas Mayores', 
@@ -285,7 +286,33 @@ export default function PreFormacionScreen() {
       icon: 'cut' as any,
       color: '#000'
     }
-  ];
+  ]), []);
+
+  const loadCourseAccess = useCallback(async () => {
+    try {
+      const entries = await Promise.all(
+        cursos.map(async (curso) => {
+          const hasAccess = await checkCourseAccess(curso.key);
+          return [curso.key, hasAccess] as const;
+        })
+      );
+
+      const accessMap: Record<string, boolean> = {};
+      entries.forEach(([key, hasAccess]) => {
+        accessMap[key] = hasAccess;
+      });
+
+      setCourseAccess(accessMap);
+    } catch (error) {
+      console.error('Error cargando accesos de cursos:', error);
+    }
+  }, [checkCourseAccess, cursos]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadCourseAccess();
+    }, [loadCourseAccess])
+  );
 
   return (
     <View style={styles.container}>
@@ -318,28 +345,37 @@ export default function PreFormacionScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
           <View style={styles.coursesGrid}>
-            {cursos.map((curso) => (
-              <View key={curso.key} style={styles.courseCardContainer}>
-                <TouchableOpacity
-                  style={styles.courseCard}
-                  onPress={() => manejarAccesoCurso(curso)}
-                >
-                  <LinearGradient
-                    colors={['#000', '#000']}
-                    style={[styles.courseGradient, { borderWidth: 1, borderColor: '#FFD700' }]}
+            {cursos.map((curso) => {
+              const isPaid = courseAccess[curso.key];
+              return (
+                <View key={curso.key} style={styles.courseCardContainer}>
+                  <TouchableOpacity
+                    style={styles.courseCard}
+                    onPress={() => manejarAccesoCurso(curso)}
                   >
-                    <View style={styles.courseIcon}>
-                      <Ionicons name={curso.icon} size={32} color="#fff" />
-                    </View>
-                    <Text style={styles.courseTitle}>{curso.label}</Text>
-                    <Text style={styles.courseTitleAr}>{curso.labelAr}</Text>
-                    <View style={styles.courseArrow}>
-                      <Ionicons name="arrow-forward" size={20} color="#fff" />
-                    </View>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
-            ))}
+                    <LinearGradient
+                      colors={['#000', '#000']}
+                      style={[styles.courseGradient, { borderWidth: 1, borderColor: '#FFD700' }]}
+                    >
+                      {isPaid ? (
+                        <View style={styles.paidBadge}>
+                          <Ionicons name="checkmark-circle" size={14} color="#fff" />
+                          <Text style={styles.paidBadgeText}>Pagado</Text>
+                        </View>
+                      ) : null}
+                      <View style={styles.courseIcon}>
+                        <Ionicons name={curso.icon} size={32} color="#fff" />
+                      </View>
+                      <Text style={styles.courseTitle}>{curso.label}</Text>
+                      <Text style={styles.courseTitleAr}>{curso.labelAr}</Text>
+                      <View style={styles.courseArrow}>
+                        <Ionicons name="arrow-forward" size={20} color="#fff" />
+                      </View>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
 
           <View style={styles.infoCard}>
@@ -359,6 +395,10 @@ export default function PreFormacionScreen() {
           onPaymentSuccess={(cursoKey) => {
             setShowPaymentModal(false);
             setSelectedCourse(null);
+            setCourseAccess((prev) => ({
+              ...prev,
+              [cursoKey]: true
+            }));
             // Navigate to the course
             const curso = cursos.find(c => c.key === cursoKey);
             if (curso) {
@@ -368,9 +408,6 @@ export default function PreFormacionScreen() {
           onCancel={() => {
             setShowPaymentModal(false);
             setSelectedCourse(null);
-          }}
-          onPaymentError={(error) => {
-            Alert.alert('Error de pago', error);
           }}
           visible={showPaymentModal}
         />
@@ -508,7 +545,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+  paidBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#2E7D32',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  paidBadgeText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
   // Info card styles
   infoCard: {
     backgroundColor: '#fff',

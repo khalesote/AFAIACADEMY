@@ -9,7 +9,7 @@ import { useUser } from '@/contexts/UserContext';
 import { CECABANK_CONFIG, validateCecabankConfig } from '../config/cecabank';
 import { getCecabankDateTime, formatAmount, generateOrderId } from '../utils/cecabank';
 
-const PRECIO_BASE = 5; // 5 euros para cada curso
+const PRECIO_BASE = 4; // Precio base de preformación (sin IVA)
 const IVA_RATE = 0.21; // 21% IVA
 
 interface CursoIndividualPaymentProps {
@@ -41,6 +41,7 @@ export default function CursoIndividualPayment({
   const [showWebView, setShowWebView] = useState(false);
   const [webViewHtml, setWebViewHtml] = useState('');
   const webViewRef = useRef<WebView>(null);
+  const paymentHandledRef = useRef(false);
 
   const basePrice = PRECIO_BASE;
   const iva = basePrice * IVA_RATE;
@@ -165,6 +166,7 @@ export default function CursoIndividualPayment({
       // No longer adding extra button, just modifying existing one
 
       setWebViewHtml(modifiedHtml);
+      paymentHandledRef.current = false;
       setShowWebView(true);
     } catch (err: any) {
       console.error('❌ Error en el proceso de pago:', err);
@@ -234,6 +236,7 @@ export default function CursoIndividualPayment({
   };
 
   const cancelPayment = () => {
+    paymentHandledRef.current = false;
     setShowWebView(false);
     setLoading(false);
     // onCancel(); // Maybe not call onCancel here, just close WebView
@@ -243,16 +246,67 @@ export default function CursoIndividualPayment({
     try {
       const data = JSON.parse(event.nativeEvent.data);
       if (data.type === 'PAYMENT_SUCCESS') {
+        if (paymentHandledRef.current) return;
+        paymentHandledRef.current = true;
         handlePaymentSuccess(data);
       } else if (data.type === 'PAYMENT_CANCEL') {
+        if (paymentHandledRef.current) return;
+        paymentHandledRef.current = true;
         setShowWebView(false);
       } else if (data.type === 'PAYMENT_ERROR') {
+        if (paymentHandledRef.current) return;
+        paymentHandledRef.current = true;
         setShowWebView(false);
         setError(data.error || 'Error en el pago');
         Alert.alert('Error en el pago', data.error || 'Error desconocido');
       }
     } catch {
       // Ignorar mensajes no válidos
+    }
+  };
+
+  const handleNavigationChange = (navState: any) => {
+    const currentUrl = (navState?.url || '').toLowerCase();
+    const okUrl = (CECABANK_CONFIG.urlOk || '').toLowerCase();
+    const koUrl = (CECABANK_CONFIG.urlKo || '').toLowerCase();
+    if (!currentUrl) return;
+    const isOk = (okUrl && currentUrl.startsWith(okUrl)) || currentUrl.includes('/api/cecabank/ok');
+    const isKo = (koUrl && currentUrl.startsWith(koUrl)) || currentUrl.includes('/api/cecabank/ko');
+    if (isOk) {
+      if (paymentHandledRef.current) return;
+      paymentHandledRef.current = true;
+      setShowWebView(false);
+      handlePaymentSuccess({ type: 'PAYMENT_SUCCESS', url: navState.url });
+      return;
+    }
+    if (isKo) {
+      if (paymentHandledRef.current) return;
+      paymentHandledRef.current = true;
+      setShowWebView(false);
+      setError('Pago cancelado o rechazado');
+      Alert.alert('Pago cancelado', 'El pago fue cancelado o rechazado.');
+    }
+  };
+
+  const handleShouldStartLoad = (request: any) => {
+    try {
+      if (request?.url) {
+        handleNavigationChange({ url: request.url });
+      }
+    } catch {
+      // ignore
+    }
+    return true;
+  };
+
+  const handleLoadEnd = (event: any) => {
+    try {
+      const url = event?.nativeEvent?.url;
+      if (url) {
+        handleNavigationChange({ url });
+      }
+    } catch {
+      // ignore
     }
   };
 
@@ -456,6 +510,66 @@ export default function CursoIndividualPayment({
                 : 'https://pgw.ceca.es',
           }}
           onMessage={handleWebViewMessage}
+          onNavigationStateChange={handleNavigationChange}
+          onShouldStartLoadWithRequest={handleShouldStartLoad}
+          onLoadEnd={handleLoadEnd}
+          injectedJavaScript={`
+            (function() {
+              var handled = false;
+              var checkPage = function() {
+                if (handled) return;
+                var url = window.location.href.toLowerCase();
+                var pageText = document.body ? document.body.innerText.toLowerCase() : '';
+
+                var isSuccessText = pageText.includes('pago exitoso') ||
+                  pageText.includes('operación realizada') ||
+                  pageText.includes('operacion realizada') ||
+                  pageText.includes('pago realizado') ||
+                  pageText.includes('pago correcto') ||
+                  pageText.includes('transacción aprobada') ||
+                  pageText.includes('transaccion aprobada') ||
+                  pageText.includes('operación autorizada') ||
+                  pageText.includes('operacion autorizada') ||
+                  pageText.includes('compra realizada') ||
+                  pageText.includes('payment successful') ||
+                  pageText.includes('return to merchant') ||
+                  pageText.includes('volver al comercio') ||
+                  pageText.includes('regresar al comercio') ||
+                  pageText.includes('autorizada');
+
+                if (isSuccessText) {
+                  var buttons = document.querySelectorAll('a, button, input[type="submit"], input[type="button"]');
+                  for (var i = 0; i < buttons.length; i++) {
+                    var btn = buttons[i];
+                    var text = (btn.innerText || btn.value || '').toLowerCase();
+                    if (text.includes('volver') || text.includes('comercio') || text.includes('continuar') || text.includes('aceptar')) {
+                      btn.click();
+                      break;
+                    }
+                  }
+                  handled = true;
+                  window.ReactNativeWebView.postMessage(JSON.stringify({type: 'PAYMENT_SUCCESS', url: url, source: 'page_detection'}));
+                  return;
+                }
+
+                if (url.includes('/api/cecabank/ok') || url.includes('pago_exitoso') || url.includes('payment_success')) {
+                  handled = true;
+                  window.ReactNativeWebView.postMessage(JSON.stringify({type: 'PAYMENT_SUCCESS', url: url, source: 'url_detection'}));
+                  return;
+                }
+
+                if (url.includes('/api/cecabank/ko') || pageText.includes('pago rechazado') || pageText.includes('pago cancelado') || pageText.includes('error en el pago')) {
+                  handled = true;
+                  window.ReactNativeWebView.postMessage(JSON.stringify({type: 'PAYMENT_ERROR', url: url}));
+                  return;
+                }
+              };
+
+              setTimeout(checkPage, 500);
+              setInterval(checkPage, 1000);
+            })();
+            true;
+          `}
           originWhitelist={['*']}
         />
       </View>

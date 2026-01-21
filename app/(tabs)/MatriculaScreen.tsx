@@ -61,9 +61,8 @@ export default function MatriculaScreen() {
   const [paymentMethod, setPaymentMethod] = useState<'payment' | 'code'>('payment');
 
   const priceKey = `MATRICULA_${selectedLevel}` as keyof typeof ENROLLMENT_PRICES;
-  // Precio especial para A1: 0.01€ (sin descuento)
-  const basePrice = selectedLevel === 'A1' ? 0.01 : (ENROLLMENT_PRICES[priceKey] || 0);
-  const amount = selectedLevel === 'A1' ? 0.01 : (basePrice * 0.5);
+  const basePrice = ENROLLMENT_PRICES[priceKey] || 0;
+  const amount = basePrice * 0.5;
   const operationType = `matricula-${selectedLevel.toLowerCase()}` as string;
   const customerName = `${safeFormData.nombre} ${safeFormData.apellido1} ${safeFormData.apellido2}`.trim();
 
@@ -341,11 +340,11 @@ export default function MatriculaScreen() {
               <View style={styles.priceRow}>
                 <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_A1}€</Text>
                 <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>0.01€</Text>
+                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_A1 * 0.5).toFixed(2)}€</Text>
                   <Text style={styles.ivaText}> (impuestos incluidos)</Text>
                 </View>
               </View>
-              <Text style={styles.discountBadge}>🔥 Precio especial de prueba</Text>
+              <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
             </View>
             <Text style={styles.optionDescription}>Acceso al nivel A1: Acceso</Text>
           </TouchableOpacity>
