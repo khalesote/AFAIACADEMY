@@ -19,6 +19,12 @@ export interface User {
   matriculado?: boolean;
   matriculado_escuela_virtual?: boolean;
   nivelMatricula?: string | null;
+  nivelesDesbloqueados?: {
+    A1?: boolean;
+    A2?: boolean;
+    B1?: boolean;
+    B2?: boolean;
+  };
   telefono?: string;
   provincia?: string;
   localidad?: string;
@@ -73,6 +79,7 @@ export class UserService {
         matriculado: userData?.matriculado,
         matriculado_escuela_virtual: userData?.matriculado_escuela_virtual,
         nivelMatricula: userData?.nivelMatricula ?? null,
+        nivelesDesbloqueados: userData?.nivelesDesbloqueados,
         telefono: userData?.telefono,
         provincia: userData?.provincia,
         localidad: userData?.localidad,
@@ -288,6 +295,7 @@ export class UserService {
         matriculado: userData.matriculado,
         matriculado_escuela_virtual: userData.matriculado_escuela_virtual,
         nivelMatricula: userData.nivelMatricula,
+        nivelesDesbloqueados: userData.nivelesDesbloqueados,
         telefono: userData.telefono,
         provincia: userData.provincia,
         localidad: userData.localidad,
@@ -327,6 +335,7 @@ export class UserService {
           matriculado: userData?.matriculado,
           matriculado_escuela_virtual: userData?.matriculado_escuela_virtual,
           nivelMatricula: userData?.nivelMatricula,
+          nivelesDesbloqueados: userData?.nivelesDesbloqueados,
           telefono: userData?.telefono,
           provincia: userData?.provincia,
           localidad: userData?.localidad,

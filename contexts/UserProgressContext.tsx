@@ -93,14 +93,6 @@ export const UserProgressProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const loadProgress = useCallback(async () => {
     try {
-      if (__DEV__) {
-        // En modo desarrollo, resetear progreso en cada carga para testing
-        console.log('📂 [DEV] Reseteando progreso a valores por defecto');
-        const defaultProgress = createDefaultProgress();
-        setProgress(defaultProgress);
-        return defaultProgress;
-      }
-
       const stored = await AsyncStorage.getItem(USER_PROGRESS_KEY);
       console.log('📂 Cargando progreso desde AsyncStorage');
       if (stored) {
@@ -156,6 +148,7 @@ export const UserProgressProvider: React.FC<{ children: React.ReactNode }> = ({ 
         [level]: updated,
         ...(nextLevel && updated.diplomaReady ? { [nextLevel]: { ...prev[nextLevel], unlocked: true } } : {})
       };
+      persistProgress(nextState);
       return nextState;
     });
   }, [persistProgress]);

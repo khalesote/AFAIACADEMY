@@ -40,6 +40,7 @@ export default function CecabankPayment({
   const [showWebView, setShowWebView] = useState(false);
   const [webViewHtml, setWebViewHtml] = useState('');
   const webViewRef = useRef<WebView>(null);
+  const paymentHandledRef = useRef(false);
 
   const handlePayment = async () => {
     if (loading) return;
@@ -59,6 +60,7 @@ export default function CecabankPayment({
     try {
       setLoading(true);
       setShowModal(false);
+      paymentHandledRef.current = false;
 
       const { fecha, hora } = getCecabankDateTime();
       const numOperacion = generateOrderId(operationType as any);
@@ -94,6 +96,7 @@ export default function CecabankPayment({
       });
 
       const endpointUrl = `${CECABANK_CONFIG.apiUrl}/api/cecabank/redirect-clean`;
+      const statusUrl = `${CECABANK_CONFIG.apiUrl}/api/cecabank/payment-status?orderId=${encodeURIComponent(String(numOperacion))}`;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
 
@@ -161,6 +164,7 @@ export default function CecabankPayment({
 
       setWebViewHtml(modifiedHtml);
       setShowWebView(true);
+      startPaymentStatusPolling(statusUrl);
     } catch (error: any) {
       setLoading(false);
       setShowModal(true);
@@ -171,6 +175,7 @@ export default function CecabankPayment({
   };
 
   const cancelPayment = () => {
+    paymentHandledRef.current = false;
     setShowModal(false);
     setShowWebView(false);
     setLoading(false);
@@ -181,17 +186,107 @@ export default function CecabankPayment({
     try {
       const data = JSON.parse(event.nativeEvent.data);
       if (data.type === 'PAYMENT_SUCCESS') {
+        if (paymentHandledRef.current) return;
+        paymentHandledRef.current = true;
         setShowWebView(false);
         onPaymentSuccess(data);
       } else if (data.type === 'PAYMENT_CANCEL') {
+        if (paymentHandledRef.current) return;
+        paymentHandledRef.current = true;
         setShowWebView(false);
         onPaymentCancel();
       } else if (data.type === 'PAYMENT_ERROR') {
+        if (paymentHandledRef.current) return;
+        paymentHandledRef.current = true;
         setShowWebView(false);
         onPaymentError(data.error || 'Error en el pago');
       }
     } catch {
       // Ignorar mensajes no válidos
+    }
+  };
+
+  const handleNavigationChange = (navState: any) => {
+    const currentUrl = (navState?.url || '').toLowerCase();
+    const okUrl = (CECABANK_CONFIG.urlOk || '').toLowerCase();
+    const koUrl = (CECABANK_CONFIG.urlKo || '').toLowerCase();
+    if (!currentUrl) return;
+    const isOk = (okUrl && currentUrl.startsWith(okUrl)) || currentUrl.includes('/api/cecabank/ok');
+    const isKo = (koUrl && currentUrl.startsWith(koUrl)) || currentUrl.includes('/api/cecabank/ko');
+    if (isOk) {
+      if (paymentHandledRef.current) return;
+      paymentHandledRef.current = true;
+      setShowWebView(false);
+      onPaymentSuccess({ type: 'PAYMENT_SUCCESS', url: navState.url });
+      return;
+    }
+    if (isKo) {
+      if (paymentHandledRef.current) return;
+      paymentHandledRef.current = true;
+      setShowWebView(false);
+      onPaymentError('Pago cancelado o rechazado');
+    }
+  };
+
+  const startPaymentStatusPolling = (statusUrl: string) => {
+    let attempts = 0;
+    const maxAttempts = 30;
+    const intervalMs = 3000;
+
+    const poll = async () => {
+      if (paymentHandledRef.current) return;
+      attempts += 1;
+      try {
+        const response = await fetch(statusUrl);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'ok') {
+            if (!paymentHandledRef.current) {
+              paymentHandledRef.current = true;
+              setShowWebView(false);
+              onPaymentSuccess({ type: 'PAYMENT_SUCCESS', ...data });
+            }
+            return;
+          }
+          if (data.status === 'ko') {
+            if (!paymentHandledRef.current) {
+              paymentHandledRef.current = true;
+              setShowWebView(false);
+              onPaymentError('Pago cancelado o rechazado');
+            }
+            return;
+          }
+        }
+      } catch {
+        // ignore polling errors
+      }
+      if (attempts < maxAttempts && !paymentHandledRef.current) {
+        setTimeout(poll, intervalMs);
+      }
+    };
+
+    poll();
+  };
+
+  const handleShouldStartLoad = (request: any) => {
+    try {
+      if (request?.url) {
+        handleNavigationChange({ url: request.url });
+      }
+    } catch {
+      // ignore
+    }
+    return true;
+  };
+
+  const handleLoadEnd = (event: any) => {
+    try {
+      const url = event?.nativeEvent?.url;
+      if (url) {
+        handleNavigationChange({ url });
+      }
+    } catch {
+      // ignore
     }
   };
 
@@ -249,6 +344,9 @@ export default function CecabankPayment({
                   : 'https://pgw.ceca.es',
             }}
             onMessage={handleWebViewMessage}
+            onNavigationStateChange={handleNavigationChange}
+            onShouldStartLoadWithRequest={handleShouldStartLoad}
+            onLoadEnd={handleLoadEnd}
             originWhitelist={['*']}
           />
         </View>

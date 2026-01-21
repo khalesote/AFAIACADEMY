@@ -18,6 +18,7 @@ import { collection, addDoc, onSnapshot, query, orderBy, Timestamp, doc, updateD
 import { firestore, auth } from '../../config/firebase';
 import { useUser } from '../../contexts/UserContext';
 import { useRouter } from 'expo-router';
+import { chatService } from '../../services/chatService';
 
 interface Message {
   id: string;
@@ -37,10 +38,10 @@ const db = firestore;
 
 export default function ChatScreen() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showPublishModal, setShowPublishModal] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [connectedUsers, setConnectedUsers] = useState<User[]>([]);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const { profileImage } = useUser();
   const router = useRouter();
@@ -94,6 +95,19 @@ export default function ChatScreen() {
         );
       }
       setConnectedUsers(usersData);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // Unread notifications counter for private messages
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    const unsubscribe = chatService.subscribeToNotifications(user.uid, (notifications) => {
+      const unread = notifications.filter(n => !n.read).length;
+      setUnreadNotifications(unread);
     });
 
     return unsubscribe;
@@ -251,11 +265,17 @@ export default function ChatScreen() {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Chat en Vivo</Text>
           <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setShowPublishModal(true)}
+            style={styles.privateMessagesButton}
+            onPress={() => router.push('/(tabs)/PrivateChatsScreen')}
           >
-            <Ionicons name="add-circle" size={24} color="#FFD700" />
-            <Text style={styles.addButtonText}>Publicar</Text>
+            <Ionicons name="mail" size={24} color="#FFD700" />
+            {unreadNotifications > 0 && (
+              <View style={styles.badgeContainer}>
+                <Text style={styles.badgeText}>
+                  {unreadNotifications > 99 ? '99+' : unreadNotifications}
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -298,29 +318,6 @@ export default function ChatScreen() {
             />
           </View>
         </View>
-
-        {/* Publicar Modal */}
-        <Modal
-          visible={showPublishModal}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowPublishModal(false)}
-        >
-          <View style={styles.publishModalOverlay}>
-            <View style={styles.publishModalContent}>
-              <Text style={styles.publishModalTitle}>Publicar anuncio</Text>
-              <Text style={styles.publishModalDescription}>
-                Próximamente podrás compartir anuncios destacados desde aquí.
-              </Text>
-              <TouchableOpacity
-                style={styles.publishModalButton}
-                onPress={() => setShowPublishModal(false)}
-              >
-                <Text style={styles.publishModalButtonText}>Cerrar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
 
         {/* Emoji Picker Modal */}
         <Modal
@@ -378,19 +375,30 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
+    flex: 1,
   },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  privateMessagesButton: {
+    padding: 8,
     borderRadius: 20,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    position: 'relative',
   },
-  addButtonText: {
-    color: '#FFD700',
-    fontWeight: '600',
+  badgeContainer: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#FF3B30',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   content: {
     flex: 1,
@@ -562,39 +570,5 @@ const styles = StyleSheet.create({
   closeEmojiText: {
     color: '#fff',
     fontWeight: 'bold',
-  },
-  publishModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  publishModalContent: {
-    backgroundColor: '#fff',
-    padding: 24,
-    borderRadius: 20,
-    width: '80%',
-    alignItems: 'center',
-  },
-  publishModalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 8,
-    color: '#1a1a1a',
-  },
-  publishModalDescription: {
-    textAlign: 'center',
-    color: '#4a4a4a',
-    marginBottom: 16,
-  },
-  publishModalButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  publishModalButtonText: {
-    color: '#fff',
-    fontWeight: '600',
   },
 });

@@ -1,0 +1,74 @@
+{
+  "niveles": {
+    "A1": {
+      "nombre": "Acceso A1 - Básico",
+      "descripcion": "Nivel básico de español para principiantes",
+      "codigos": [
+        "A1-2025-001",
+        "A1-2025-002", 
+        "A1-2025-003",
+        "A1-2025-004",
+        "A1-2025-005",
+        "A1-2025-006",
+        "A1-2025-007",
+        "A1-2025-008",
+        "A1-2025-009",
+        "A1-2025-010"
+      ]
+    },
+    "A2": {
+      "nombre": "Acceso A2 - Elemental",
+      "descripcion": "Nivel elemental de español",
+      "codigos": [
+        "A2-2025-001",
+        "A2-2025-002",
+        "A2-2025-003", 
+        "A2-2025-004",
+        "A2-2025-005",
+        "A2-2025-006",
+        "A2-2025-007",
+        "A2-2025-008",
+        "A2-2025-009",
+        "A2-2025-010"
+      ]
+    },
+    "B1": {
+      "nombre": "Acceso B1 - Intermedio",
+      "descripcion": "Nivel intermedio de español",
+      "codigos": [
+        "B1-2025-001",
+        "B1-2025-002",
+        "B1-2025-003",
+        "B1-2025-004", 
+        "B1-2025-005",
+        "B1-2025-006",
+        "B1-2025-007",
+        "B1-2025-008",
+        "B1-2025-009",
+        "B1-2025-010"
+      ]
+    },
+    "B2": {
+      "nombre": "Acceso B2 - Avanzado",
+      "descripcion": "Nivel avanzado de español",
+      "codigos": [
+        "B2-2025-001",
+        "B2-2025-002",
+        "B2-2025-003",
+        "B2-2025-004",
+        "B2-2025-005", 
+        "B2-2025-006",
+        "B2-2025-007",
+        "B2-2025-008",
+        "B2-2025-009",
+        "B2-2025-010"
+      ]
+    }
+  },
+  "configuracion": {
+    "formato": "NIVEL-AÑO-NÚMERO",
+    "longitud": 10,
+    "vigencia": "2025-12-31",
+    "usos_por_codigo": 1
+  }
+}

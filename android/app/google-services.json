@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "366110120529",
+    "project_id": "academia-inmigrantes-movil",
+    "storage_bucket": "academia-inmigrantes-movil.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366110120529:android:ad147c976b206ac1bbf670",
+        "android_client_info": {
+          "package_name": "com.academiadeinmigrantes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "366110120529-s5jkgho6i90ariiikn495afl5mtittb8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvyKrByXcclQNLfZIyyyn3Hc5fWutMiBY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "366110120529-s5jkgho6i90ariiikn495afl5mtittb8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

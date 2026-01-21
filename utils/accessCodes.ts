@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { firestore } from '../config/firebase';
-import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, deleteDoc, writeBatch } from 'firebase/firestore';
 import * as Application from 'expo-application';
 import { Platform } from 'react-native';
 
@@ -76,67 +76,46 @@ interface AccessCodeInfo {
 /**
  * Lista de códigos de acceso válidos para escuela virtual
  * Cada código está vinculado a UN SOLO documento, usuario, dispositivo y nivel
+ * Formato: NIVEL-XXXX (ej: A1-0001, A2-0001, B1-0001, B2-0001)
+ * Total: 1000 códigos por nivel = 4000 códigos en total
  */
-const VALID_ACCESS_CODES: AccessCodeInfo[] = [
-  { code: 'ACADEMIA2024-001', level: 'A1', used: false },
-  { code: 'ACADEMIA2024-002', level: 'A1', used: false },
-  { code: 'ACADEMIA2024-003', level: 'A1', used: false },
-  { code: 'ACADEMIA2024-004', level: 'A1', used: false },
-  { code: 'ACADEMIA2024-005', level: 'A1', used: false },
-  { code: 'ACADEMIA2025-A1-001', level: 'A1', used: false },
-  { code: 'ACADEMIA2025-A1-002', level: 'A1', used: false },
-  { code: 'ACADEMIA2025-A1-003', level: 'A1', used: false },
-  { code: 'ACADEMIA2025-A1-004', level: 'A1', used: false },
-  { code: 'ACADEMIA2025-A1-005', level: 'A1', used: false },
-  { code: 'ACADEMIA2025-A1-006', level: 'A1', used: false },
-  { code: 'ACADEMIA2025-A1-007', level: 'A1', used: false },
-  { code: 'ACADEMIA2025-A1-008', level: 'A1', used: false },
-  { code: 'ACADEMIA2025-A1-009', level: 'A1', used: false },
-  { code: 'ACADEMIA2025-A1-010', level: 'A1', used: false },
+const VALID_ACCESS_CODES: AccessCodeInfo[] = (() => {
+  const codes: AccessCodeInfo[] = [];
+  const levels: Array<'A1' | 'A2' | 'B1' | 'B2'> = ['A1', 'A2', 'B1', 'B2'];
   
-  // Nuevos códigos B1 2025
-  { code: 'ACADEMIA2025-B1-001', level: 'B1', used: false },
-  { code: 'ACADEMIA2025-B1-002', level: 'B1', used: false },
-  { code: 'ACADEMIA2025-B1-003', level: 'B1', used: false },
-  { code: 'ACADEMIA2025-B1-004', level: 'B1', used: false },
-  { code: 'ACADEMIA2025-B1-005', level: 'B1', used: false },
+  levels.forEach(level => {
+    for (let i = 1; i <= 1000; i++) {
+      const codeNumber = String(i).padStart(4, '0');
+      codes.push({
+        code: `${level}-${codeNumber}`,
+        level: level,
+        used: false
+      });
+    }
+  });
   
-  // Nuevos códigos B2 2025
-  { code: 'ACADEMIA2025-B2-001', level: 'B2', used: false },
-  { code: 'ACADEMIA2025-B2-002', level: 'B2', used: false },
-  { code: 'ACADEMIA2025-B2-003', level: 'B2', used: false },
-  { code: 'ACADEMIA2025-B2-004', level: 'B2', used: false },
-  { code: 'ACADEMIA2025-B2-005', level: 'B2', used: false },
-  
-  { code: 'ACADEMIA2024-006', level: 'A2', used: false },
-  { code: 'ACADEMIA2024-007', level: 'A2', used: false },
-  { code: 'ACADEMIA2024-008', level: 'A2', used: false },
-  { code: 'ACADEMIA2024-009', level: 'A2', used: false },
-  { code: 'ACADEMIA2024-010', level: 'A2', used: false },
-  { code: 'ACADEMIA2024-011', level: 'B1', used: false },
-  { code: 'ACADEMIA2024-012', level: 'B1', used: false },
-  { code: 'ACADEMIA2024-013', level: 'B1', used: false },
-  { code: 'ACADEMIA2024-014', level: 'B1', used: false },
-  { code: 'ACADEMIA2024-015', level: 'B1', used: false },
-  { code: 'ACADEMIA2024-016', level: 'B2', used: false },
-  { code: 'ACADEMIA2024-017', level: 'B2', used: false },
-  { code: 'ACADEMIA2024-018', level: 'B2', used: false },
-  { code: 'ACADEMIA2024-019', level: 'B2', used: false },
-  { code: 'ACADEMIA2024-020', level: 'B2', used: false },
-  // Códigos de respaldo
-  { code: 'ACADEMIA2024-021', level: 'A1', used: false },
-  { code: 'ACADEMIA2024-022', level: 'A2', used: false },
-  { code: 'ACADEMIA2024-023', level: 'B1', used: false },
-  { code: 'ACADEMIA2024-024', level: 'B2', used: false },
-  { code: 'ACADEMIA2024-025', level: 'A1', used: false },
-  { code: 'ACADEMIA2024-026', level: 'A2', used: false },
-  { code: 'ACADEMIA2024-027', level: 'B1', used: false },
-  { code: 'ACADEMIA2024-028', level: 'B2', used: false },
-  { code: 'ACADEMIA2024-029', level: 'A1', used: false },
-  { code: 'ACADEMIA2024-030', level: 'A2', used: false },
-  // Código especial para pruebas (temporal)
-  { code: 'TEST-ACCESS-2024', level: 'A1', used: false },
-];
+  return codes;
+})();
+
+async function getValidAccessCodeFromFirestore(code: string): Promise<AccessCodeInfo | null> {
+  if (!firestore) return null;
+  try {
+    const codeDocRef = doc(firestore, FIRESTORE_VALID_CODES_COLLECTION, code);
+    const codeDoc = await getDoc(codeDocRef);
+    if (!codeDoc.exists()) return null;
+    const data = codeDoc.data();
+    if (data.active === false) return null;
+    const level = (data.level || 'ALL') as AccessCodeInfo['level'];
+    return {
+      code,
+      level,
+      used: false
+    };
+  } catch (error) {
+    console.warn('Error obteniendo código válido desde Firebase:', error);
+    return null;
+  }
+}
 
 /**
  * Lista de códigos de acceso válidos para formación profesional
@@ -380,11 +359,14 @@ export async function validateAccessCode(
     // Obtener información del código desde Firebase (fuente de verdad)
     const codeUsageInfo = await getCodeUsageInfo(normalizedCode);
     
-    // Obtener códigos válidos
-    const validCodes = await getValidAccessCodes();
+    // Intentar obtener código válido desde Firebase (producción)
+    let codeInfo = await getValidAccessCodeFromFirestore(normalizedCode);
     
-    // Buscar el código en la lista de válidos
-    const codeInfo = validCodes.find(c => c.code === normalizedCode);
+    // Fallback: lista local
+    if (!codeInfo) {
+      const validCodes = await getValidAccessCodes();
+      codeInfo = validCodes.find(c => c.code === normalizedCode) || null;
+    }
     
     // Verificar si el código existe
     if (!codeInfo) {
@@ -605,6 +587,40 @@ export async function markAccessCodeAsUsed(
     console.error('Error marcando código como usado:', error);
     throw error;
   }
+}
+
+export async function seedValidAccessCodesToFirestore(): Promise<void> {
+  if (!firestore) {
+    throw new Error('Firestore no está disponible');
+  }
+  const batchSize = 400;
+  let batch = writeBatch(firestore);
+  let opCount = 0;
+  let total = 0;
+
+  for (const codeInfo of VALID_ACCESS_CODES) {
+    const codeDocRef = doc(firestore, FIRESTORE_VALID_CODES_COLLECTION, codeInfo.code);
+    batch.set(codeDocRef, {
+      code: codeInfo.code,
+      level: codeInfo.level,
+      active: true,
+      createdAt: serverTimestamp()
+    }, { merge: true });
+    opCount += 1;
+    total += 1;
+
+    if (opCount >= batchSize) {
+      await batch.commit();
+      batch = writeBatch(firestore);
+      opCount = 0;
+    }
+  }
+
+  if (opCount > 0) {
+    await batch.commit();
+  }
+
+  console.log(`✅ Códigos válidos enviados a Firebase: ${total}`);
 }
 
 /**

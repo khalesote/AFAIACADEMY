@@ -6,6 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUserProgress } from '@/contexts/UserProgressContext';
 import { useUser } from '@/contexts/UserContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import AccessCodeInput from '../../components/AccessCodeInput';
+import { validateAccessCode, markAccessCodeAsUsed } from '../../utils/accessCodes';
 
 // -----------------------------------------------------------------------------
 // SISTEMAS DE APOYO: Tutor Virtual, Evaluación, Datos y Componentes Auxiliares
@@ -60,116 +62,249 @@ const imagenesAlfabeto: { [key: string]: any } = {
 // -----------------------------------------------------------------------------
 export default function SchoolScreen() {
   const router = useRouter();
-  const { progress, isLoading, resetLevel, unlockLevel } = useUserProgress();
+  const { progress, isLoading, resetLevel, unlockLevel, reloadProgress } = useUserProgress();
   const { user, firebaseUser, isAuthenticated } = useUser();
 
-  // Estados de desbloqueo de niveles - Inicialmente bloqueados
-  const [nivelesDesbloqueados, setNivelesDesbloqueados] = React.useState({
-    A1: false,  // Desbloqueado solo con pago o código
-    A2: false,  // Desbloqueado solo con pago o código
-    B1: false,  // Desbloqueado solo con pago o código
-    B2: false   // Desbloqueado solo con pago o código
-  });
+  // Estados de desbloqueo de niveles - Usar el contexto como fuente principal
+  const nivelesDesbloqueados = React.useMemo(() => ({
+    A1: progress.A1?.unlocked || false,
+    A2: progress.A2?.unlocked || false,
+    B1: progress.B1?.unlocked || false,
+    B2: progress.B2?.unlocked || false
+  }), [progress.A1?.unlocked, progress.A2?.unlocked, progress.B1?.unlocked, progress.B2?.unlocked]);
   
   const [modalVisible, setModalVisible] = React.useState(false);
   const [modalMsg, setModalMsg] = React.useState('');
   
   // Estados de matrícula
-  const [matriculadoA1A2, setMatriculadoA1A2] = React.useState(false);
-  const [matriculadoB1B2, setMatriculadoB1B2] = React.useState(false);
+  const [matriculadoA1, setMatriculadoA1] = React.useState(false);
+  const [matriculadoA2, setMatriculadoA2] = React.useState(false);
+  const [matriculadoB1, setMatriculadoB1] = React.useState(false);
+  const [matriculadoB2, setMatriculadoB2] = React.useState(false);
 
-  // Estados de códigos de acceso
-  const [accessA1A2, setAccessA1A2] = React.useState(false);
-  const [accessB1B2, setAccessB1B2] = React.useState(false);
+  // Estados de acceso por código
+  const [accessA1, setAccessA1] = React.useState(false);
+  const [accessA2, setAccessA2] = React.useState(false);
+  const [accessB1, setAccessB1] = React.useState(false);
+  const [accessB2, setAccessB2] = React.useState(false);
 
   // Estados para modal de código de acceso
   const [accessModalVisible, setAccessModalVisible] = React.useState(false);
   const [accessCode, setAccessCode] = React.useState('');
-  const [currentLevel, setCurrentLevel] = React.useState<'A1A2' | 'B1B2' | null>(null);
+  const [currentLevel, setCurrentLevel] = React.useState<'A1' | 'A2' | 'B1' | 'B2' | null>(null);
+  const [error, setError] = React.useState('');
+
+  const handleCodeValid = async (code: string) => {
+    if (!currentLevel || !user?.documento) {
+      console.error('No hay nivel o usuario para validar código');
+      return;
+    }
+
+    try {
+      const result = await validateAccessCode(code, currentLevel, user.documento);
+      
+      console.log('🔍 Resultado de validateAccessCode:', result);
+      console.log('🔍 result.valid:', result.valid);
+      console.log('🔍 result.message:', result.message);
+      
+      if (result.valid) {
+        // Marcar el código como usado para el nivel específico
+        await markAccessCodeAsUsed(code, currentLevel, user.documento);
+        
+        // Guardar el acceso en AsyncStorage
+        const userId = firebaseUser?.uid || null;
+        const accessKey = getAccessCodeKey(currentLevel, userId);
+        await AsyncStorage.setItem(accessKey, 'true');
+        
+        // Desbloquear el nivel usando el contexto
+        console.log(`🔓 Desbloqueando nivel ${currentLevel}...`);
+        unlockLevel(currentLevel);
+        
+        // Recargar el progreso para actualizar la UI
+        await reloadProgress();
+        
+        setAccessModalVisible(false);
+        showModal(`¡Código válido! Nivel ${currentLevel} desbloqueado.`);
+      } else {
+        setError(result.message);
+      }
+    } catch (error) {
+      console.error('Error validando código:', error);
+      setError('Error al validar el código. Por favor, inténtalo de nuevo.');
+    }
+  };
 
   // Manejar parámetros de navegación
   const params = useLocalSearchParams<{
     refresh?: string;
-    matriculado?: 'A1A2' | 'B1B2';
+    matriculado?: 'A1' | 'A2' | 'B1' | 'B2';
   }>();
 
   // Usar una referencia para rastrear si ya mostramos el mensaje
   const hasShownWelcome = React.useRef(false);
   // Referencia para rastrear el último estado de matrícula y evitar resets innecesarios
-  const lastMatriculaState = React.useRef({ A1A2: false, B1B2: false });
+  const lastMatriculaState = React.useRef({ 
+    A1: false, 
+    A2: false, 
+    B1: false, 
+    B2: false 
+  });
+
+  // Funciones helper para obtener claves de AsyncStorage asociadas al usuario
+  const getMatriculaKey = (level: string, userId: string | null): string => {
+    if (!userId) return `matricula_${level}_completada_guest`;
+    return `matricula_${level}_completada_${userId}`;
+  };
+
+  const getAccessCodeKey = (level: string, userId: string | null): string => {
+    if (!userId) return `access_code_${level}_valid_guest`;
+    return `access_code_${level}_valid_${userId}`;
+  };
 
   React.useEffect(() => {
     const loadMatriculas = async () => {
       try {
-        const [a1a2Stored, b1b2Stored, a1a2AccessStored, b1b2AccessStored] = await Promise.all([
-          AsyncStorage.getItem('matricula_A1A2_completada'),
-          AsyncStorage.getItem('matricula_B1B2_completada'),
-          AsyncStorage.getItem('access_code_A1A2_valid'),
-          AsyncStorage.getItem('access_code_B1B2_valid')
+        console.log('🔄 Recargando matrículas y progreso...');
+        // Recargar progreso del contexto
+        await reloadProgress();
+        
+        const userId = firebaseUser?.uid || null;
+        console.log('📋 [SchoolScreen] Cargando matrículas para usuario:', userId || 'invitado');
+        
+        const [a1Stored, a2Stored, b1Stored, b2Stored, a1AccessStored, a2AccessStored, b1AccessStored, b2AccessStored] = await Promise.all([
+          AsyncStorage.getItem(getMatriculaKey('A1', userId)),
+          AsyncStorage.getItem(getMatriculaKey('A2', userId)),
+          AsyncStorage.getItem(getMatriculaKey('B1', userId)),
+          AsyncStorage.getItem(getMatriculaKey('B2', userId)),
+          AsyncStorage.getItem(getAccessCodeKey('A1', userId)),
+          AsyncStorage.getItem(getAccessCodeKey('A2', userId)),
+          AsyncStorage.getItem(getAccessCodeKey('B1', userId)),
+          AsyncStorage.getItem(getAccessCodeKey('B2', userId))
         ]);
-        setMatriculadoA1A2(a1a2Stored === 'true');
-        setMatriculadoB1B2(b1b2Stored === 'true');
-        setAccessA1A2(a1a2AccessStored === 'true');
-        setAccessB1B2(b1b2AccessStored === 'true');
-        setNivelesDesbloqueados({
-          A1: accessA1A2 || matriculadoA1A2,
-          A2: accessA1A2 || matriculadoA1A2,
-          B1: accessB1B2 || matriculadoB1B2,
-          B2: accessB1B2 || matriculadoB1B2
+        
+        const isMatriculadoA1 = a1Stored === 'true';
+        const isMatriculadoA2 = a2Stored === 'true';
+        const isMatriculadoB1 = b1Stored === 'true';
+        const isMatriculadoB2 = b2Stored === 'true';
+        const hasAccessA1 = a1AccessStored === 'true';
+        const hasAccessA2 = a2AccessStored === 'true';
+        const hasAccessB1 = b1AccessStored === 'true';
+        const hasAccessB2 = b2AccessStored === 'true';
+        
+        console.log('📋 Estados cargados:', {
+          matriculadoA1: isMatriculadoA1,
+          matriculadoA2: isMatriculadoA2,
+          matriculadoB1: isMatriculadoB1,
+          matriculadoB2: isMatriculadoB2,
+          accessA1: hasAccessA1,
+          accessA2: hasAccessA2,
+          accessB1: hasAccessB1,
+          accessB2: hasAccessB2,
+          progressA1: progress.A1?.unlocked,
+          progressA2: progress.A2?.unlocked,
+          progressB1: progress.B1?.unlocked,
+          progressB2: progress.B2?.unlocked
         });
+        
+        setMatriculadoA1(isMatriculadoA1);
+        setMatriculadoA2(isMatriculadoA2);
+        setMatriculadoB1(isMatriculadoB1);
+        setMatriculadoB2(isMatriculadoB2);
+        setAccessA1(hasAccessA1);
+        setAccessA2(hasAccessA2);
+        setAccessB1(hasAccessB1);
+        setAccessB2(hasAccessB2);
       } catch (error) {
         console.error('Error cargando matrículas:', error);
       }
     };
     loadMatriculas();
-  }, []);
+  }, [params?.refresh, reloadProgress, firebaseUser?.uid]);
 
-  // Resetear progreso de niveles si no está matriculado (solo cuando cambia el estado de matrícula)
+  React.useEffect(() => {
+    if (!user?.nivelesDesbloqueados) return;
+    const { A1, A2, B1, B2 } = user.nivelesDesbloqueados;
+    if (A1 && !progress.A1?.unlocked) unlockLevel('A1');
+    if (A2 && !progress.A2?.unlocked) unlockLevel('A2');
+    if (B1 && !progress.B1?.unlocked) unlockLevel('B1');
+    if (B2 && !progress.B2?.unlocked) unlockLevel('B2');
+  }, [user?.nivelesDesbloqueados, progress.A1?.unlocked, progress.A2?.unlocked, progress.B1?.unlocked, progress.B2?.unlocked, unlockLevel]);
+
+  // Desbloquear niveles si hay matrícula o acceso (ejecutar primero)
+  React.useEffect(() => {
+    if (isLoading) return;
+    
+    console.log('🔍 Verificando desbloqueo de niveles...');
+    console.log('🔍 Estados actuales:', {
+      matriculadoA1, matriculadoA2, matriculadoB1, matriculadoB2,
+      accessA1, accessA2, accessB1, accessB2,
+      progressA1: progress.A1?.unlocked,
+      progressA2: progress.A2?.unlocked,
+      progressB1: progress.B1?.unlocked,
+      progressB2: progress.B2?.unlocked
+    });
+    
+    if ((accessA1 || matriculadoA1) && !progress.A1?.unlocked) {
+      console.log('[SchoolScreen] Desbloqueando A1 - Matrícula:', matriculadoA1, 'Acceso:', accessA1);
+      unlockLevel('A1');
+    }
+    if ((accessA2 || matriculadoA2) && !progress.A2?.unlocked) {
+      console.log('[SchoolScreen] Desbloqueando A2 - Matrícula:', matriculadoA2, 'Acceso:', accessA2);
+      unlockLevel('A2');
+    }
+    if ((accessB1 || matriculadoB1) && !progress.B1?.unlocked) {
+      console.log('[SchoolScreen] Desbloqueando B1 - Matrícula:', matriculadoB1, 'Acceso:', accessB1);
+      unlockLevel('B1');
+    }
+    if ((accessB2 || matriculadoB2) && !progress.B2?.unlocked) {
+      console.log('[SchoolScreen] Desbloqueando B2 - Matrícula:', matriculadoB2, 'Acceso:', accessB2);
+      unlockLevel('B2');
+    }
+  }, [matriculadoA1, matriculadoA2, matriculadoB1, matriculadoB2, accessA1, accessA2, accessB1, accessB2, progress.A1?.unlocked, progress.A2?.unlocked, progress.B1?.unlocked, progress.B2?.unlocked, unlockLevel, isLoading]);
+
+  // Resetear progreso de niveles si no está matriculado (ejecutar después)
   React.useEffect(() => {
     if (isLoading) return;
 
     // Solo resetear si el estado de matrícula cambió de true a false
-    const a1a2Changed = lastMatriculaState.current.A1A2 !== matriculadoA1A2;
-    const b1b2Changed = lastMatriculaState.current.B1B2 !== matriculadoB1B2;
+    const a1Changed = lastMatriculaState.current.A1 !== matriculadoA1;
+    const a2Changed = lastMatriculaState.current.A2 !== matriculadoA2;
+    const b1Changed = lastMatriculaState.current.B1 !== matriculadoB1;
+    const b2Changed = lastMatriculaState.current.B2 !== matriculadoB2;
 
-    // Si no está matriculado en A1A2 y el estado cambió, resetear progreso de A2 (A1 ya no requiere matrícula)
-    if (!matriculadoA1A2 && (a1a2Changed || !lastMatriculaState.current.A1A2)) {
+    // Si no está matriculado en A1 y el estado cambió, resetear progreso de A2 (A1 ya no requiere matrícula)
+    if (!matriculadoA1 && (a1Changed || !lastMatriculaState.current.A1)) {
       const a2HasProgress = progress.A2.unlocked || progress.A2.unitsCompleted.some(u => u) || 
                             progress.A2.oralPassed || progress.A2.writtenPassed || progress.A2.diplomaReady;
       
-      if (a2HasProgress) {
+      // Solo resetear A2 si NO está matriculado en A2
+      if (a2HasProgress && !matriculadoA2) {
+        console.log('🔄 Reseteando A2 porque no está matriculado en A1 ni A2');
         resetLevel('A2');
       }
     }
 
-    // Si no está matriculado en B1B2 y el estado cambió, resetear progreso de B1 y B2
-    if (!matriculadoB1B2 && (b1b2Changed || !lastMatriculaState.current.B1B2)) {
+    // Si no está matriculado en B1 y el estado cambió, resetear progreso de B1 y B2
+    if (!matriculadoB1 && (b1Changed || !lastMatriculaState.current.B1)) {
       const b1HasProgress = progress.B1.unlocked || progress.B1.unitsCompleted.some(u => u) || 
                             progress.B1.oralPassed || progress.B1.writtenPassed || progress.B1.diplomaReady;
       const b2HasProgress = progress.B2.unlocked || progress.B2.unitsCompleted.some(u => u) || 
                             progress.B2.oralPassed || progress.B2.writtenPassed || progress.B2.diplomaReady;
       
-      if (b1HasProgress) {
+      // Solo resetear si NO está matriculado en los niveles correspondientes
+      if (b1HasProgress && !matriculadoB1) {
+        console.log('🔄 Reseteando B1 porque no está matriculado');
         resetLevel('B1');
       }
-      if (b2HasProgress) {
+      if (b2HasProgress && !matriculadoB2) {
+        console.log('🔄 Reseteando B2 porque no está matriculado');
         resetLevel('B2');
       }
     }
 
     // Actualizar el estado de referencia
-    lastMatriculaState.current = { A1A2: matriculadoA1A2, B1B2: matriculadoB1B2 };
-  }, [matriculadoA1A2, matriculadoB1B2, isLoading, progress, resetLevel]);
-
-  // Actualizar niveles desbloqueados cuando cambian matriculado o acceso
-  React.useEffect(() => {
-    setNivelesDesbloqueados({
-      A1: matriculadoA1A2 || accessA1A2,
-      A2: matriculadoA1A2 || accessA1A2,
-      B1: matriculadoB1B2 || accessB1B2,
-      B2: matriculadoB1B2 || accessB1B2
-    });
-  }, [matriculadoA1A2, matriculadoB1B2, accessA1A2, accessB1B2]);
+    lastMatriculaState.current = { A1: matriculadoA1, A2: matriculadoA2, B1: matriculadoB1, B2: matriculadoB2 };
+  }, [matriculadoA1, matriculadoA2, matriculadoB1, matriculadoB2, isLoading, progress, resetLevel]);
 
   React.useEffect(() => {
     if (!params?.matriculado || hasShownWelcome.current) {
@@ -207,7 +342,7 @@ export default function SchoolScreen() {
     setModalVisible(false);
   };
 
-  const handleEnterAccessCode = (level: 'A1A2' | 'B1B2') => {
+  const handleEnterAccessCode = (level: 'A1' | 'A2' | 'B1' | 'B2') => {
     setCurrentLevel(level);
     setAccessModalVisible(true);
   };
@@ -247,7 +382,7 @@ export default function SchoolScreen() {
               style={styles.standardButton}
               onPress={async () => {
                 // Verificar si ya está matriculado en todos los niveles
-                if (matriculadoA1A2 && matriculadoB1B2) {
+                if (matriculadoA1 && matriculadoA2 && matriculadoB1 && matriculadoB2) {
                   showModal('Ya estás matriculado en todos los niveles disponibles.');
                   return;
                 }
@@ -292,9 +427,9 @@ export default function SchoolScreen() {
                 />
                 <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                   <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>
-                    {(matriculadoA1A2 && matriculadoB1B2) ? '¡Matriculado en todos los niveles!' : 'Matricúlate'}
+                    {(matriculadoA1 && matriculadoA2 && matriculadoB1 && matriculadoB2) ? '¡Matriculado en todos los niveles!' : 'Matricúlate'}
                   </Text>
-                  {!(matriculadoA1A2 && matriculadoB1B2) && (
+                  {!(matriculadoA1 && matriculadoA2 && matriculadoB1 && matriculadoB2) && (
                     <Text style={{
                       color: '#fff',
                       fontSize: 16,
@@ -311,12 +446,16 @@ export default function SchoolScreen() {
             </TouchableOpacity>
             
             {/* Indicador de niveles matriculados */}
-            {(matriculadoA1A2 || matriculadoB1B2) && (
+            {(matriculadoA1 || matriculadoA2 || matriculadoB1 || matriculadoB2) && (
               <View style={{ marginTop: 10, alignItems: 'center' }}>
                 <Text style={{ color: '#79A890', fontWeight: '500' }}>
-                  {matriculadoA1A2 && '✓ Niveles A1/A2 desbloqueados'}
-                  {matriculadoA1A2 && matriculadoB1B2 && '\n'}
-                  {matriculadoB1B2 && '✓ Niveles B1/B2 desbloqueados'}
+                  {matriculadoA1 && '✓ Nivel A1 desbloqueado'}
+                  {matriculadoA1 && matriculadoA2 && '\n'}
+                  {matriculadoA2 && '✓ Nivel A2 desbloqueado'}
+                  {matriculadoA2 && matriculadoB1 && '\n'}
+                  {matriculadoB1 && '✓ Nivel B1 desbloqueado'}
+                  {matriculadoB1 && matriculadoB2 && '\n'}
+                  {matriculadoB2 && '✓ Nivel B2 desbloqueado'}
                 </Text>
               </View>
             )}

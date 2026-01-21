@@ -5,20 +5,18 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
-  Alert
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { validateAccessCode } from '../utils/accessCodes';
 
-interface AccessCodeInputProps {
+interface AccessCodeInputA1Props {
   documento: string;
-  level: 'A1' | 'A2' | 'B1' | 'B2';
   onCodeValid: (code: string) => void;
   onCancel?: () => void;
 }
 
-export default function AccessCodeInput({ documento, level, onCodeValid, onCancel }: AccessCodeInputProps) {
+export default function AccessCodeInputA1({ documento, onCodeValid, onCancel }: AccessCodeInputA1Props) {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,11 +31,15 @@ export default function AccessCodeInput({ documento, level, onCodeValid, onCance
     setError('');
 
     try {
-      const result = await validateAccessCode(code, level, documento);
+      console.log('🔍 AccessCodeInputA1: Validando código:', code, 'para nivel: A1');
+      const result = await validateAccessCode(code, 'A1', documento);
+      console.log('🔍 AccessCodeInputA1: Resultado:', result);
       
       if (result.valid) {
+        console.log('✅ AccessCodeInputA1: Código válido');
         onCodeValid(code);
       } else {
+        console.log('❌ AccessCodeInputA1: Código inválido:', result.message);
         setError(result.message);
       }
     } catch (error) {
@@ -52,11 +54,11 @@ export default function AccessCodeInput({ documento, level, onCodeValid, onCance
     <View style={styles.container}>
       <View style={styles.header}>
         <Ionicons name="key-outline" size={24} color="#9DC3AA" style={styles.icon} />
-        <Text style={styles.title}>Código de Acceso</Text>
+        <Text style={styles.title}>Código de Acceso - Nivel A1</Text>
       </View>
       
       <Text style={styles.description}>
-        Si tienes un código de acceso para el grupo de prueba, introdúcelo aquí para matricularte sin pagar.
+        Si tienes un código de acceso para el nivel A1, introdúcelo aquí para matricularte sin pagar.
       </Text>
 
       <View style={styles.inputContainer}>
@@ -67,7 +69,7 @@ export default function AccessCodeInput({ documento, level, onCodeValid, onCance
             setCode(text.toUpperCase());
             setError('');
           }}
-          placeholder="Introduce tu código de acceso"
+          placeholder="Introduce tu código de acceso A1"
           placeholderTextColor="#999"
           autoCapitalize="characters"
           editable={!loading}

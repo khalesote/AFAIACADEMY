@@ -216,6 +216,14 @@ export default function TabLayout() {
           tabBarStyle: { display: 'none' },
         }}
       />
+      <Tabs.Screen
+        name="PrivateChatsScreen"
+        options={{
+          title: "Mensajes Privados",
+          tabBarIcon: ({ color }) => <Ionicons name="mail" size={28} color={color} />,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
     </Tabs>
   );
 }

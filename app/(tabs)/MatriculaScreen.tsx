@@ -15,7 +15,7 @@ import { useUser } from '@/contexts/UserContext';
 import AccessCodeInput from '../../components/AccessCodeInput';
 import CecabankPayment from '../../components/CecabankPayment';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
-import { markAccessCodeAsUsed, initializeAccessCodes } from '../../utils/accessCodes';
+import { markAccessCodeAsUsed, initializeAccessCodes, validateAccessCode } from '../../utils/accessCodes';
 import { CECABANK_PRICES } from '../../config/cecabank';
 import { UserService } from '../../services/userService';
 import { auth } from '../../config/firebase';
@@ -35,11 +35,11 @@ interface FormData {
   email?: string;
 }
 
-type EnrollmentLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'A1A2' | 'B1B2';
+type EnrollmentLevel = 'A1' | 'A2' | 'B1' | 'B2';
 
 export default function MatriculaScreen() {
   const router = useRouter();
-  const { progress, markUnitCompleted, unlockLevel } = useUserProgress();
+  const { progress, markUnitCompleted, unlockLevel, reloadProgress } = useUserProgress();
   const { user: firebaseUser, isAuthenticated } = useUser();
   const { level: selectedLevelParam } = useLocalSearchParams<{ level?: string }>();
   
@@ -60,7 +60,9 @@ export default function MatriculaScreen() {
   const [paymentMethod, setPaymentMethod] = useState<'payment' | 'code'>('payment');
 
   const priceKey = `MATRICULA_${selectedLevel}` as keyof typeof ENROLLMENT_PRICES;
-  const amount = (ENROLLMENT_PRICES[priceKey] || 0) * 0.5;
+  // Precio especial para A1: 0.01€ (sin descuento)
+  const basePrice = selectedLevel === 'A1' ? 0.01 : (ENROLLMENT_PRICES[priceKey] || 0);
+  const amount = selectedLevel === 'A1' ? 0.01 : (basePrice * 0.5);
   const operationType = `matricula-${selectedLevel.toLowerCase()}` as string;
   const customerName = `${safeFormData.nombre} ${safeFormData.apellido1} ${safeFormData.apellido2}`.trim();
 
@@ -100,30 +102,24 @@ export default function MatriculaScreen() {
   };
 
   const handlePaymentSuccess = async (paymentInfo: any) => {
-    console.log('✅ Pago exitoso:', paymentInfo);
+    console.log('✅ [MatriculaScreen] Pago exitoso:', paymentInfo);
+    console.log('✅ [MatriculaScreen] Nivel seleccionado:', selectedLevel);
     
     try {
       setIsLoading(true);
       
-      console.log('📝 Desbloqueando niveles para:', selectedLevel);
+      const userId = firebaseUser?.uid || null;
+      console.log('📝 [MatriculaScreen] Desbloqueando nivel:', selectedLevel, 'para usuario:', userId);
       
-      // Desbloquear niveles según la matrícula seleccionada
-      if (selectedLevel === 'A1' || selectedLevel === 'A1A2') {
-        unlockLevel('A1');
-        console.log('✅ Nivel A1 desbloqueado');
-      }
-      if (selectedLevel === 'A2' || selectedLevel === 'A1A2') {
-        unlockLevel('A2');
-        console.log('✅ Nivel A2 desbloqueado');
-      }
-      if (selectedLevel === 'B1' || selectedLevel === 'B1B2') {
-        unlockLevel('B1');
-        console.log('✅ Nivel B1 desbloqueado');
-      }
-      if (selectedLevel === 'B2' || selectedLevel === 'B1B2') {
-        unlockLevel('B2');
-        console.log('✅ Nivel B2 desbloqueado');
-      }
+      // Desbloquear el nivel seleccionado (esto persiste automáticamente en UserProgressContext)
+      await unlockLevel(selectedLevel);
+      await reloadProgress();
+      console.log('✅ [MatriculaScreen] unlockLevel ejecutado para:', selectedLevel);
+      
+      // Guardar matrícula en AsyncStorage con clave específica del usuario
+      const matriculaKey = userId ? `matricula_${selectedLevel}_completada_${userId}` : `matricula_${selectedLevel}_completada_guest`;
+      await AsyncStorage.setItem(matriculaKey, 'true');
+      console.log('✅ [MatriculaScreen] Matrícula guardada en AsyncStorage:', matriculaKey);
       
       // Guardar información del pago en AsyncStorage
       await AsyncStorage.setItem('lastPayment', JSON.stringify({
@@ -139,7 +135,106 @@ export default function MatriculaScreen() {
             matriculado: true,
             matriculado_escuela_virtual: true,
             nivelMatricula: selectedLevel,
-            fechaMatricula: new Date().toISOString()
+            fechaMatricula: new Date().toISOString(),
+            nivelesDesbloqueados: {
+              [selectedLevel]: true
+            }
+          });
+          console.log('✅ [MatriculaScreen] Matrícula guardada en Firebase');
+        } catch (firebaseError) {
+          console.error('⚠️ [MatriculaScreen] Error guardando en Firebase (no crítico):', firebaseError);
+        }
+      }
+
+      // Esperar un momento para asegurar que todo se guardó
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      Alert.alert(
+        '✅ Matrícula Exitosa',
+        `¡Felicidades! Tu matrícula para ${selectedLevel} ha sido procesada correctamente.`,
+        [
+          {
+            text: 'Ir a la Escuela Virtual',
+            onPress: () => {
+              console.log('🔄 [MatriculaScreen] Navegando a SchoolScreen con refresh');
+              router.replace({
+                pathname: '/(tabs)/SchoolScreen',
+                params: { 
+                  refresh: Date.now(),
+                  matriculado: selectedLevel
+                }
+              });
+            }
+          }
+        ]
+      );
+    } catch (error) {
+      console.error('❌ [MatriculaScreen] Error procesando matrícula:', error);
+      Alert.alert('Error', 'Hubo un error al procesar tu matrícula. Por favor, contacta soporte.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCodeValid = async (code: string) => {
+    console.log('🚀 ===== handleCodeValid INICIADO =====');
+    console.log('🚀 Código recibido:', code);
+    console.log('🚀 Nivel seleccionado:', selectedLevel);
+    try {
+      setIsLoading(true);
+      
+      const documento = safeFormData.documento || '';
+      const userId = firebaseUser?.uid || null;
+      
+      console.log('🔍 Validando código para nivel:', selectedLevel, 'con documento:', documento || 'sin documento');
+      
+      const result = await validateAccessCode(code, selectedLevel, documento);
+      
+      console.log('📋 Resultado de validación:', result);
+      
+      if (!result.valid) {
+        console.log('❌ Código inválido:', result.message);
+        Alert.alert('Código Inválido', result.message);
+        setIsLoading(false);
+        return;
+      }
+      
+      console.log('✅ Código válido, marcando como usado...');
+      
+      // Marcar el código como usado
+      await markAccessCodeAsUsed(code, selectedLevel, documento);
+      console.log('✅ Código marcado como usado en Firebase');
+      
+      // Desbloquear el nivel seleccionado
+      console.log('[MatriculaScreen] Iniciando desbloqueo para:', selectedLevel);
+      await unlockLevel(selectedLevel);
+      await reloadProgress();
+      
+      // Guardar con claves específicas del usuario
+      const matriculaKey = userId ? `matricula_${selectedLevel}_completada_${userId}` : `matricula_${selectedLevel}_completada_guest`;
+      const accessCodeKey = userId ? `access_code_${selectedLevel}_valid_${userId}` : `access_code_${selectedLevel}_valid_guest`;
+      await AsyncStorage.setItem(matriculaKey, 'true');
+      await AsyncStorage.setItem(accessCodeKey, 'true');
+      console.log(`✅ Nivel ${selectedLevel} desbloqueado y guardado con claves:`, matriculaKey, accessCodeKey);
+      
+      // Guardar información del código en AsyncStorage
+      await AsyncStorage.setItem('lastCodeUsed', JSON.stringify({
+        code: code,
+        level: selectedLevel,
+        timestamp: new Date().toISOString()
+      }));
+
+      // Guardar información de matrícula en Firebase si el usuario está autenticado
+      if (firebaseUser && 'uid' in firebaseUser) {
+        try {
+          await UserService.updateUserProfile({
+            matriculado: true,
+            matriculado_escuela_virtual: true,
+            nivelMatricula: selectedLevel,
+            fechaMatricula: new Date().toISOString(),
+            nivelesDesbloqueados: {
+              [selectedLevel]: true
+            }
           });
           console.log('✅ Matrícula guardada en Firebase');
         } catch (firebaseError) {
@@ -147,9 +242,12 @@ export default function MatriculaScreen() {
         }
       }
 
+      // Esperar un momento para asegurar que todo se guardó
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       Alert.alert(
-        '✅ Matrícula Exitosa',
-        `¡Felicidades! Tu matrícula para ${selectedLevel} ha sido procesada correctamente.`,
+        '✅ Código Válido',
+        `¡Felicidades! Tu código ha sido validado y tienes acceso a ${selectedLevel}.`,
         [
           {
             text: 'Ir a la Escuela Virtual',
@@ -160,38 +258,6 @@ export default function MatriculaScreen() {
                 matriculado: selectedLevel
               }
             })
-          }
-        ]
-      );
-    } catch (error) {
-      console.error('Error procesando matrícula:', error);
-      Alert.alert('Error', 'Hubo un error al procesar tu matrícula. Por favor, contacta soporte.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCodeValid = async (code: string) => {
-    try {
-      setIsLoading(true);
-      
-      // Simular validación de código (sin usar markAccessCodeAsUsed)
-      console.log('� Validando código:', code);
-      
-      // Guardar información del código en AsyncStorage
-      await AsyncStorage.setItem('lastCodeUsed', JSON.stringify({
-        code: code,
-        level: selectedLevel,
-        timestamp: new Date().toISOString()
-      }));
-
-      Alert.alert(
-        '✅ Código Válido',
-        `¡Felicidades! Tu código ha sido validado y tienes acceso a ${selectedLevel}.`,
-        [
-          {
-            text: 'Ir a la Escuela Virtual',
-            onPress: () => router.replace('/(tabs)/SchoolScreen')
           }
         ]
       );
@@ -260,11 +326,11 @@ export default function MatriculaScreen() {
               <View style={styles.priceRow}>
                 <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_A1}€</Text>
                 <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_A1 * 0.5).toFixed(0)}€</Text>
-                  <Text style={styles.ivaText}> + IVA</Text>
+                  <Text style={styles.discountedPrice}>0.01€</Text>
+                  <Text style={styles.ivaText}> (impuestos incluidos)</Text>
                 </View>
               </View>
-              <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
+              <Text style={styles.discountBadge}>🔥 Precio especial de prueba</Text>
             </View>
             <Text style={styles.optionDescription}>Acceso al nivel A1: Acceso</Text>
           </TouchableOpacity>
@@ -289,8 +355,8 @@ export default function MatriculaScreen() {
               <View style={styles.priceRow}>
                 <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_A2}€</Text>
                 <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_A2 * 0.5).toFixed(0)}€</Text>
-                  <Text style={styles.ivaText}> + IVA</Text>
+                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_A2 * 0.5).toFixed(2)}€</Text>
+                  <Text style={styles.ivaText}> (impuestos incluidos)</Text>
                 </View>
               </View>
               <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
@@ -318,8 +384,8 @@ export default function MatriculaScreen() {
               <View style={styles.priceRow}>
                 <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_B1}€</Text>
                 <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_B1 * 0.5).toFixed(0)}€</Text>
-                  <Text style={styles.ivaText}> + IVA</Text>
+                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_B1 * 0.5).toFixed(2)}€</Text>
+                  <Text style={styles.ivaText}> (impuestos incluidos)</Text>
                 </View>
               </View>
               <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
@@ -347,8 +413,8 @@ export default function MatriculaScreen() {
               <View style={styles.priceRow}>
                 <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_B2}€</Text>
                 <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_B2 * 0.5).toFixed(0)}€</Text>
-                  <Text style={styles.ivaText}> + IVA</Text>
+                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_B2 * 0.5).toFixed(2)}€</Text>
+                  <Text style={styles.ivaText}> (impuestos incluidos)</Text>
                 </View>
               </View>
               <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
@@ -414,7 +480,9 @@ export default function MatriculaScreen() {
           </View>
         ) : (
           <AccessCodeInput
+            key={`access-code-${selectedLevel}`}
             documento={safeFormData.documento}
+            level={selectedLevel}
             onCodeValid={handleCodeValid}
             onCancel={() => setPaymentMethod('payment')}
           />

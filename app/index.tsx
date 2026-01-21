@@ -5,9 +5,12 @@ import { Animated, PanResponder, View as RNView, StyleSheet as RNStyleSheet, Pla
 // REMOVED: import LottieView from 'lottie-react-native'; // Not used in this component
 import { userDB, userStorage, User, UserProgress, getFullName } from '../utils/userDatabase';
 import { fetchLatestNews, NewsItem } from '../services/newsService';
+import { fetchActivePromoMessages, PromoMessage } from '../services/promoService';
 import { initializeB1Progress, syncA1A2FromLegacy } from '../utils/unitProgress';
 import { testAsyncStorage } from '../utils/asyncStorageTest';
 import { useUser } from '../contexts/UserContext';
+import { collection, getCountFromServer } from 'firebase/firestore';
+import { firestore } from '../config/firebase';
 
 // Variables de texto
 const TITLE_ES = "Academia de Inmigrantes";
@@ -64,6 +67,7 @@ export function HomeScreenContent() {
   const promoTickerRef = useRef<ScrollView>(null);
   const promoScrollPosRef = useRef<number>(0);
   const [promoContentWidth, setPromoContentWidth] = useState<number>(0);
+  const [promoMessages, setPromoMessages] = useState<PromoMessage[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
@@ -72,6 +76,7 @@ export function HomeScreenContent() {
   const newsScrollRef = useRef<ScrollView>(null);
   const newsScrollPosition = useRef(0);
   const [newsContentWidth, setNewsContentWidth] = useState(0);
+  const [registeredUsersCount, setRegisteredUsersCount] = useState<number>(0);
   
   // Scroll automático para horarios de oración
   const prayerTimesScrollRef = useRef<ScrollView>(null);
@@ -111,56 +116,31 @@ export function HomeScreenContent() {
 
   // Mapeo de provincias a coordenadas (lat, lon)
   const PROVINCE_COORDINATES: Record<string, { lat: number; lon: number }> = {
-    'Álava': { lat: 42.8467, lon: -2.6716 },
-    'Albacete': { lat: 38.9942, lon: -1.8564 },
-    'Alicante': { lat: 38.3452, lon: -0.4810 },
-    'Almería': { lat: 36.8381, lon: -2.4597 },
-    'Asturias': { lat: 43.3619, lon: -5.8494 },
-    'Ávila': { lat: 40.6564, lon: -4.6944 },
-    'Badajoz': { lat: 38.8786, lon: -6.9706 },
-    'Barcelona': { lat: 41.3851, lon: 2.1734 },
-    'Burgos': { lat: 42.3439, lon: -3.6969 },
-    'Cáceres': { lat: 39.4753, lon: -6.3724 },
-    'Cádiz': { lat: 36.5270, lon: -6.2886 },
-    'Cantabria': { lat: 43.4623, lon: -3.8099 },
-    'Castellón': { lat: 39.9864, lon: -0.0513 },
-    'Ciudad Real': { lat: 38.9863, lon: -3.9293 },
-    'Córdoba': { lat: 37.8882, lon: -4.7794 },
-    'La Coruña': { lat: 43.3623, lon: -8.4115 },
-    'Cuenca': { lat: 40.0718, lon: -2.1340 },
-    'Gerona': { lat: 41.9794, lon: 2.8214 },
-    'Granada': { lat: 37.1773, lon: -3.5986 },
-    'Guadalajara': { lat: 40.6286, lon: -3.1618 },
-    'Guipúzcoa': { lat: 43.3183, lon: -1.9812 },
-    'Huelva': { lat: 37.2614, lon: -6.9447 },
-    'Huesca': { lat: 42.1361, lon: -0.4087 },
-    'Islas Baleares': { lat: 39.5696, lon: 2.6502 },
-    'Jaén': { lat: 37.7796, lon: -3.7849 },
-    'León': { lat: 42.5987, lon: -5.5671 },
-    'Lérida': { lat: 41.6176, lon: 0.6200 },
-    'Lugo': { lat: 43.0097, lon: -7.5568 },
     'Madrid': { lat: 40.4168, lon: -3.7038 },
+    'Barcelona': { lat: 41.3851, lon: 2.1734 },
+    'Valencia': { lat: 39.4699, lon: -0.3763 },
+    'Sevilla': { lat: 37.3891, lon: -5.9845 },
+    'Zaragoza': { lat: 41.6488, lon: -0.8891 },
     'Málaga': { lat: 36.7213, lon: -4.4214 },
     'Murcia': { lat: 37.9922, lon: -1.1307 },
-    'Navarra': { lat: 42.8125, lon: -1.6458 },
-    'Orense': { lat: 42.3360, lon: -7.8642 },
-    'Palencia': { lat: 42.0096, lon: -4.5240 },
+    'Islas Baleares': { lat: 39.5696, lon: 2.6502 },
     'Las Palmas': { lat: 28.1248, lon: -15.4300 },
-    'Pontevedra': { lat: 42.4336, lon: -8.6480 },
-    'La Rioja': { lat: 42.4650, lon: -2.4456 },
-    'Salamanca': { lat: 40.9701, lon: -5.6635 },
-    'Segovia': { lat: 40.9429, lon: -4.1088 },
-    'Sevilla': { lat: 37.3891, lon: -5.9845 },
-    'Soria': { lat: 41.7640, lon: -2.4688 },
-    'Tarragona': { lat: 41.1189, lon: 1.2445 },
-    'Santa Cruz de Tenerife': { lat: 28.4636, lon: -16.2518 },
-    'Teruel': { lat: 40.3440, lon: -1.1069 },
-    'Toledo': { lat: 39.8628, lon: -4.0273 },
-    'Valencia': { lat: 39.4699, lon: -0.3763 },
-    'Valladolid': { lat: 41.6523, lon: -4.7245 },
     'Vizcaya': { lat: 43.2627, lon: -2.9253 },
-    'Zamora': { lat: 41.5036, lon: -5.7438 },
-    'Zaragoza': { lat: 41.6488, lon: -0.8891 },
+    'Alicante': { lat: 38.3452, lon: -0.4810 },
+    'Córdoba': { lat: 37.8882, lon: -4.7794 },
+    'Valladolid': { lat: 41.6523, lon: -4.7245 },
+    'Pontevedra': { lat: 42.4336, lon: -8.6480 },
+    'Asturias': { lat: 43.3619, lon: -5.8494 },
+    'Granada': { lat: 37.1773, lon: -3.5986 },
+    'La Coruña': { lat: 43.3623, lon: -8.4115 },
+    'Santa Cruz de Tenerife': { lat: 28.4636, lon: -16.2518 },
+    'Navarra': { lat: 42.8125, lon: -1.6458 },
+    'Cantabria': { lat: 43.4623, lon: -3.8099 },
+    'Salamanca': { lat: 40.9701, lon: -5.6635 },
+    'Burgos': { lat: 42.3439, lon: -3.6969 },
+    'Almería': { lat: 36.8381, lon: -2.4597 },
+    'Badajoz': { lat: 38.8786, lon: -6.9706 },
+    'Toledo': { lat: 39.8628, lon: -4.0273 },
   };
 
   // Función para ejecutar la acción del menú - VERIFICAR AUTENTICACIÓN
@@ -231,7 +211,9 @@ export function HomeScreenContent() {
     '📋 طلبات قابلة للتحميل لجميع الإجراءات',
     '💬 انضم إلى دردشة المجتمع للتعرف عليك وتبادل الأفكار',
   ];
-  const promoPhrases = [...promoPhrasesEs, ...promoPhrasesAr];
+  const promoPhrases = promoMessages.length > 0
+    ? promoMessages.flatMap((msg) => [msg.textEs, msg.textAr].filter(Boolean))
+    : [...promoPhrasesEs, ...promoPhrasesAr];
 
   useEffect(() => {
     const stepPx = 1; // velocidad del ticker (px por frame)
@@ -308,6 +290,40 @@ export function HomeScreenContent() {
       }
     };
     loadNews();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadRegisteredUsers = async () => {
+      try {
+        if (!firestore) return;
+        const usersRef = collection(firestore, 'users');
+        const snapshot = await getCountFromServer(usersRef);
+        if (isMounted) {
+          setRegisteredUsersCount(snapshot.data().count || 0);
+        }
+      } catch (error) {
+        console.error('Error cargando usuarios registrados:', error);
+      }
+    };
+    loadRegisteredUsers();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadPromoMessages = async () => {
+      const messages = await fetchActivePromoMessages(20);
+      if (isMounted) {
+        setPromoMessages(messages);
+      }
+    };
+    loadPromoMessages();
     return () => {
       isMounted = false;
     };
@@ -617,7 +633,13 @@ export function HomeScreenContent() {
         </View>
 
         <View style={styles.newsSection}>
-          <Text style={styles.newsSectionTitle}>Noticias</Text>
+          <View style={styles.newsHeaderRow}>
+            <Text style={styles.newsSectionTitle}>Noticias</Text>
+            <View style={styles.activeUsersBadge}>
+              <Ionicons name="people" size={16} color="#333" />
+              <Text style={styles.activeUsersText}>{registeredUsersCount} usuarios</Text>
+            </View>
+          </View>
           <ScrollView
             ref={newsScrollRef}
             horizontal
@@ -698,61 +720,11 @@ export function HomeScreenContent() {
           </TouchableOpacity>
         </View>
 
-        {/* Formación Profesional - Botón Principal */}
+        {/* Asesoría y Acompañamiento - Botón Principal */}
         <View style={[styles.mainSchoolSection, {marginTop: 10}]}>
           <TouchableOpacity
             style={styles.mainSchoolButton}
-            onPress={() => handleMenuPress(() => router.push("/PreFormacionScreen"))}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={['#1a1a1a', '#000000']}
-              style={styles.mainSchoolButtonGradient}
-            >
-              <View style={styles.mainSchoolContent}>
-                <View style={styles.mainSchoolIconContainer}>
-                  <Ionicons name="briefcase" size={40} color="#FFD700" />
-                </View>
-                <View style={styles.mainSchoolTextContainer}>
-                  <Text style={[styles.mainSchoolTitle, {marginTop: 30, color: '#FFD700'}]}>Tu Centro de Preformación</Text>
-                  <Text style={[styles.mainSchoolTitleAr, {color: '#FFD700'}]}>مركزك للتدريب المسبق</Text>
-                  <Text style={[styles.mainSchoolSubtitle, {color: '#FFD700'}]}>Cursos profesionales</Text>
-                </View>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-
-        {/* Alfabetización - Botón Principal */}
-        <View style={[styles.mainSchoolSection, {marginTop: 10}]}>
-          <TouchableOpacity
-            style={styles.mainSchoolButton}
-            onPress={() => handleMenuPress(() => router.push("/(tabs)/AlfabetizacionScreen"))}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={['#1a1a1a', '#000000']}
-              style={styles.mainSchoolButtonGradient}
-            >
-              <View style={styles.mainSchoolContent}>
-                <View style={styles.mainSchoolIconContainer}>
-                  <Ionicons name="school" size={40} color="#FFD700" />
-                </View>
-                <View style={styles.mainSchoolTextContainer}>
-                  <Text style={[styles.mainSchoolTitle, {marginTop: 30, color: '#FFD700'}]}>Alfabetización</Text>
-                  <Text style={[styles.mainSchoolTitleAr, {color: '#FFD700'}]}>محو الأمية</Text>
-                  <Text style={[styles.mainSchoolSubtitle, {color: '#FFD700'}]}>Leer y escribir</Text>
-                </View>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-
-        {/* Integración de la Mujer - Botón Principal */}
-        <View style={[styles.mainSchoolSection, {marginTop: 10}]}>
-          <TouchableOpacity
-            style={styles.mainSchoolButton}
-            onPress={() => handleMenuPress(() => router.push("/(tabs)/IntegracionMujerScreen"))}
+            onPress={() => handleMenuPress(() => router.push("/AsesoriaScreen"))}
             activeOpacity={0.8}
           >
             <LinearGradient
@@ -764,43 +736,85 @@ export function HomeScreenContent() {
                   <Ionicons name="people" size={40} color="#FFD700" />
                 </View>
                 <View style={styles.mainSchoolTextContainer}>
-                  <Text style={[styles.mainSchoolTitle, {marginTop: 30, color: '#FFD700'}]}>Integración de la Mujer</Text>
-                  <Text style={[styles.mainSchoolTitleAr, {color: '#FFD700'}]}>اندماج المرأة</Text>
-                  <Text style={[styles.mainSchoolSubtitle, {color: '#FFD700'}]}>Recursos y apoyo</Text>
+                  <Text style={[styles.mainSchoolTitle, {marginTop: 30, color: '#FFD700'}]}>Asesoría y Acompañamiento</Text>
+                  <Text style={[styles.mainSchoolTitleAr, {color: '#FFD700'}]}>استشارة ومرافقة</Text>
+                  <Text style={[styles.mainSchoolSubtitle, {color: '#FFD700'}]}>Inmigración</Text>
                 </View>
               </View>
             </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={[styles.highlightButton, { marginBottom: 20 }]}
-          onPress={() => router.push("/(tabs)/CreadorCVProScreen")}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="document-text" size={18} color="#FFD700" />
-          <Text style={styles.highlightButtonText}>Creador de CV</Text>
-        </TouchableOpacity>
-
-        {/* Categorías Principales */}
+        {/* Nuestros Servicios Gratuitos */}
         <View style={styles.categoriesSection}>
-          <Text style={styles.sectionTitle}>Categorías Principales</Text>
+          <Text style={styles.sectionTitle}>Nuestros Servicios Gratuitos</Text>
 
           <View style={styles.categoriesGrid}>
-            {/* Asesoría */}
-             <TouchableOpacity
+            {/* Creador de CV */}
+            <TouchableOpacity
               style={styles.categoryCard}
-              onPress={() => handleMenuPress(() => router.push("/AsesoriaScreen"))}
+              onPress={() => router.push("/(tabs)/CreadorCVProScreen")}
             >
-               <LinearGradient
+              <LinearGradient
                 colors={['#1a1a1a', '#000000']}
                 style={styles.categoryGradient}
               >
-                <Ionicons name="people" size={32} color="#FFD700" />
-                                 <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Asesoría y Acompañamiento</Text>
-                 <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>استشارة ومرافقة</Text>
-                 <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Inmigración</Text>
-                 <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>هجرة</Text>
+                <Ionicons name="document-text" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Creador de CV</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>منشئ السيرة الذاتية</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Profesional</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>احترافي</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Portal para el Empleo */}
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => Linking.openURL('https://consultoresdeformacion.portalemp.com/espacio-del-demandante.html')}
+            >
+              <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="briefcase-outline" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Portal para el Empleo</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>بوابة التوظيف</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Ofertas de trabajo</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>عروض العمل</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Aprende a Escribir */}
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/AprendeEscribirScreen"))}
+            >
+              <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="create" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Aprende a Escribir</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>تعلّم الكتابة</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Leer y escribir</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>قراءة وكتابة</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Alfabetización */}
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/AlfabetizacionScreen"))}
+            >
+              <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="school" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Alfabetización</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>محو الأمية</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Leer y escribir</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>قراءة وكتابة</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -838,20 +852,37 @@ export function HomeScreenContent() {
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Aprende a Escribir */}
+            {/* Integración de la Mujer */}
             <TouchableOpacity
               style={styles.categoryCard}
-              onPress={() => handleMenuPress(() => router.push("/(tabs)/AprendeEscribirScreen"))}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/IntegracionMujerScreen"))}
             >
               <LinearGradient
                 colors={['#1a1a1a', '#000000']}
                 style={styles.categoryGradient}
               >
-                <Ionicons name="create" size={32} color="#FFD700" />
-                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Aprende a Escribir</Text>
-                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>تعلّم الكتابة</Text>
-                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Leer y escribir</Text>
-                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>قراءة وكتابة</Text>
+                <Ionicons name="female" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Integración de la Mujer</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>اندماج المرأة</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Recursos y apoyo</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>موارد ودعم</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Noticias */}
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/NoticiasInmigracionScreen"))}
+            >
+              <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="newspaper" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Noticias</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>أخبار</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Inmigración</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>هجرة</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -903,23 +934,6 @@ export function HomeScreenContent() {
                  <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>مكتبة</Text>
                  <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Recursos</Text>
                  <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>موارد</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            {/* Noticias */}
-            <TouchableOpacity
-              style={styles.categoryCard}
-              onPress={() => handleMenuPress(() => router.push("/NoticiasInmigracionScreen"))}
-            >
-              <LinearGradient
-                colors={['#1a1a1a', '#000000']}
-                style={styles.categoryGradient}
-              >
-                <Ionicons name="newspaper" size={32} color="#FFD700" />
-                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Noticias</Text>
-                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>أخبار</Text>
-                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Inmigración</Text>
-                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>هجرة</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -1381,6 +1395,26 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#000',
     marginBottom: 8,
+  },
+  newsHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  activeUsersBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e8f5e9',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  activeUsersText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+    marginLeft: 4,
   },
   newsScrollContent: {
     paddingVertical: 4,
