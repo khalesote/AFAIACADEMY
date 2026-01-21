@@ -974,9 +974,9 @@ export function HomeScreenContent() {
           </View>
         </View>
 
-        {/* Accesos Rápidos */}
+        {/* Otros servicios */}
         <View style={styles.quickAccessSection}>
-          <Text style={styles.sectionTitle}>Accesos Rápidos</Text>
+          <Text style={styles.sectionTitle}>Otros servicios</Text>
 
           <View style={styles.quickAccessGrid}>
             <TouchableOpacity
@@ -1061,7 +1061,7 @@ export function HomeScreenContent() {
               <View style={styles.quickAccessIcon}>
                 <Ionicons name="school" size={24} color="#FFD700" />
               </View>
-              <Text style={styles.quickAccessText}>Pre-formación SEPE</Text>
+              <Text style={styles.quickAccessText}>Preformación para el empleo</Text>
               <Text style={styles.quickAccessTextAr}>تدريب مهني</Text>
             </TouchableOpacity>
 
