@@ -230,8 +230,8 @@ export default function CecabankPayment({
 
   const startPaymentStatusPolling = (statusUrl: string) => {
     let attempts = 0;
-    const maxAttempts = 30;
-    const intervalMs = 3000;
+    const maxAttempts = 60;
+    const intervalMs = 1500;
 
     const poll = async () => {
       if (paymentHandledRef.current) return;
@@ -347,6 +347,72 @@ export default function CecabankPayment({
             onNavigationStateChange={handleNavigationChange}
             onShouldStartLoadWithRequest={handleShouldStartLoad}
             onLoadEnd={handleLoadEnd}
+            injectedJavaScript={`
+              (function() {
+                var handled = false;
+                var checkPage = function() {
+                  if (handled) return;
+                  var url = window.location.href.toLowerCase();
+                  var pageText = document.body ? document.body.innerText.toLowerCase() : '';
+                  
+                  // Detectar página de éxito de Ibercaja/Cecabank
+                  var isSuccessText = pageText.includes('pago exitoso') ||
+                    pageText.includes('operación realizada') ||
+                    pageText.includes('operacion realizada') ||
+                    pageText.includes('pago realizado') ||
+                    pageText.includes('pago correcto') ||
+                    pageText.includes('transacción aprobada') ||
+                    pageText.includes('transaccion aprobada') ||
+                    pageText.includes('operación autorizada') ||
+                    pageText.includes('operacion autorizada') ||
+                    pageText.includes('compra realizada') ||
+                    pageText.includes('payment successful') ||
+                    pageText.includes('return to merchant') ||
+                    pageText.includes('volver al comercio') ||
+                    pageText.includes('regresar al comercio') ||
+                    pageText.includes('autorizada');
+
+                  if (isSuccessText) {
+                    
+                    // Buscar y hacer clic en botón "Volver al comercio"
+                    var buttons = document.querySelectorAll('a, button, input[type="submit"], input[type="button"]');
+                    for (var i = 0; i < buttons.length; i++) {
+                      var btn = buttons[i];
+                      var text = (btn.innerText || btn.value || '').toLowerCase();
+                      if (text.includes('volver') || text.includes('comercio') || text.includes('continuar') || text.includes('aceptar')) {
+                        console.log('Clicking button:', text);
+                        btn.click();
+                        break;
+                      }
+                    }
+                    
+                    // Notificar éxito inmediatamente
+                    handled = true;
+                    window.ReactNativeWebView.postMessage(JSON.stringify({type: 'PAYMENT_SUCCESS', url: url, source: 'page_detection'}));
+                    return;
+                  }
+                  
+                  // Detectar URL de éxito
+                  if (url.includes('/api/cecabank/ok') || url.includes('pago_exitoso') || url.includes('payment_success')) {
+                    handled = true;
+                    window.ReactNativeWebView.postMessage(JSON.stringify({type: 'PAYMENT_SUCCESS', url: url, source: 'url_detection'}));
+                    return;
+                  }
+                  
+                  // Detectar error
+                  if (url.includes('/api/cecabank/ko') || pageText.includes('pago rechazado') || pageText.includes('pago cancelado') || pageText.includes('error en el pago')) {
+                    handled = true;
+                    window.ReactNativeWebView.postMessage(JSON.stringify({type: 'PAYMENT_ERROR', url: url}));
+                    return;
+                  }
+                };
+                
+                // Verificar inmediatamente y cada 500ms
+                setTimeout(checkPage, 500);
+                setInterval(checkPage, 1000);
+              })();
+              true;
+            `}
             originWhitelist={['*']}
           />
         </View>

@@ -3,13 +3,16 @@
  * NOTA: Valores sensibles se configuran vía variables de entorno.
  */
 
+const CECABANK_API_URL =
+  process.env.EXPO_PUBLIC_CECABANK_API_URL || 'https://academia-backend-s9np.onrender.com';
+
 export const CECABANK_CONFIG = {
   // Backend en Render
-  apiUrl: process.env.EXPO_PUBLIC_CECABANK_API_URL || 'https://academia-backend-s9np.onrender.com',
+  apiUrl: CECABANK_API_URL,
 
   // URLs OK/KO (configuradas en el backend)
-  urlOk: process.env.EXPO_PUBLIC_CECABANK_SUCCESS_URL || '',
-  urlKo: process.env.EXPO_PUBLIC_CECABANK_ERROR_URL || '',
+  urlOk: process.env.EXPO_PUBLIC_CECABANK_SUCCESS_URL || `${CECABANK_API_URL}/api/cecabank/ok`,
+  urlKo: process.env.EXPO_PUBLIC_CECABANK_ERROR_URL || `${CECABANK_API_URL}/api/cecabank/ko`,
 
   // Datos de comercio (solo lectura en frontend)
   merchantId: process.env.EXPO_PUBLIC_CECABANK_MERCHANT_ID || '',
@@ -23,13 +26,22 @@ export const CECABANK_CONFIG = {
 } as const;
 
 export const CECABANK_PRICES = {
-  MATRICULA_A1: 36,
-  MATRICULA_A2: 48,
-  MATRICULA_B1: 60,
-  MATRICULA_B2: 80,
-  MATRICULA_A1A2: 60,
-  MATRICULA_B1B2: 120,
-  FORMACION_PROFESIONAL: 10,
+  // PRECIOS TEMPORALES PARA PRUEBAS - RESTAURAR DESPUÉS
+  MATRICULA_A1: 0.01,
+  MATRICULA_A2: 0.01,
+  MATRICULA_B1: 0.01,
+  MATRICULA_B2: 0.01,
+  MATRICULA_A1A2: 0.01,
+  MATRICULA_B1B2: 0.01,
+  FORMACION_PROFESIONAL: 0.20,
+  // PRECIOS ORIGINALES:
+  // MATRICULA_A1: 36,
+  // MATRICULA_A2: 48,
+  // MATRICULA_B1: 60,
+  // MATRICULA_B2: 80,
+  // MATRICULA_A1A2: 60,
+  // MATRICULA_B1B2: 120,
+  // FORMACION_PROFESIONAL: 10,
 } as const;
 
 export type CecabankOperationType =

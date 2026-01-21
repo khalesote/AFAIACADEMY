@@ -700,7 +700,7 @@ export function HomeScreenContent() {
         <View style={styles.mainSchoolSection}>
           <TouchableOpacity
             style={styles.mainSchoolButton}
-            onPress={() => handleMenuPress(() => router.replace("/SchoolScreen"))}
+            onPress={() => handleMenuPress(() => router.push("/(tabs)/SchoolScreen"))}
             activeOpacity={0.8}
           >
             <LinearGradient
@@ -753,7 +753,7 @@ export function HomeScreenContent() {
             {/* Creador de CV */}
             <TouchableOpacity
               style={styles.categoryCard}
-              onPress={() => router.push("/(tabs)/CreadorCVProScreen")}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/CreadorCVProScreen"))}
             >
               <LinearGradient
                 colors={['#1a1a1a', '#000000']}
@@ -770,7 +770,7 @@ export function HomeScreenContent() {
             {/* Portal para el Empleo */}
             <TouchableOpacity
               style={styles.categoryCard}
-              onPress={() => Linking.openURL('https://consultoresdeformacion.portalemp.com/espacio-del-demandante.html')}
+              onPress={() => handleMenuPress(() => Linking.openURL('https://consultoresdeformacion.portalemp.com/espacio-del-demandante.html'))}
             >
               <LinearGradient
                 colors={['#1a1a1a', '#000000']}

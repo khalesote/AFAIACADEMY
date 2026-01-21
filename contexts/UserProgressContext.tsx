@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { firestore, auth } from '../config/firebase';
 
 type LevelKey = 'A1' | 'A2' | 'B1' | 'B2';
 
@@ -16,16 +19,19 @@ type UserProgress = Record<LevelKey, LevelProgress>;
 type UserProgressContextType = {
   progress: UserProgress;
   isLoading: boolean;
-  unlockLevel: (level: LevelKey) => void;
+  unlockLevel: (level: LevelKey) => Promise<void>;
   markUnitCompleted: (level: LevelKey, unitIndex: number) => Promise<void>;
-  markOralPassed: (level: LevelKey) => void;
-  markWrittenPassed: (level: LevelKey) => void;
+  markOralPassed: (level: LevelKey) => Promise<void>;
+  markWrittenPassed: (level: LevelKey) => Promise<void>;
   resetLevel: (level: LevelKey) => Promise<void>;
   resetAll: () => void;
   reloadProgress: () => Promise<void>;
 };
 
 const USER_PROGRESS_KEY = 'userProgress_v2';
+
+const getProgressStorageKey = (userId?: string | null) =>
+  userId ? `${USER_PROGRESS_KEY}_${userId}` : `${USER_PROGRESS_KEY}_guest`;
 
 const LEVEL_CONFIG: Record<LevelKey, { units: number }> = {
   A1: { units: 7 },
@@ -90,71 +96,141 @@ const UserProgressContext = createContext<UserProgressContextType | undefined>(u
 export const UserProgressProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [progress, setProgress] = useState<UserProgress>(createDefaultProgress());
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  const loadProgress = useCallback(async () => {
+  const loadProgressFromFirebase = useCallback(async (userId: string): Promise<UserProgress | null> => {
     try {
-      const stored = await AsyncStorage.getItem(USER_PROGRESS_KEY);
-      console.log('📂 Cargando progreso desde AsyncStorage');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        console.log('📂 Datos almacenados encontrados:', parsed);
-        const normalized = normalizeProgress(parsed);
-        console.log('📂 Datos normalizados:', normalized);
-        setProgress(normalized);
-        return normalized;
-      } else {
-        console.log('📂 No hay datos almacenados, usando progreso por defecto');
-        const defaultProgress = createDefaultProgress();
-        setProgress(defaultProgress);
-        return defaultProgress;
+      if (!firestore) return null;
+      const docRef = doc(firestore, 'userProgress', userId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        console.log('☁️ Progreso cargado desde Firebase para usuario:', userId);
+        return normalizeProgress(docSnap.data());
       }
+      return null;
     } catch (error) {
-      console.error('❌ Error al cargar el progreso:', error);
-      const defaultProgress = createDefaultProgress();
-      setProgress(defaultProgress);
-      return defaultProgress;
+      console.error('❌ Error cargando progreso desde Firebase:', error);
+      return null;
     }
   }, []);
 
-  useEffect(() => {
-    loadProgress().finally(() => {
+  const saveProgressToFirebase = useCallback(async (userId: string, progressData: UserProgress) => {
+    try {
+      if (!firestore) return;
+      const docRef = doc(firestore, 'userProgress', userId);
+      await setDoc(docRef, {
+        ...progressData,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+      console.log('☁️ Progreso guardado en Firebase para usuario:', userId);
+    } catch (error) {
+      console.error('❌ Error guardando progreso en Firebase:', error);
+    }
+  }, []);
+
+  const loadProgressFromLocal = useCallback(async (userId?: string | null): Promise<UserProgress> => {
+    try {
+      const storageKey = getProgressStorageKey(userId);
+      const stored = await AsyncStorage.getItem(storageKey);
+      if (stored) {
+        return normalizeProgress(JSON.parse(stored));
+      }
+    } catch (error) {
+      console.error('❌ Error cargando progreso local:', error);
+    }
+    return createDefaultProgress();
+  }, []);
+
+  const saveProgressToLocal = useCallback(async (progressData: UserProgress, userId?: string | null) => {
+    try {
+      const storageKey = getProgressStorageKey(userId);
+      await AsyncStorage.setItem(storageKey, JSON.stringify(progressData));
+      console.log('💾 Progreso guardado en AsyncStorage:', storageKey);
+    } catch (error) {
+      console.error('❌ Error guardando progreso local:', error);
+    }
+  }, []);
+
+  const loadProgress = useCallback(async () => {
+    setIsLoading(true);
+    const user = auth.currentUser;
+    
+    if (user) {
+      setCurrentUserId(user.uid);
+      console.log('👤 Usuario autenticado:', user.uid);
+      
+      const firebaseProgress = await loadProgressFromFirebase(user.uid);
+      if (firebaseProgress) {
+        setProgress(firebaseProgress);
+        await saveProgressToLocal(firebaseProgress, user.uid);
+        setIsLoading(false);
+        return firebaseProgress;
+      }
+      
+      const localProgress = await loadProgressFromLocal(user.uid);
+      if (localProgress.A1.unlocked || localProgress.A2.unlocked || localProgress.B1.unlocked || localProgress.B2.unlocked) {
+        await saveProgressToFirebase(user.uid, localProgress);
+      }
+      setProgress(localProgress);
       setIsLoading(false);
+      return localProgress;
+    } else {
+      setCurrentUserId(null);
+      console.log('👤 Usuario no autenticado, usando progreso local');
+      const localProgress = await loadProgressFromLocal(null);
+      setProgress(localProgress);
+      setIsLoading(false);
+      return localProgress;
+    }
+  }, [loadProgressFromFirebase, loadProgressFromLocal, saveProgressToFirebase, saveProgressToLocal]);
+
+  useEffect(() => {
+    loadProgress();
+
+    const unsubscribe = auth.onAuthStateChanged((user: typeof auth.currentUser) => {
+      if (user?.uid !== currentUserId) {
+        console.log('🔄 Cambio de usuario detectado, recargando progreso...');
+        loadProgress();
+      }
     });
-  }, [loadProgress]);
+
+    return () => unsubscribe();
+  }, []);
 
   const reloadProgress = useCallback(async () => {
     await loadProgress();
   }, [loadProgress]);
 
   const persistProgress = useCallback(async (nextState: UserProgress) => {
-    try {
-      await AsyncStorage.setItem(USER_PROGRESS_KEY, JSON.stringify(nextState));
-      console.log('💾 Progreso persistido en AsyncStorage');
-    } catch (error) {
-      console.error('❌ Error al persistir el progreso:', error);
+    const currentUser = auth.currentUser;
+    await saveProgressToLocal(nextState, currentUser?.uid ?? null);
+    
+    if (currentUser) {
+      await saveProgressToFirebase(currentUser.uid, nextState);
     }
-  }, []);
+  }, [saveProgressToLocal, saveProgressToFirebase]);
 
-  // NO guardar automáticamente aquí porque markUnitCompleted ya guarda directamente
-  // Esto evitaba condiciones de carrera donde el useEffect guardaba un estado viejo
-
-  const applyLevelUpdate = useCallback((level: LevelKey, updater: (prev: LevelProgress) => LevelProgress) => {
-    setProgress((prev) => {
-      const current = ensureLevelShape(prev[level], LEVEL_CONFIG[level].units);
-      const updated = ensureLevelShape(updater(current), LEVEL_CONFIG[level].units);
-      const nextLevel = LEVEL_ADVANCEMENTS[level];
-      const nextState: UserProgress = {
-        ...prev,
-        [level]: updated,
-        ...(nextLevel && updated.diplomaReady ? { [nextLevel]: { ...prev[nextLevel], unlocked: true } } : {})
-      };
-      persistProgress(nextState);
-      return nextState;
+  const applyLevelUpdate = useCallback(async (level: LevelKey, updater: (prev: LevelProgress) => LevelProgress) => {
+    return new Promise<void>((resolve) => {
+      setProgress((prev) => {
+        const current = ensureLevelShape(prev[level], LEVEL_CONFIG[level].units);
+        const updated = ensureLevelShape(updater(current), LEVEL_CONFIG[level].units);
+        const nextLevel = LEVEL_ADVANCEMENTS[level];
+        const nextState: UserProgress = {
+          ...prev,
+          [level]: updated,
+          ...(nextLevel && updated.diplomaReady ? { [nextLevel]: { ...prev[nextLevel], unlocked: true } } : {})
+        };
+        
+        persistProgress(nextState).then(() => resolve());
+        return nextState;
+      });
     });
   }, [persistProgress]);
 
-  const unlockLevel = useCallback((level: LevelKey) => {
-    applyLevelUpdate(level, (prevLevel) => ({
+  const unlockLevel = useCallback(async (level: LevelKey) => {
+    console.log(`🔓 Desbloqueando nivel ${level}`);
+    await applyLevelUpdate(level, (prevLevel) => ({
       ...prevLevel,
       unlocked: true
     }));
@@ -168,60 +244,26 @@ export const UserProgressProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
     console.log(`✅ Marcando unidad ${unitIndex} como completada en nivel ${level}`);
     
-    return new Promise<void>((resolve) => {
-      setProgress((prev) => {
-        const current = ensureLevelShape(prev[level], LEVEL_CONFIG[level].units);
-        const nextUnits = [...current.unitsCompleted];
-        nextUnits[unitIndex] = true;
-        const updated = {
-          ...current,
-          unitsCompleted: nextUnits
-        };
-        const nextState: UserProgress = {
-          ...prev,
-          [level]: ensureLevelShape(updated, LEVEL_CONFIG[level].units)
-        };
-        
-        console.log(`✅ Estado actualizado: unidades completadas para ${level}:`, nextUnits);
-        console.log(`📊 Estado completo guardado:`, JSON.stringify(nextState));
-        
-        // Guardar inmediatamente en AsyncStorage
-        AsyncStorage.setItem(USER_PROGRESS_KEY, JSON.stringify(nextState))
-          .then(async () => {
-            console.log(`💾 Progreso guardado en AsyncStorage para ${level}`);
-            // Verificar que se guardó correctamente
-            const verify = await AsyncStorage.getItem(USER_PROGRESS_KEY);
-            if (verify) {
-              const parsed = JSON.parse(verify);
-              console.log(`✅ Verificación: Datos guardados correctamente:`, parsed[level]?.unitsCompleted);
-              // Recargar desde AsyncStorage para asegurar sincronización completa
-              // Esto asegura que el estado en memoria esté sincronizado con AsyncStorage
-              loadProgress().then(() => {
-                console.log(`🔄 Progreso recargado desde AsyncStorage después del guardado`);
-              });
-            }
-            resolve();
-          })
-          .catch((error) => {
-            console.error('❌ Error al guardar progreso:', error);
-            resolve();
-          });
-        
-        return nextState;
-      });
+    await applyLevelUpdate(level, (prevLevel) => {
+      const nextUnits = [...prevLevel.unitsCompleted];
+      nextUnits[unitIndex] = true;
+      return {
+        ...prevLevel,
+        unitsCompleted: nextUnits
+      };
     });
-  }, [loadProgress]);
+  }, [applyLevelUpdate]);
 
-  const markOralPassed = useCallback((level: LevelKey) => {
-    applyLevelUpdate(level, (prevLevel) => ({
+  const markOralPassed = useCallback(async (level: LevelKey) => {
+    await applyLevelUpdate(level, (prevLevel) => ({
       ...prevLevel,
       oralPassed: true,
       diplomaReady: prevLevel.writtenPassed || prevLevel.diplomaReady
     }));
   }, [applyLevelUpdate]);
 
-  const markWrittenPassed = useCallback((level: LevelKey) => {
-    applyLevelUpdate(level, (prevLevel) => ({
+  const markWrittenPassed = useCallback(async (level: LevelKey) => {
+    await applyLevelUpdate(level, (prevLevel) => ({
       ...prevLevel,
       writtenPassed: true,
       diplomaReady: prevLevel.oralPassed || prevLevel.diplomaReady
@@ -229,34 +271,26 @@ export const UserProgressProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [applyLevelUpdate]);
 
   const resetLevel = useCallback(async (level: LevelKey) => {
-    const resetProgress = createLevelProgress(LEVEL_CONFIG[level].units);
+    const resetProgressData = createLevelProgress(LEVEL_CONFIG[level].units);
     
     return new Promise<void>((resolve) => {
       setProgress((prev) => {
         const nextState: UserProgress = {
           ...prev,
-          [level]: resetProgress
+          [level]: resetProgressData
         };
         
-        // Guardar en AsyncStorage
-        AsyncStorage.setItem(USER_PROGRESS_KEY, JSON.stringify(nextState))
-          .then(() => {
-            console.log(`💾 Progreso de ${level} reseteado y guardado en AsyncStorage`);
-            resolve();
-          })
-          .catch((error) => {
-            console.error(`❌ Error al guardar progreso reseteado de ${level}:`, error);
-            resolve();
-          });
-        
+        persistProgress(nextState).then(() => resolve());
         return nextState;
       });
     });
-  }, []);
+  }, [persistProgress]);
 
   const resetAll = useCallback(() => {
-    setProgress(createDefaultProgress());
-  }, []);
+    const defaultProgress = createDefaultProgress();
+    setProgress(defaultProgress);
+    persistProgress(defaultProgress);
+  }, [persistProgress]);
 
   const value = useMemo<UserProgressContextType>(() => ({
     progress,
@@ -272,7 +306,12 @@ export const UserProgressProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   return (
     <UserProgressContext.Provider value={value}>
-      {!isLoading ? children : null}
+      {children}
+      {isLoading ? (
+        <View style={{ ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255, 255, 255, 0.6)' }}>
+          <ActivityIndicator size="large" color="#9DC3AA" />
+        </View>
+      ) : null}
     </UserProgressContext.Provider>
   );
 };

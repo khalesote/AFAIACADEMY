@@ -1,8 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { firestore } from '../config/firebase';
+import { firestore, auth } from '../config/firebase';
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, deleteDoc, writeBatch } from 'firebase/firestore';
-import * as Application from 'expo-application';
-import { Platform } from 'react-native';
+
+/**
+ * Obtiene el userId del usuario autenticado
+ * @returns userId o null si no hay usuario autenticado
+ */
+function getCurrentUserId(): string | null {
+  return auth.currentUser?.uid || null;
+}
 
 const ACCESS_CODES_KEY = 'access_codes_valid';
 const USED_CODES_KEY = 'access_codes_used';
@@ -10,65 +16,17 @@ const FIRESTORE_COLLECTION = 'access_codes_used';
 const FIRESTORE_VALID_CODES_COLLECTION = 'access_codes_valid';
 
 /**
- * Obtiene el ID único del dispositivo
- * Usa una combinación de identificadores del dispositivo para crear un ID único
- */
-async function getDeviceId(): Promise<string> {
-  try {
-    // Intentar obtener ID nativo del dispositivo
-    let nativeId: string | null = null;
-    
-    if (Platform.OS === 'android') {
-      try {
-        nativeId = Application.getAndroidId();
-      } catch (e) {
-        console.warn('No se pudo obtener Android ID:', e);
-      }
-    } else if (Platform.OS === 'ios') {
-      try {
-        nativeId = await Application.getIosIdForVendorAsync();
-      } catch (e) {
-        console.warn('No se pudo obtener iOS ID:', e);
-      }
-    }
-    
-    // Si tenemos un ID nativo, usarlo
-    if (nativeId) {
-      // Guardarlo en AsyncStorage para persistencia
-      await AsyncStorage.setItem('device_id', nativeId);
-      return nativeId;
-    }
-  } catch (error) {
-    console.warn('Error obteniendo ID nativo del dispositivo:', error);
-  }
-  
-  // Fallback: usar un ID generado y guardado en AsyncStorage
-  try {
-    let deviceId = await AsyncStorage.getItem('device_id');
-    if (!deviceId) {
-      // Generar un ID único basado en timestamp y random
-      deviceId = `device_${Platform.OS}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      await AsyncStorage.setItem('device_id', deviceId);
-    }
-    return deviceId;
-  } catch (error) {
-    console.error('Error obteniendo ID del dispositivo:', error);
-    // Último fallback: generar un ID temporal
-    return `device_${Platform.OS}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-}
-
-/**
  * Estructura para códigos de acceso de la escuela virtual
- * Cada código está vinculado a UN SOLO documento, usuario, dispositivo y nivel
+ * Cada código está vinculado a UN SOLO usuario (cuenta Firebase) y nivel
+ * IMPORTANTE: El progreso se vincula a la cuenta del usuario, no al dispositivo
  */
 interface AccessCodeInfo {
   code: string;
-  level: 'A1' | 'A2' | 'B1' | 'B2' | 'ALL'; // Nivel al que da acceso el código
-  used: boolean; // Si ya ha sido usado
+  level: 'A1' | 'A2' | 'B1' | 'B2' | 'ALL';
+  used: boolean;
   usedBy?: {
     documento: string;
-    deviceId: string;
+    userId: string;
     usedAt: Date;
   };
 }
@@ -156,46 +114,6 @@ const VALID_FORMACION_CODES = [
 ];
 
 /**
- * Lista de códigos de acceso válidos para examen de nacionalidad
- * IMPORTANTE: Cada código está vinculado a UN SOLO documento, usuario y dispositivo
- * Total: 30 códigos para examen de nacionalidad CCSE
- */
-const VALID_EXAMEN_NACIONALIDAD_CODES = [
-  'EXAMEN2024-001',
-  'EXAMEN2024-002',
-  'EXAMEN2024-003',
-  'EXAMEN2024-004',
-  'EXAMEN2024-005',
-  'EXAMEN2024-006',
-  'EXAMEN2024-007',
-  'EXAMEN2024-008',
-  'EXAMEN2024-009',
-  'EXAMEN2024-010',
-  'EXAMEN2024-011',
-  'EXAMEN2024-012',
-  'EXAMEN2024-013',
-  'EXAMEN2024-014',
-  'EXAMEN2024-015',
-  'EXAMEN2024-016',
-  'EXAMEN2024-017',
-  'EXAMEN2024-018',
-  'EXAMEN2024-019',
-  'EXAMEN2024-020',
-  'EXAMEN2024-021',
-  'EXAMEN2024-022',
-  'EXAMEN2024-023',
-  'EXAMEN2024-024',
-  'EXAMEN2024-025',
-  'EXAMEN2024-026',
-  'EXAMEN2024-027',
-  'EXAMEN2024-028',
-  'EXAMEN2024-029',
-  'EXAMEN2024-030',
-  // Código especial para pruebas
-  'TEST-EXAMEN-2024',
-];
-
-/**
  * RESETEA todos los códigos usados (solo para administración)
  * Elimina todos los registros de códigos usados en Firebase y AsyncStorage
  */
@@ -278,10 +196,11 @@ async function getValidAccessCodes(): Promise<AccessCodeInfo[]> {
 
 /**
  * Obtiene información de un código usado desde Firebase
+ * Ahora verifica por userId (cuenta de usuario) en lugar de deviceId
  */
 async function getCodeUsageInfo(code: string): Promise<{
   documento: string;
-  deviceId: string;
+  userId: string;
   usadoEn: any;
 } | null> {
   if (!firestore) {
@@ -297,12 +216,12 @@ async function getCodeUsageInfo(code: string): Promise<{
       const data = codeDoc.data();
       console.log(`✅ Código ${code} encontrado en Firebase:`, {
         documento: data.documento || 'sin documento',
-        deviceId: data.deviceId || 'sin deviceId',
+        userId: data.userId || data.usedBy?.userId || 'sin userId',
         usadoEn: data.usadoEn ? 'sí' : 'no'
       });
       return {
         documento: data.documento || '',
-        deviceId: data.deviceId || '',
+        userId: data.userId || data.usedBy?.userId || '',
         usadoEn: data.usadoEn || null
       };
     }
@@ -315,7 +234,6 @@ async function getCodeUsageInfo(code: string): Promise<{
       code: error?.code,
       stack: error?.stack
     });
-    // Si hay un error de Firebase, intentar usar AsyncStorage como fallback
     try {
       const usedCodes = await getUsedAccessCodes();
       if (usedCodes[code]) {
@@ -323,7 +241,7 @@ async function getCodeUsageInfo(code: string): Promise<{
         console.log(`⚠️ Usando información local del código ${code} (Firebase no disponible)`);
         return {
           documento: localInfo.documento || '',
-          deviceId: localInfo.deviceId || '',
+          userId: localInfo.userId || localInfo.usedBy?.userId || '',
           usadoEn: localInfo.timestamp ? new Date(localInfo.timestamp) : null
         };
       }
@@ -337,7 +255,8 @@ async function getCodeUsageInfo(code: string): Promise<{
 /**
  * Valida un código de acceso para un nivel específico
  * Verifica que el código sea válido, que no haya sido usado y que sea para el nivel correcto
- * IMPORTANTE: Cada código solo se puede usar UNA VEZ, en UN SOLO DISPOSITIVO y para UN SOLO NIVEL
+ * IMPORTANTE: Cada código solo se puede usar UNA VEZ, por UN SOLO USUARIO (cuenta Firebase) y para UN SOLO NIVEL
+ * El código queda vinculado a la cuenta del usuario, permitiendo acceso desde cualquier dispositivo
  * @param code - El código a validar
  * @param level - El nivel para el que se está validando el código
  * @param documento - El documento del usuario (opcional)
@@ -354,21 +273,24 @@ export async function validateAccessCode(
 }> {
   try {
     const normalizedCode = code.trim().toUpperCase();
-    const deviceId = await getDeviceId();
+    const currentUserId = getCurrentUserId();
     
-    // Obtener información del código desde Firebase (fuente de verdad)
+    if (!currentUserId) {
+      return {
+        valid: false,
+        message: 'Debes iniciar sesión para usar un código de acceso.'
+      };
+    }
+    
     const codeUsageInfo = await getCodeUsageInfo(normalizedCode);
     
-    // Intentar obtener código válido desde Firebase (producción)
     let codeInfo = await getValidAccessCodeFromFirestore(normalizedCode);
     
-    // Fallback: lista local
     if (!codeInfo) {
       const validCodes = await getValidAccessCodes();
       codeInfo = validCodes.find(c => c.code === normalizedCode) || null;
     }
     
-    // Verificar si el código existe
     if (!codeInfo) {
       return {
         valid: false,
@@ -376,7 +298,6 @@ export async function validateAccessCode(
       };
     }
     
-    // Verificar que el código sea para el nivel solicitado o para todos los niveles
     if (codeInfo.level !== level && codeInfo.level !== 'ALL') {
       return {
         valid: false,
@@ -385,20 +306,15 @@ export async function validateAccessCode(
       };
     }
     
-    // Si el código ya fue usado, verificar restricciones
     if (codeUsageInfo) {
-      // El código ya fue usado - verificar dispositivo y nivel
-      if (codeUsageInfo.deviceId !== deviceId) {
-        // Diferente dispositivo - rechazar
+      if (codeUsageInfo.userId !== currentUserId) {
         return {
           valid: false,
-          message: 'Este código ya ha sido utilizado en otro dispositivo.',
+          message: 'Este código ya ha sido utilizado por otro usuario.',
           codeInfo
         };
       }
       
-      // Mismo dispositivo - verificar si se está intentando usar para el mismo nivel
-      // Obtener el nivel usado desde Firebase
       if (firestore) {
         try {
           const codeDocRef = doc(firestore, FIRESTORE_COLLECTION, normalizedCode);
@@ -408,7 +324,6 @@ export async function validateAccessCode(
             const data = codeDoc.data();
             const usedLevel = data.usedLevel || data.level;
             
-            // Si el código ya fue usado para un nivel específico, solo permitir ese nivel
             if (usedLevel && usedLevel !== 'ALL' && usedLevel !== level) {
               return {
                 valid: false,
@@ -417,11 +332,10 @@ export async function validateAccessCode(
               };
             }
             
-            // Si es el mismo nivel o es código ALL, permitir (ya está activado)
             if (usedLevel === level || usedLevel === 'ALL' || codeInfo.level === 'ALL') {
               return {
                 valid: true,
-                message: 'Código ya activado en este dispositivo para este nivel.',
+                message: 'Código ya activado para tu cuenta en este nivel.',
                 codeInfo
               };
             }
@@ -432,7 +346,6 @@ export async function validateAccessCode(
       }
     }
     
-    // Si llegamos aquí, el código es válido y no ha sido usado
     return {
       valid: true,
       message: 'Código válido.',
@@ -454,7 +367,7 @@ export async function validateAccessCode(
 
 /**
  * Marca un código como usado para un nivel específico
- * IMPORTANTE: Cada código solo se puede usar UNA VEZ, en UN SOLO DISPOSITIVO y para UN SOLO NIVEL
+ * IMPORTANTE: Cada código solo se puede usar UNA VEZ, por UN SOLO USUARIO (cuenta Firebase) y para UN SOLO NIVEL
  * Guarda en Firebase (global) y en AsyncStorage (cache local)
  * @param code - El código usado
  * @param level - El nivel específico para el que se usa el código (A1, A2, B1, B2)
@@ -467,8 +380,12 @@ export async function markAccessCodeAsUsed(
 ): Promise<void> {
   try {
     const normalizedCode = code.trim().toUpperCase();
-    const deviceId = await getDeviceId();
+    const currentUserId = getCurrentUserId();
     const now = new Date();
+    
+    if (!currentUserId) {
+      throw new Error('Debes iniciar sesión para usar un código de acceso');
+    }
     
     // Obtener códigos válidos para actualizar el estado local
     const validCodes = await getValidAccessCodes();
@@ -497,10 +414,11 @@ export async function markAccessCodeAsUsed(
           // El código ya existe - verificar restricciones
           const data = codeDoc.data();
           const usedLevel = data.usedLevel || data.level; // Nivel específico para el que se usó
+          const storedUserId = data.userId || data.usedBy?.userId;
           
-          // Verificar dispositivo
-          if (data.deviceId !== deviceId) {
-            throw new Error('Este código de acceso ya ha sido utilizado en otro dispositivo');
+          // Verificar usuario
+          if (storedUserId && storedUserId !== currentUserId) {
+            throw new Error('Este código de acceso ya ha sido utilizado por otro usuario');
           }
           
           // Verificar nivel - si ya fue usado para un nivel específico, no permitir otro nivel
@@ -510,7 +428,7 @@ export async function markAccessCodeAsUsed(
           
           // Si es el mismo nivel o código ALL, ya está registrado
           if (usedLevel === level || usedLevel === 'ALL' || codeInfo.level === 'ALL') {
-            console.log(`✅ Código ${normalizedCode} ya estaba marcado para este dispositivo y nivel`);
+            console.log(`✅ Código ${normalizedCode} ya estaba marcado para este usuario y nivel`);
             return; // Ya está registrado, no hacer nada
           }
         }
@@ -524,15 +442,16 @@ export async function markAccessCodeAsUsed(
           level: codeInfo.level, // Nivel original del código
           usedLevel: levelToStore, // Nivel específico para el que se usa
           used: true,
+          userId: currentUserId, // Guardar userId a nivel de documento
           usedBy: {
             documento: documento || '',
-            deviceId,
+            userId: currentUserId,
             usedAt: serverTimestamp()
           },
           createdAt: serverTimestamp()
         }, { merge: true });
         
-        console.log(`✅ Código ${normalizedCode} marcado como usado en Firebase para nivel ${levelToStore}`);
+        console.log(`✅ Código ${normalizedCode} marcado como usado en Firebase para nivel ${levelToStore} por usuario ${currentUserId}`);
         
       } catch (firebaseError: any) {
         // Si es un error de permisos
@@ -556,7 +475,7 @@ export async function markAccessCodeAsUsed(
     const levelToStore = codeInfo.level === 'ALL' ? level : codeInfo.level;
     codeInfo.usedBy = {
       documento: documento || '',
-      deviceId,
+      userId: currentUserId,
       usedAt: now
     };
     
@@ -568,9 +487,10 @@ export async function markAccessCodeAsUsed(
         level: codeInfo.level,
         usedLevel: levelToStore, // Nivel específico usado
         used: true,
+        userId: currentUserId,
         usedBy: {
           documento: documento || '',
-          deviceId,
+          userId: currentUserId,
           usedAt: now.toISOString()
         }
       });
@@ -740,10 +660,8 @@ export async function validateFormacionCode(code: string, documento: string): Pr
   message: string;
 }> {
   try {
-    // Normalizar el código (mayúsculas, sin espacios)
     const normalizedCode = code.trim().toUpperCase();
 
-    // Verificar que el código no esté vacío
     if (!normalizedCode) {
       return {
         valid: false,
@@ -751,10 +669,8 @@ export async function validateFormacionCode(code: string, documento: string): Pr
       };
     }
 
-    // Obtener códigos válidos de formación profesional
     const validCodes = await getValidFormacionCodes();
 
-    // Verificar si el código es válido
     if (!validCodes.includes(normalizedCode)) {
       return {
         valid: false,
@@ -762,39 +678,31 @@ export async function validateFormacionCode(code: string, documento: string): Pr
       };
     }
 
-    // Obtener ID del dispositivo actual
-    const currentDeviceId = await getDeviceId();
+    const currentUserId = getCurrentUserId();
+    
+    if (!currentUserId) {
+      return {
+        valid: false,
+        message: 'Debes iniciar sesión para usar un código de acceso'
+      };
+    }
 
-    // Verificar en Firebase si el código ya ha sido usado
     const codeInfo = await getCodeUsageInfo(normalizedCode);
     
     if (codeInfo) {
-      // El código ya fue usado
-      // Verificar si es el mismo documento Y el mismo dispositivo
-      if (codeInfo.documento === documento && codeInfo.deviceId === currentDeviceId) {
-        // Mismo usuario, mismo dispositivo - permitir (ya lo usó antes)
+      if (codeInfo.userId === currentUserId) {
         return {
           valid: true,
           message: 'Código válido'
         };
       } else {
-        // Diferente documento o dispositivo - rechazar
-        if (codeInfo.documento !== documento) {
-          return {
-            valid: false,
-            message: 'Este código de acceso ya ha sido utilizado por otro usuario con otro documento'
-          };
-        }
-        if (codeInfo.deviceId !== currentDeviceId) {
-          return {
-            valid: false,
-            message: 'Este código de acceso ya ha sido utilizado en otro dispositivo'
-          };
-        }
+        return {
+          valid: false,
+          message: 'Este código de acceso ya ha sido utilizado por otro usuario'
+        };
       }
     }
 
-    // El código es válido y no ha sido usado (o fue usado por el mismo usuario en el mismo dispositivo)
     return {
       valid: true,
       message: 'Código válido'
@@ -814,152 +722,5 @@ export async function validateFormacionCode(code: string, documento: string): Pr
  * @param documento - El documento del usuario
  */
 export async function markFormacionCodeAsUsed(code: string, documento: string): Promise<void> {
-  // Reutilizar la función que marca códigos normales con nivel 'ALL'
-  // ya que los códigos de formación profesional no están asociados a un nivel específico
   return markAccessCodeAsUsed(code, 'ALL', documento);
-}
-
-/**
- * Obtiene la lista de códigos válidos para examen de nacionalidad
- */
-export async function getValidExamenNacionalidadCodes(): Promise<string[]> {
-  try {
-    const stored = await AsyncStorage.getItem('examen_nacionalidad_codes_valid');
-    if (stored) {
-      return JSON.parse(stored);
-    }
-    // Inicializar con los códigos por defecto
-    await AsyncStorage.setItem('examen_nacionalidad_codes_valid', JSON.stringify(VALID_EXAMEN_NACIONALIDAD_CODES));
-    return VALID_EXAMEN_NACIONALIDAD_CODES;
-  } catch (error) {
-    console.error('Error obteniendo códigos de examen de nacionalidad:', error);
-    return VALID_EXAMEN_NACIONALIDAD_CODES;
-  }
-}
-
-/**
- * Valida un código de acceso para examen de nacionalidad
- * @param code - El código a validar
- * @param documento - El documento del usuario (opcional para códigos de prueba)
- */
-export async function validateExamenNacionalidadCode(code: string, documento?: string): Promise<{
-  valid: boolean;
-  message: string;
-}> {
-  try {
-    // Normalizar el código (mayúsculas, sin espacios)
-    const normalizedCode = code.trim().toUpperCase();
-
-    // Verificar que el código no esté vacío
-    if (!normalizedCode) {
-      return {
-        valid: false,
-        message: 'Por favor, introduce un código de acceso'
-      };
-    }
-
-    // Obtener códigos válidos de examen de nacionalidad
-    const validCodes = await getValidExamenNacionalidadCodes();
-
-    // Verificar si el código es válido
-    if (!validCodes.includes(normalizedCode)) {
-      return {
-        valid: false,
-        message: 'El código de acceso no es válido'
-      };
-    }
-
-    // Si es un código de prueba (TEST-EXAMEN-2024), permitir sin documento
-    if (normalizedCode === 'TEST-EXAMEN-2024') {
-      return {
-        valid: true,
-        message: 'Código válido (prueba)'
-      };
-    }
-
-    // Para códigos normales, verificar documento y dispositivo
-    if (!documento) {
-      return {
-        valid: false,
-        message: 'Se requiere documento de identidad para este código'
-      };
-    }
-
-    // Obtener ID del dispositivo actual
-    const currentDeviceId = await getDeviceId();
-
-    // Verificar en Firebase si el código ya ha sido usado
-    const codeInfo = await getCodeUsageInfo(normalizedCode);
-    
-    if (codeInfo) {
-      // El código ya fue usado
-      // Verificar si es el mismo documento Y el mismo dispositivo
-      if (codeInfo.documento === documento && codeInfo.deviceId === currentDeviceId) {
-        // Mismo usuario, mismo dispositivo - permitir (ya lo usó antes)
-        return {
-          valid: true,
-          message: 'Código válido'
-        };
-      } else {
-        // Diferente documento o dispositivo - rechazar
-        if (codeInfo.documento !== documento) {
-          return {
-            valid: false,
-            message: 'Este código de acceso ya ha sido utilizado por otro usuario con otro documento'
-          };
-        }
-        if (codeInfo.deviceId !== currentDeviceId) {
-          return {
-            valid: false,
-            message: 'Este código de acceso ya ha sido utilizado en otro dispositivo'
-          };
-        }
-      }
-    }
-
-    // El código es válido y no ha sido usado (o fue usado por el mismo usuario en el mismo dispositivo)
-    return {
-      valid: true,
-      message: 'Código válido'
-    };
-  } catch (error) {
-    console.error('Error validando código de examen de nacionalidad:', error);
-    return {
-      valid: false,
-      message: 'Error al validar el código. Por favor, inténtalo de nuevo.'
-    };
-  }
-}
-
-/**
- * Marca un código de examen de nacionalidad como usado
- * @param code - El código usado
- * @param documento - El documento del usuario (opcional para códigos de prueba)
- */
-/**
- * Marca un código de examen de nacionalidad como usado
- * @param code - El código usado
- * @param documento - El documento del usuario (opcional para códigos de prueba)
- */
-export async function markExamenNacionalidadCodeAsUsed(code: string, documento?: string): Promise<void> {
-  try {
-    const normalizedCode = code.trim().toUpperCase();
-    
-    // Si es código de prueba, no requiere documento ni marca en Firebase
-    if (normalizedCode === 'TEST-EXAMEN-2024') {
-      console.log('✅ Código de prueba usado (no se marca en Firebase)');
-      return;
-    }
-
-    // Para códigos normales, usar la función estándar con nivel 'B1' como predeterminado
-    // ya que el examen de nacionalidad es equivalente a nivel B1
-    if (documento) {
-      return markAccessCodeAsUsed(normalizedCode, 'B1', documento);
-    } else {
-      throw new Error('Se requiere documento de identidad para marcar este código como usado');
-    }
-  } catch (error) {
-    console.error('Error marcando código de examen de nacionalidad:', error);
-    throw error;
-  }
 }

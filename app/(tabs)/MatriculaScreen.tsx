@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { 
   View,
   Text,
@@ -40,10 +40,11 @@ type EnrollmentLevel = 'A1' | 'A2' | 'B1' | 'B2';
 export default function MatriculaScreen() {
   const router = useRouter();
   const { progress, markUnitCompleted, unlockLevel, reloadProgress } = useUserProgress();
-  const { user: firebaseUser, isAuthenticated } = useUser();
+  const { firebaseUser, isAuthenticated } = useUser();
   const { level: selectedLevelParam } = useLocalSearchParams<{ level?: string }>();
   
   const [selectedLevel, setSelectedLevel] = useState<EnrollmentLevel>('A1');
+  const selectedLevelRef = useRef<EnrollmentLevel>('A1');
   const [formData, setFormData] = useState<FormData | null>(null);
   const [safeFormData, setSafeFormData] = useState<FormData>({
     nombre: '',
@@ -74,6 +75,18 @@ export default function MatriculaScreen() {
     initializeAccessCodes();
   }, [selectedLevelParam]);
 
+  useEffect(() => {
+    selectedLevelRef.current = selectedLevel;
+  }, [selectedLevel]);
+
+  const resolvePaymentLevel = (paymentInfo: any, fallback: EnrollmentLevel): EnrollmentLevel => {
+    const raw = String(paymentInfo?.levelUnlocked || paymentInfo?.level || paymentInfo?.nivelMatricula || '').toUpperCase();
+    if (raw === 'A1' || raw === 'A2' || raw === 'B1' || raw === 'B2') {
+      return raw as EnrollmentLevel;
+    }
+    return fallback;
+  };
+
   const loadFormData = async () => {
     try {
       const savedData = await AsyncStorage.getItem('matriculaFormData');
@@ -103,28 +116,30 @@ export default function MatriculaScreen() {
 
   const handlePaymentSuccess = async (paymentInfo: any) => {
     console.log('✅ [MatriculaScreen] Pago exitoso:', paymentInfo);
+    const resolvedLevel = resolvePaymentLevel(paymentInfo, selectedLevelRef.current);
     console.log('✅ [MatriculaScreen] Nivel seleccionado:', selectedLevel);
+    console.log('✅ [MatriculaScreen] Nivel confirmado:', resolvedLevel);
     
     try {
       setIsLoading(true);
       
       const userId = firebaseUser?.uid || null;
-      console.log('📝 [MatriculaScreen] Desbloqueando nivel:', selectedLevel, 'para usuario:', userId);
+      console.log('📝 [MatriculaScreen] Desbloqueando nivel:', resolvedLevel, 'para usuario:', userId);
       
       // Desbloquear el nivel seleccionado (esto persiste automáticamente en UserProgressContext)
-      await unlockLevel(selectedLevel);
+      await unlockLevel(resolvedLevel);
       await reloadProgress();
-      console.log('✅ [MatriculaScreen] unlockLevel ejecutado para:', selectedLevel);
+      console.log('✅ [MatriculaScreen] unlockLevel ejecutado para:', resolvedLevel);
       
       // Guardar matrícula en AsyncStorage con clave específica del usuario
-      const matriculaKey = userId ? `matricula_${selectedLevel}_completada_${userId}` : `matricula_${selectedLevel}_completada_guest`;
+      const matriculaKey = userId ? `matricula_${resolvedLevel}_completada_${userId}` : `matricula_${resolvedLevel}_completada_guest`;
       await AsyncStorage.setItem(matriculaKey, 'true');
       console.log('✅ [MatriculaScreen] Matrícula guardada en AsyncStorage:', matriculaKey);
       
       // Guardar información del pago en AsyncStorage
       await AsyncStorage.setItem('lastPayment', JSON.stringify({
         ...paymentInfo,
-        level: selectedLevel,
+        level: resolvedLevel,
         timestamp: new Date().toISOString()
       }));
 
@@ -134,10 +149,10 @@ export default function MatriculaScreen() {
           await UserService.updateUserProfile({
             matriculado: true,
             matriculado_escuela_virtual: true,
-            nivelMatricula: selectedLevel,
+            nivelMatricula: resolvedLevel,
             fechaMatricula: new Date().toISOString(),
             nivelesDesbloqueados: {
-              [selectedLevel]: true
+              [resolvedLevel]: true
             }
           });
           console.log('✅ [MatriculaScreen] Matrícula guardada en Firebase');
@@ -151,7 +166,7 @@ export default function MatriculaScreen() {
 
       Alert.alert(
         '✅ Matrícula Exitosa',
-        `¡Felicidades! Tu matrícula para ${selectedLevel} ha sido procesada correctamente.`,
+        `¡Felicidades! Tu matrícula para ${resolvedLevel} ha sido procesada correctamente.`,
         [
           {
             text: 'Ir a la Escuela Virtual',
@@ -161,7 +176,7 @@ export default function MatriculaScreen() {
                 pathname: '/(tabs)/SchoolScreen',
                 params: { 
                   refresh: Date.now(),
-                  matriculado: selectedLevel
+                  matriculado: resolvedLevel
                 }
               });
             }
