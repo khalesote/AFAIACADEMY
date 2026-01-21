@@ -130,14 +130,49 @@ app.use((req, res, next) => {
 app.get('/api/cecabank/ok', (req, res) => {
   try {
     console.log('✅ Cecabank OK recibido (GET)');
+    const Num_operacion = req.query.Num_operacion || req.query.num_operacion || '';
+    const Importe = req.query.Importe || req.query.importe || '';
+    const Descripcion = req.query.Descripcion || req.query.descripcion || '';
+    
+    // Detectar el nivel desde la descripción
+    let levelUnlocked = null;
+    const descripcionLower = (Descripcion || '').toLowerCase();
+    if (descripcionLower.includes('a1') || descripcionLower.includes('nivel a1')) {
+      levelUnlocked = 'A1';
+    } else if (descripcionLower.includes('a2') || descripcionLower.includes('nivel a2')) {
+      levelUnlocked = 'A2';
+    } else if (descripcionLower.includes('b1') || descripcionLower.includes('nivel b1')) {
+      levelUnlocked = 'B1';
+    } else if (descripcionLower.includes('b2') || descripcionLower.includes('nivel b2')) {
+      levelUnlocked = 'B2';
+    }
+    
     res.send(`
       <!DOCTYPE html>
       <html>
-      <head><meta charset="UTF-8"><title>Pago Confirmado</title></head>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pago Confirmado</title>
+      </head>
       <body style="font-family: Arial, sans-serif; text-align:center; padding: 40px;">
         <div style="font-size:48px;">✅</div>
         <h1>Pago Confirmado</h1>
         <p>Tu pago ha sido procesado correctamente. Puedes cerrar esta ventana y volver a la aplicación.</p>
+        <script>
+          try {
+            if (window.ReactNativeWebView) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'PAYMENT_SUCCESS',
+                orderId: '${Num_operacion}',
+                levelUnlocked: '${levelUnlocked || ''}',
+                importe: '${Importe}'
+              }));
+            }
+          } catch (e) {
+            console.error('Error enviando mensaje:', e);
+          }
+        </script>
       </body>
       </html>
     `);
@@ -150,14 +185,49 @@ app.get('/api/cecabank/ok', (req, res) => {
 app.post('/api/cecabank/ok', express.urlencoded({ extended: true }), (req, res) => {
   try {
     console.log('✅ Cecabank OK recibido');
+    const Num_operacion = req.body.Num_operacion || req.body.num_operacion || '';
+    const Importe = req.body.Importe || req.body.importe || '';
+    const Descripcion = req.body.Descripcion || req.body.descripcion || '';
+    
+    // Detectar el nivel desde la descripción
+    let levelUnlocked = null;
+    const descripcionLower = (Descripcion || '').toLowerCase();
+    if (descripcionLower.includes('a1') || descripcionLower.includes('nivel a1')) {
+      levelUnlocked = 'A1';
+    } else if (descripcionLower.includes('a2') || descripcionLower.includes('nivel a2')) {
+      levelUnlocked = 'A2';
+    } else if (descripcionLower.includes('b1') || descripcionLower.includes('nivel b1')) {
+      levelUnlocked = 'B1';
+    } else if (descripcionLower.includes('b2') || descripcionLower.includes('nivel b2')) {
+      levelUnlocked = 'B2';
+    }
+    
     res.send(`
       <!DOCTYPE html>
       <html>
-      <head><meta charset="UTF-8"><title>Pago Exitoso</title></head>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pago Exitoso</title>
+      </head>
       <body style="font-family: Arial, sans-serif; text-align:center; padding: 40px;">
         <div style="font-size:48px;">✅</div>
         <h1>Pago Procesado Correctamente</h1>
         <p>Puedes cerrar esta ventana y volver a la aplicación.</p>
+        <script>
+          try {
+            if (window.ReactNativeWebView) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'PAYMENT_SUCCESS',
+                orderId: '${Num_operacion}',
+                levelUnlocked: '${levelUnlocked || ''}',
+                importe: '${Importe}'
+              }));
+            }
+          } catch (e) {
+            console.error('Error enviando mensaje:', e);
+          }
+        </script>
       </body>
       </html>
     `);
