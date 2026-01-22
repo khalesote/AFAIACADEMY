@@ -272,6 +272,72 @@ const PRACTICAL_GUIDES = [
   },
 ];
 
+const COMMUNITY_ACTIVITIES = [
+  {
+    title: "Círculos de conversación en español",
+    titleAr: "دوائر محادثة باللغة الإسبانية",
+    content: "Grupos gratuitos en bibliotecas, ONG y centros de barrio para practicar el idioma y hacer amigas.",
+    contentAr: "مجموعات مجانية في المكتبات والمنظمات لتدريب اللغة وتكوين صداقات.",
+    icon: "chatbubbles",
+  },
+  {
+    title: "Talleres de empleo para mujeres",
+    titleAr: "ورش عمل للوظائف للنساء",
+    content: "Orientación laboral, CV, entrevistas y búsqueda de empleo con enfoque en mujeres migrantes.",
+    contentAr: "إرشاد وظيفي، سيرة ذاتية، مقابلات وبحث عن عمل للنساء المهاجرات.",
+    icon: "briefcase",
+  },
+  {
+    title: "Formación digital básica",
+    titleAr: "تعلم المهارات الرقمية الأساسية",
+    content: "Aprende a usar móvil, correo, WhatsApp, citas médicas y trámites online.",
+    contentAr: "تعلّمي استخدام الهاتف، البريد، واتساب، حجز المواعيد والمعاملات الإلكترونية.",
+    icon: "laptop",
+  },
+  {
+    title: "Espacios de apoyo emocional",
+    titleAr: "مساحات للدعم النفسي",
+    content: "Grupos de apoyo y bienestar emocional con psicólogas o mediadoras culturales.",
+    contentAr: "مجموعات دعم وصحة نفسية مع أخصائيات أو وسيطات ثقافيات.",
+    icon: "heart",
+  },
+  {
+    title: "Deporte y salud para mujeres",
+    titleAr: "رياضة وصحة للنساء",
+    content: "Clases de gimnasia, yoga o caminatas en grupo, muchas veces con horario para mujeres.",
+    contentAr: "حصص رياضية، يوغا أو مشي جماعي، أحياناً بجدول خاص للنساء.",
+    icon: "fitness",
+  },
+  {
+    title: "Escuelas de madres y crianza",
+    titleAr: "مدارس للأمهات وتربية الأطفال",
+    content: "Apoyo sobre el sistema educativo, salud infantil y crianza respetuosa.",
+    contentAr: "دعم حول نظام المدارس وصحة الأطفال والتربية الإيجابية.",
+    icon: "people",
+  },
+  {
+    title: "Intercambio cultural y cocina",
+    titleAr: "تبادل ثقافي وطبخ",
+    content: "Actividades para compartir recetas, culturas y crear red con otras mujeres.",
+    contentAr: "نشاطات لمشاركة الوصفات والثقافات وبناء شبكة مع نساء أخريات.",
+    icon: "restaurant",
+  },
+  {
+    title: "Voluntariado y participación social",
+    titleAr: "التطوع والمشاركة الاجتماعية",
+    content: "Participa en asociaciones del barrio para integrarte y practicar el idioma.",
+    contentAr: "شاركي في جمعيات الحي للاندماج وممارسة اللغة.",
+    icon: "hand-left",
+  },
+  {
+    title: "Talleres de emprendimiento",
+    titleAr: "ورش لريادة الأعمال",
+    content: "Apoyo para iniciar pequeños negocios: costura, cocina, comercio o servicios.",
+    contentAr: "دعم لبدء مشروع صغير: خياطة، طبخ، تجارة أو خدمات.",
+    icon: "pricetag",
+  },
+];
+
 const TESTIMONIALS = [
   {
     name: "Fátima",
@@ -1163,6 +1229,27 @@ export default function IntegracionMujerScreen() {
             </View>
             <Text style={styles.rightContent}>{right.content}</Text>
             <Text style={styles.rightContentAr}>{right.contentAr}</Text>
+          </View>
+        ))}
+      </ExpandableSection>
+
+      {/* Actividades y Comunidad */}
+      <ExpandableSection
+        title="Actividades y Comunidad"
+        titleAr="الأنشطة والمجتمع"
+        icon="people"
+      >
+        {COMMUNITY_ACTIVITIES.map((activity, idx) => (
+          <View key={idx} style={styles.rightCard}>
+            <View style={styles.rightHeader}>
+              <Ionicons name={activity.icon as any} size={22} color="#000" />
+              <View style={styles.rightTitles}>
+                <Text style={styles.rightTitle}>{activity.title}</Text>
+                <Text style={styles.rightTitleAr}>{activity.titleAr}</Text>
+              </View>
+            </View>
+            <Text style={styles.rightContent}>{activity.content}</Text>
+            <Text style={styles.rightContentAr}>{activity.contentAr}</Text>
           </View>
         ))}
       </ExpandableSection>

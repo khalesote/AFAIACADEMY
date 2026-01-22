@@ -2198,9 +2198,11 @@ export default function ExamenFinal() {
           <Text style={styles.scoreText}>{puntuacion}/{totalPreguntas}</Text>
 
           <View style={styles.resultButtons}>
-            <ExamenPresencialForm nivel="A1" />
             {puntuacion >= minimoAprobar && (
-              <Text style={styles.resultHint}>¿Quieres obtener tu certificado? Apúntate al examen presencial.</Text>
+              <>
+                <ExamenPresencialForm nivel="A1" />
+                <Text style={styles.resultHint}>¿Quieres obtener tu certificado? Apúntate al examen presencial.</Text>
+              </>
             )}
             {puntuacion >= minimoAprobar ? (
               <TouchableOpacity
