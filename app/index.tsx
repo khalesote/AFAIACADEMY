@@ -9,7 +9,7 @@ import { fetchActivePromoMessages, PromoMessage } from '../services/promoService
 import { initializeB1Progress, syncA1A2FromLegacy } from '../utils/unitProgress';
 import { testAsyncStorage } from '../utils/asyncStorageTest';
 import { useUser } from '../contexts/UserContext';
-import { collection, getCountFromServer } from 'firebase/firestore';
+import { collection, doc, getCountFromServer, setDoc, serverTimestamp } from 'firebase/firestore';
 import { firestore } from '../config/firebase';
 
 // Variables de texto
@@ -37,6 +37,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { LinearGradient } from 'expo-linear-gradient';
+import Constants from 'expo-constants';
 
 import * as FileSystem from 'expo-file-system';
 import { WebView } from 'react-native-webview';
@@ -46,6 +47,15 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 async function registerForPushNotificationsAsync() {
   let token;
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+      sound: 'default',
+    });
+  }
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
   if (existingStatus !== 'granted') {
@@ -56,7 +66,8 @@ async function registerForPushNotificationsAsync() {
     alert('Failed to get push token for push notification!');
     return;
   }
-  token = (await Notifications.getExpoPushTokenAsync()).data;
+  const projectId = Constants.easConfig?.projectId ?? Constants.expoConfig?.extra?.eas?.projectId;
+  token = (await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined)).data;
   console.log('Push token:', token);
   return token;
 }
@@ -104,15 +115,15 @@ export function HomeScreenContent() {
   const { user, firebaseUser, isAuthenticated, loading: userLoading, isAdmin, updateUser } = useUser();
 
   // Set up notification handler
-  // Notifications.setNotificationHandler({
-  //   handleNotification: async () => ({
-  //     shouldShowAlert: true,
-  //     shouldPlaySound: true,
-  //     shouldSetBadge: false,
-  //     shouldShowBanner: true,
-  //     shouldShowList: true,
-  //   }),
-  // });
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
 
   // Mapeo de provincias a coordenadas (lat, lon)
   const PROVINCE_COORDINATES: Record<string, { lat: number; lon: number }> = {
@@ -438,19 +449,33 @@ export function HomeScreenContent() {
   }, [isAuthenticated, pushToken, firebaseUser]);
 
   const sendPushToken = async (token: string, userId: string) => {
-    try {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/user/push-token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, pushToken: token }),
-      });
-      if (response.ok) {
-        console.log('Push token sent to backend successfully');
-      } else {
-        console.error('Error sending push token to backend:', response.status);
+    const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+    if (backendUrl) {
+      try {
+        const response = await fetch(`${backendUrl}/api/user/push-token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, pushToken: token }),
+        });
+        if (response.ok) {
+          console.log('Push token sent to backend successfully');
+        } else {
+          console.error('Error sending push token to backend:', response.status);
+        }
+      } catch (error) {
+        console.error('Error sending push token to backend:', error);
       }
+    } else {
+      console.warn('EXPO_PUBLIC_BACKEND_URL no está definido; se omite envío al backend');
+    }
+
+    try {
+      await setDoc(doc(firestore, 'users', userId), {
+        pushToken: token,
+        pushTokenUpdatedAt: serverTimestamp(),
+      }, { merge: true });
     } catch (error) {
-      console.error('Error sending push token:', error);
+      console.error('Error guardando push token en Firestore:', error);
     }
   };
 

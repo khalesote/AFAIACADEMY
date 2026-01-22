@@ -22,6 +22,11 @@ interface Notification {
   createdAt: Timestamp;
 }
 
+const isExpoPushToken = (token?: string): token is string => {
+  if (!token) return false;
+  return token.startsWith('ExponentPushToken') || token.startsWith('ExpoPushToken');
+};
+
 export default function AdminScreen() {
   const { user, isAdmin } = useUser();
   const [title, setTitle] = useState('');
@@ -73,8 +78,16 @@ export default function AdminScreen() {
       const trimmedTitle = title.trim();
       const trimmedMessage = message.trim();
       const createdAt = Timestamp.now();
+      console.log('🚀 Enviando notificación admin', {
+        title: trimmedTitle,
+        messageLength: trimmedMessage.length,
+        adminEmail: user.email,
+        adminId: user.id,
+      });
+      console.log('👥 Usuarios encontrados para notificar:', usersSnapshot.size);
       const notificationPromises: Promise<any>[] = [];
       const tokens: string[] = [];
+      let invalidTokens = 0;
 
       usersSnapshot.forEach((docSnapshot) => {
         const userData = docSnapshot.data();
@@ -91,9 +104,18 @@ export default function AdminScreen() {
           createdAt,
         }));
 
-        if (userData.pushToken) {
-          tokens.push(userData.pushToken);
+        const pushToken = userData.pushToken as string | undefined;
+        if (isExpoPushToken(pushToken)) {
+          tokens.push(pushToken);
+        } else if (pushToken) {
+          invalidTokens += 1;
         }
+      });
+
+      console.log('🔔 Tokens de push recopilados', {
+        totalUsers: usersSnapshot.size,
+        validTokens: tokens.length,
+        invalidTokens,
       });
 
       await Promise.all(notificationPromises);
@@ -109,11 +131,15 @@ export default function AdminScreen() {
           title: trimmedTitle,
           body: trimmedMessage,
           data: { type: 'admin_notification' },
+          sound: 'default',
+          channelId: 'default',
+          priority: 'high',
         }));
 
         const batchSize = 100;
         for (let i = 0; i < messages.length; i += batchSize) {
           const batch = messages.slice(i, i + batchSize);
+          console.log('📤 Enviando batch de push:', i / batchSize + 1, 'de', Math.ceil(messages.length / batchSize));
           const response = await fetch('https://exp.host/--/api/v2/push/send', {
             method: 'POST',
             headers: {
@@ -123,11 +149,22 @@ export default function AdminScreen() {
             body: JSON.stringify(batch),
           });
 
+          const responseData = await response.json().catch(() => null);
           if (!response.ok) {
-            console.error('Failed to send push batch:', i / batchSize);
+            console.error('Failed to send push batch:', i / batchSize, responseData);
+          } else {
+            const errors = responseData?.data?.filter((item: any) => item.status === 'error');
+            if (errors?.length) {
+              console.error('Errores al enviar push:', errors);
+            }
           }
         }
         console.log('Push notifications sent to', tokens.length, 'users');
+        if (invalidTokens > 0) {
+          console.warn('Tokens inválidos omitidos:', invalidTokens);
+        }
+      } else {
+        console.warn('⚠️ No hay tokens válidos; se guardaron solo notificaciones internas.');
       }
     } catch (error) {
       console.error('Error sending notification:', error);

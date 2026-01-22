@@ -16,6 +16,46 @@ import {
 } from 'firebase/firestore';
 import { firestore } from '../config/firebase';
 
+const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
+
+const isExpoPushToken = (token?: string): boolean => {
+  if (!token) return false;
+  return token.startsWith('ExponentPushToken') || token.startsWith('ExpoPushToken');
+};
+
+const sendPushToUser = async (
+  userId: string,
+  title: string,
+  body: string,
+  data: Record<string, any> = {}
+): Promise<void> => {
+  try {
+    const userSnap = await getDoc(doc(firestore, 'users', userId));
+    if (!userSnap.exists()) return;
+    const token = userSnap.data()?.pushToken as string | undefined;
+    if (!isExpoPushToken(token)) return;
+
+    await fetch(EXPO_PUSH_URL, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: token,
+        title,
+        body,
+        data,
+        sound: 'default',
+        channelId: 'default',
+        priority: 'high',
+      }),
+    });
+  } catch (error) {
+    console.error('Error enviando push notification:', error);
+  }
+};
+
 export interface PrivateChat {
   id: string;
   participants: string[];
@@ -110,6 +150,12 @@ export const chatService = {
       createdAt: serverTimestamp(),
     });
 
+    await sendPushToUser(recipientId, 'Solicitud de chat', `${initiatorName} quiere chatear contigo`, {
+      type: 'private_chat_request',
+      chatId: chatRef.id,
+      fromUserId: initiatorId,
+    });
+
     return chatRef.id;
   },
 
@@ -137,6 +183,12 @@ export const chatService = {
       read: false,
       createdAt: serverTimestamp(),
     });
+
+    await sendPushToUser(chat.initiatorId, 'Chat aceptado', `${recipientName} aceptó tu solicitud`, {
+      type: 'chat_accepted',
+      chatId,
+      fromUserId: recipientId,
+    });
   },
 
   async rejectChatRequest(chatId: string, recipientId: string, recipientName: string): Promise<void> {
@@ -162,6 +214,12 @@ export const chatService = {
       message: `${recipientName} rechazó tu solicitud de chat`,
       read: false,
       createdAt: serverTimestamp(),
+    });
+
+    await sendPushToUser(chat.initiatorId, 'Chat rechazado', `${recipientName} rechazó tu solicitud`, {
+      type: 'chat_rejected',
+      chatId,
+      fromUserId: recipientId,
     });
   },
 
@@ -210,6 +268,12 @@ export const chatService = {
       read: false,
       createdAt: serverTimestamp(),
     });
+
+    await sendPushToUser(recipientId, `Tienes un nuevo mensaje de ${senderName}`, text, {
+      type: 'new_message',
+      chatId,
+      fromUserId: senderId,
+    });
   },
 
   async markChatAsRead(chatId: string, userId: string): Promise<void> {
@@ -235,21 +299,33 @@ export const chatService = {
 
   subscribeToPrivateChats(
     userId: string,
-    callback: (chats: PrivateChat[]) => void
+    callback: (chats: PrivateChat[]) => void,
+    onError?: (error: Error) => void
   ): () => void {
     const q = query(
       collection(firestore, 'privateChats'),
-      where('participants', 'array-contains', userId),
-      orderBy('lastMessageTime', 'desc')
+      where('participants', 'array-contains', userId)
     );
 
-    return onSnapshot(q, (snapshot) => {
-      const chats: PrivateChat[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as PrivateChat[];
-      callback(chats);
-    });
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const chats: PrivateChat[] = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as PrivateChat[];
+        chats.sort((a, b) => {
+          const aTime = a.lastMessageTime?.toMillis?.() ?? 0;
+          const bTime = b.lastMessageTime?.toMillis?.() ?? 0;
+          return bTime - aTime;
+        });
+        callback(chats);
+      },
+      (error) => {
+        console.error('Error cargando chats privados:', error);
+        onError?.(error as Error);
+      }
+    );
   },
 
   subscribeToPrivateMessages(
@@ -258,8 +334,7 @@ export const chatService = {
   ): () => void {
     const q = query(
       collection(firestore, 'privateMessages'),
-      where('chatId', '==', chatId),
-      orderBy('timestamp', 'asc')
+      where('chatId', '==', chatId)
     );
 
     return onSnapshot(q, (snapshot) => {
@@ -267,28 +342,44 @@ export const chatService = {
         id: doc.id,
         ...doc.data(),
       })) as PrivateMessage[];
+      messages.sort((a, b) => {
+        const aTime = a.timestamp?.toMillis?.() ?? 0;
+        const bTime = b.timestamp?.toMillis?.() ?? 0;
+        return aTime - bTime;
+      });
       callback(messages);
     });
   },
 
   subscribeToNotifications(
     userId: string,
-    callback: (notifications: ChatNotification[]) => void
+    callback: (notifications: ChatNotification[]) => void,
+    onError?: (error: Error) => void
   ): () => void {
     const q = query(
       collection(firestore, 'notifications'),
-      where('toUserId', '==', userId),
-      orderBy('createdAt', 'desc'),
-      limit(50)
+      where('toUserId', '==', userId)
     );
 
-    return onSnapshot(q, (snapshot) => {
-      const notifications: ChatNotification[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as ChatNotification[];
-      callback(notifications);
-    });
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const notifications: ChatNotification[] = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as ChatNotification[];
+        notifications.sort((a, b) => {
+          const aTime = a.createdAt?.toMillis?.() ?? 0;
+          const bTime = b.createdAt?.toMillis?.() ?? 0;
+          return bTime - aTime;
+        });
+        callback(notifications.slice(0, 50));
+      },
+      (error) => {
+        console.error('Error cargando notificaciones de chat:', error);
+        onError?.(error as Error);
+      }
+    );
   },
 
   async markNotificationAsRead(notificationId: string): Promise<void> {

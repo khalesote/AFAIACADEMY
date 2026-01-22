@@ -181,17 +181,84 @@ export default function ForumScreen() {
     }
 
     try {
-      await addDoc(collection(firestore, 'forum_posts'), {
-        title: newPostTitle.trim(),
-        content: newPostContent.trim(),
-        author: user.name || user.email,
+      const trimmedTitle = newPostTitle.trim();
+      const trimmedContent = newPostContent.trim();
+      const authorName = user.name || user.email;
+      const createdAt = Timestamp.now();
+
+      const postRef = await addDoc(collection(firestore, 'forum_posts'), {
+        title: trimmedTitle,
+        content: trimmedContent,
+        author: authorName,
         authorId: user.id,
         authorPhoto: profileImage || null,
         imageUrl: null,
-        createdAt: Timestamp.now(),
+        createdAt,
         category: selectedCategory,
         commentsCount: 0,
       });
+
+      try {
+        const usersSnapshot = await getDocs(collection(firestore, 'users'));
+        const notificationPromises: Promise<any>[] = [];
+        const tokens: string[] = [];
+        const title = 'Nueva publicación en el foro';
+        const message = `${authorName} publicó: ${trimmedTitle}`;
+
+        usersSnapshot.forEach((docSnapshot) => {
+          if (docSnapshot.id === user.id) return;
+          const userData = docSnapshot.data();
+          notificationPromises.push(addDoc(collection(firestore, 'notifications'), {
+            title,
+            message,
+            sentBy: authorName,
+            sentByEmail: user.email,
+            sentById: user.id,
+            toUserId: docSnapshot.id,
+            read: false,
+            type: 'forum_post',
+            postId: postRef.id,
+            createdAt,
+          }));
+
+          if (userData.pushToken) {
+            tokens.push(userData.pushToken);
+          }
+        });
+
+        await Promise.all(notificationPromises);
+
+        if (tokens.length > 0) {
+          const messages = tokens.map((token) => ({
+            to: token,
+            title,
+            body: message,
+            data: { type: 'forum_post', postId: postRef.id },
+            sound: 'default',
+            channelId: 'default',
+            priority: 'high',
+          }));
+
+          const batchSize = 100;
+          for (let i = 0; i < messages.length; i += batchSize) {
+            const batch = messages.slice(i, i + batchSize);
+            const response = await fetch('https://exp.host/--/api/v2/push/send', {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(batch),
+            });
+
+            if (!response.ok) {
+              console.error('Error enviando push de foro, batch:', i / batchSize);
+            }
+          }
+        }
+      } catch (notifyError) {
+        console.error('Error notificando publicación de foro:', notifyError);
+      }
 
       setModalVisible(false);
       setNewPostTitle('');

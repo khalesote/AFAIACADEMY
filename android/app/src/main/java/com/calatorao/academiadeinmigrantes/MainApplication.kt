@@ -1,4 +1,4 @@
-package com.calatorao.academiadeinmigrantes
+package com.academiadeinmigrantes
 
 import android.app.Application
 import android.content.res.Configuration

@@ -1,4 +1,4 @@
-package com.calatorao.academiadeinmigrantes
+package com.academiadeinmigrantes
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

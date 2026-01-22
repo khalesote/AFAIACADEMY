@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User as FirebaseUser } from 'firebase/auth';
-import { UserService, User } from '../services/userService';
-import { auth } from '../config/firebase';
-import { View, Text, ActivityIndicator } from 'react-native';
+import type { User as FirebaseUser } from '@firebase/auth';
+import { UserService } from '../services/userService';
+import type { User } from '../services/userService';
+import { auth, firestore } from '../config/firebase';
+import { View, Text, ActivityIndicator, Platform } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 interface UserContextType {
   user: User | null;
@@ -26,8 +30,79 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pushTokenRegistered, setPushTokenRegistered] = useState(false);
 
   const adminEmails = ['admin@academiadeinmigrantes.es', 'somos@afaiacademiadeinmigrantes.com'];
+
+  const registerForPushNotificationsAsync = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('default', {
+          name: 'default',
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#FF231F7C',
+          sound: 'default',
+        });
+      }
+
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== 'granted') {
+        console.warn('⚠️ UserContext: Permiso de notificaciones no concedido', { finalStatus });
+        return null;
+      }
+
+      const projectId = Constants.easConfig?.projectId ?? Constants.expoConfig?.extra?.eas?.projectId;
+      if (!projectId) {
+        console.warn('⚠️ UserContext: projectId no encontrado; usando fallback sin projectId');
+      }
+
+      const response = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
+      console.log('🔑 UserContext: Push token obtenido', response?.data);
+      return response?.data ?? null;
+    } catch (error) {
+      console.error('❌ UserContext: Error obteniendo push token', error);
+      return null;
+    }
+  };
+
+  const syncPushToken = async (token: string, userId: string) => {
+    const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+    if (backendUrl) {
+      try {
+        const response = await fetch(`${backendUrl}/api/user/push-token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, pushToken: token }),
+        });
+        if (response.ok) {
+          console.log('✅ UserContext: Push token enviado al backend');
+        } else {
+          console.error('❌ UserContext: Error enviando push token al backend', response.status);
+        }
+      } catch (error) {
+        console.error('❌ UserContext: Error enviando push token al backend', error);
+      }
+    } else {
+      console.warn('⚠️ UserContext: EXPO_PUBLIC_BACKEND_URL no está definido; se omite envío al backend');
+    }
+
+    try {
+      await setDoc(doc(firestore, 'users', userId), {
+        pushToken: token,
+        pushTokenUpdatedAt: serverTimestamp(),
+      }, { merge: true });
+      console.log('✅ UserContext: Push token guardado en Firestore');
+    } catch (error) {
+      console.error('❌ UserContext: Error guardando push token en Firestore', error);
+    }
+  };
 
   const loadUserData = async () => {
     try {
@@ -55,7 +130,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('ℹ️ No hay usuario autenticado al inicializar (sesión persistida no encontrada)');
       }
 
-      const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+      const unsubscribe = auth.onAuthStateChanged(async (firebaseUser: FirebaseUser | null) => {
         console.log('🔐 Estado de autenticación cambiado:', firebaseUser ? 'Usuario autenticado' : 'Usuario no autenticado');
 
         if (firebaseUser) {
@@ -104,6 +179,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(null);
           setIsAuthenticated(false);
           setProfileImage(null);
+          setPushTokenRegistered(false);
         }
 
         setLoading(false);
@@ -207,6 +283,33 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       unsubscribe?.then(unsub => unsub?.());
     };
   }, []);
+
+  useEffect(() => {
+    if (!firebaseUser || pushTokenRegistered) {
+      return;
+    }
+
+    let isActive = true;
+    const registerAndSync = async () => {
+      console.log('🔔 UserContext: Registrando push token global', { uid: firebaseUser.uid });
+      const token = await registerForPushNotificationsAsync();
+      if (!token) {
+        console.warn('⚠️ UserContext: No se obtuvo push token; se omite registro');
+        return;
+      }
+      if (!isActive) return;
+      await syncPushToken(token, firebaseUser.uid);
+      if (isActive) {
+        setPushTokenRegistered(true);
+      }
+    };
+
+    registerAndSync();
+
+    return () => {
+      isActive = false;
+    };
+  }, [firebaseUser, pushTokenRegistered]);
 
   return (
     <UserContext.Provider value={{

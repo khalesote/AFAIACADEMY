@@ -73,6 +73,7 @@
       "googleServicesFile": "./android/app/google-services.json",
       "permissions": [
         "RECORD_AUDIO",
+        "POST_NOTIFICATIONS",
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE",
         "WAKE_LOCK"

@@ -3,7 +3,8 @@ import React, { useEffect, useCallback } from "react";
 import { View, StyleSheet, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { collection, query, where, onSnapshot, doc, updateDoc, DocumentReference, Timestamp } from 'firebase/firestore';
-import { firestore, auth } from '../../config/firebase';
+import { firestore } from '../../config/firebase';
+import { useUser } from '../../contexts/UserContext';
 
 const db = firestore;
 
@@ -31,6 +32,7 @@ const styles = StyleSheet.create({
 
 export default function TabLayout() {
   const router = useRouter();
+  const { firebaseUser } = useUser();
 
   const handlePrivateChatResponse = useCallback(async (
     notificationRef: DocumentReference,
@@ -60,7 +62,7 @@ export default function TabLayout() {
       });
 
       if (accept) {
-        router.push({ pathname: '/(tabs)/PrivateChatScreen', params: { chatId } });
+        router.push({ pathname: '/(tabs)/PrivateChatsScreen', params: { chatId } });
       }
     } catch (error) {
       console.error('Error handling private chat response:', error);
@@ -69,16 +71,20 @@ export default function TabLayout() {
 
   // Global notification listener
   useEffect(() => {
-    if (auth.currentUser) {
-      const q = query(
-        collection(db, 'notifications'),
-        where('toUserId', '==', auth.currentUser.uid),
-        where('read', '==', false)
-      );
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    if (!firebaseUser) return;
+
+    const q = query(
+      collection(db, 'notifications'),
+      where('toUserId', '==', firebaseUser.uid)
+    );
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
         querySnapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             const data = change.doc.data();
+            if (data.read) return;
+
             if (data.type === 'private_chat_request' && data.chatId) {
               Alert.alert(
                 'Solicitud de chat privado',
@@ -96,17 +102,24 @@ export default function TabLayout() {
                 ],
                 { cancelable: false }
               );
+            } else if (data.type === 'new_message') {
+              const senderName = data.fromUserName || 'Alguien';
+              Alert.alert(`Tienes un nuevo mensaje de ${senderName}`, data.message || '');
+              updateDoc(change.doc.ref, { read: true });
             } else {
-              Alert.alert('Nueva notificación', data.message);
+              Alert.alert(data.title || 'Nueva notificación', data.message || '');
               updateDoc(change.doc.ref, { read: true });
             }
           }
         });
-      });
+      },
+      (error) => {
+        console.error('Error listening to notifications:', error);
+      }
+    );
 
-      return unsubscribe;
-    }
-  }, [handlePrivateChatResponse]);
+    return unsubscribe;
+  }, [firebaseUser, handlePrivateChatResponse]);
 
   return (
     <Tabs

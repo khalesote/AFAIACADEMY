@@ -2,6 +2,8 @@ configurations.all {
     exclude group: 'com.android.support'
 }
 
+apply plugin: "com.google.gms.google-services"
+
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
@@ -91,9 +93,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.calatorao.academiadeinmigrantes'
+    namespace 'com.academiadeinmigrantes'
     defaultConfig {
-        applicationId 'com.calatorao.academiadeinmigrantes'
+        applicationId 'com.academiadeinmigrantes'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

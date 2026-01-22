@@ -22,6 +22,7 @@ type TabType = 'chats' | 'requests' | 'notifications';
 
 export default function PrivateChatsScreen() {
   const router = useRouter();
+  const { chatId } = useLocalSearchParams<{ chatId?: string }>();
   const { firebaseUser, user } = useUser();
   const [activeTab, setActiveTab] = useState<TabType>('chats');
   const [chats, setChats] = useState<PrivateChat[]>([]);
@@ -40,14 +41,28 @@ export default function PrivateChatsScreen() {
   useEffect(() => {
     if (!userId) return;
 
-    const unsubChats = chatService.subscribeToPrivateChats(userId, (updatedChats) => {
-      setChats(updatedChats);
-      setLoading(false);
-    });
+    const unsubChats = chatService.subscribeToPrivateChats(
+      userId,
+      (updatedChats) => {
+        setChats(updatedChats);
+        setLoading(false);
+      },
+      (error) => {
+        setLoading(false);
+        Alert.alert('Error', 'No se pudieron cargar los chats privados.');
+        console.error('Error en chats privados:', error);
+      }
+    );
 
-    const unsubNotifs = chatService.subscribeToNotifications(userId, (updatedNotifs) => {
-      setNotifications(updatedNotifs);
-    });
+    const unsubNotifs = chatService.subscribeToNotifications(
+      userId,
+      (updatedNotifs) => {
+        setNotifications(updatedNotifs);
+      },
+      (error) => {
+        console.error('Error en notificaciones de chat:', error);
+      }
+    );
 
     return () => {
       unsubChats();
@@ -67,6 +82,19 @@ export default function PrivateChatsScreen() {
 
     return () => unsubMessages();
   }, [selectedChat, userId]);
+
+  useEffect(() => {
+    if (!chatId) return;
+    const chat = chats.find((c) => c.id === chatId);
+    if (!chat) return;
+
+    if (chat.status === 'active') {
+      setSelectedChat(chat);
+      setActiveTab('chats');
+    } else if (chat.status === 'pending') {
+      setActiveTab(chat.recipientId === userId ? 'requests' : 'chats');
+    }
+  }, [chatId, chats, userId]);
 
   const activeChats = chats.filter((c) => c.status === 'active');
   const pendingRequests = chats.filter((c) => c.status === 'pending' && c.recipientId === userId);

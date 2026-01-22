@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, query, orderBy, onSnapshot, Timestamp, where, updateDoc, doc } from 'firebase/firestore';
+import { collection, query, onSnapshot, Timestamp, where, updateDoc, doc } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
 import { useUser } from '../../contexts/UserContext';
 
@@ -18,7 +18,7 @@ interface Notification {
   message: string;
   sentBy: string;
   sentByEmail: string;
-  createdAt: Timestamp;
+  createdAt?: Timestamp | null;
 }
 
 export default function NotificationsScreen() {
@@ -35,14 +35,18 @@ export default function NotificationsScreen() {
 
     const notificationsQuery = query(
       collection(firestore, 'notifications'),
-      where('toUserId', '==', user.id),
-      orderBy('createdAt', 'desc')
+      where('toUserId', '==', user.id)
     );
 
     const unsubscribe = onSnapshot(notificationsQuery, (querySnapshot) => {
       const notificationsData: Notification[] = [];
       querySnapshot.forEach((doc) => {
         notificationsData.push({ id: doc.id, ...doc.data() } as Notification);
+      });
+      notificationsData.sort((a, b) => {
+        const aTime = a.createdAt?.toMillis?.() ?? 0;
+        const bTime = b.createdAt?.toMillis?.() ?? 0;
+        return bTime - aTime;
       });
       setNotifications(notificationsData);
       setLoading(false);
@@ -63,7 +67,10 @@ export default function NotificationsScreen() {
     return unsubscribe;
   }, [user]);
 
-  const formatDate = (timestamp: Timestamp) => {
+  const formatDate = (timestamp?: Timestamp | null) => {
+    if (!timestamp || typeof timestamp.toDate !== 'function') {
+      return 'Fecha no disponible';
+    }
     const date = timestamp.toDate();
     return date.toLocaleDateString('es-ES', {
       day: '2-digit',

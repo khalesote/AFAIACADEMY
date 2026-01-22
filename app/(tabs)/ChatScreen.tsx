@@ -192,7 +192,7 @@ export default function ChatScreen() {
       if (chatSnapshot.exists()) {
         const chatData = chatSnapshot.data();
         if (chatData.status === 'active') {
-          router.push({ pathname: '/(tabs)/PrivateChatScreen', params: { chatId } });
+          router.push({ pathname: '/(tabs)/PrivateChatsScreen', params: { chatId } });
           return;
         }
 
