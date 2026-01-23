@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  Modal,
-  TouchableWithoutFeedback
+  Modal
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import PoliticaProteccionDatos from '../../components/PoliticaProteccionDatos';
 
 // Lista de provincias españolas
 const PROVINCIAS = [
@@ -24,7 +24,26 @@ const PROVINCIAS = [
   'Teruel', 'Toledo', 'Valencia', 'Valladolid', 'Vizcaya', 'Zamora', 'Zaragoza'
 ].sort();
 
-export type TipoDocumento = 'NIE' | 'NIF' | 'PASAPORTE';
+const NIVELES_ESPANOL = [
+  { value: 0, label: '0 - Sin conocimientos' },
+  { value: 1, label: '1 - Básico' },
+  { value: 2, label: '2 - Elemental' },
+  { value: 3, label: '3 - Intermedio' },
+  { value: 4, label: '4 - Avanzado' },
+  { value: 5, label: '5 - Fluido/Nativo' }
+];
+
+const NIVELES_ESTUDIOS = [
+  'Sin estudios',
+  'Primaria',
+  'Secundaria',
+  'Bachillerato',
+  'Formación profesional',
+  'Universidad',
+  'Máster/Doctorado'
+];
+
+export type TipoDocumento = 'NIE' | 'DNI' | 'NIF' | 'PASAPORTE';
 
 export type FormDataType = {
   nombre: string;
@@ -37,6 +56,8 @@ export type FormDataType = {
   email: string;
   documento: string;
   tipoDocumento: TipoDocumento;
+  nivelEspanol?: number | null;
+  nivelEstudios?: string;
 };
 
 type FormularioDatosPersonalesProps = {
@@ -75,17 +96,23 @@ export default function FormularioDatosPersonales({
     telefono: initialData?.telefono ?? '',
     email: initialData?.email ?? '',
     documento: initialData?.documento ?? '',
-    tipoDocumento: initialData?.tipoDocumento ?? 'NIE'
+    tipoDocumento: initialData?.tipoDocumento === 'NIF'
+      ? 'DNI'
+      : (initialData?.tipoDocumento ?? 'NIE'),
+    nivelEspanol: typeof initialData?.nivelEspanol === 'number' ? initialData.nivelEspanol : null,
+    nivelEstudios: initialData?.nivelEstudios ?? ''
   });
   
   const [showDateModal, setShowDateModal] = useState(false);
   const [showProvinceModal, setShowProvinceModal] = useState(false);
-  const [showDocTypeModal, setShowDocTypeModal] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(new Date());
   const [tempProvince, setTempProvince] = useState('');
-  const [tempDocType, setTempDocType] = useState<TipoDocumento>('NIE');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptedPolicy, setAcceptedPolicy] = useState(false);
+  const [showPolicyModal, setShowPolicyModal] = useState(false);
+  const [showSpanishLevelModal, setShowSpanishLevelModal] = useState(false);
+  const [showEducationLevelModal, setShowEducationLevelModal] = useState(false);
   
   const handleInputChange = <K extends keyof FormDataType>(
     field: K,
@@ -115,7 +142,16 @@ export default function FormularioDatosPersonales({
 
   const handleDocTypeSelect = (tipo: TipoDocumento) => {
     handleInputChange('tipoDocumento', tipo);
-    setShowDocTypeModal(false);
+  };
+
+  const handleSpanishLevelSelect = (nivel: number) => {
+    handleInputChange('nivelEspanol', nivel);
+    setShowSpanishLevelModal(false);
+  };
+
+  const handleEducationLevelSelect = (nivel: string) => {
+    handleInputChange('nivelEstudios', nivel);
+    setShowEducationLevelModal(false);
   };
 
   const validarFormulario = () => {
@@ -190,11 +226,33 @@ export default function FormularioDatosPersonales({
   };
 
   const esFormacion = modo === 'formacion';
+  const selectedSpanishLevel = typeof formData.nivelEspanol === 'number'
+    ? NIVELES_ESPANOL.find((nivel) => nivel.value === formData.nivelEspanol)
+    : undefined;
+  const selectedEducationLevel = formData.nivelEstudios?.trim() || '';
 
   const handleSiguiente = useCallback(() => {
+    if (showPasswordFields && !acceptedPolicy) {
+      Alert.alert('Error', 'Debes aceptar la política de protección de datos para continuar');
+      return;
+    }
+
     if (validarFormulario()) {
       // Navegar a la pantalla de pago con los datos del formulario
-      const { nombre, apellido1, apellido2, fechaNacimiento, provincia, localidad, telefono, tipoDocumento, documento, email } = formData;
+      const {
+        nombre,
+        apellido1,
+        apellido2,
+        fechaNacimiento,
+        provincia,
+        localidad,
+        telefono,
+        tipoDocumento,
+        documento,
+        email,
+        nivelEspanol,
+        nivelEstudios
+      } = formData;
       
       if (!fechaNacimiento) {
         Alert.alert('Error', 'La fecha de nacimiento es requerida');
@@ -213,7 +271,13 @@ export default function FormularioDatosPersonales({
         telefono,
         tipoDocumento,
         documento,
-        email: email.trim()
+        email: email.trim(),
+        ...(showPasswordFields
+          ? {
+              nivelEspanol: typeof nivelEspanol === 'number' ? nivelEspanol : null,
+              nivelEstudios: nivelEstudios?.trim() || ''
+            }
+          : {})
       };
       
       if (onComplete) {
@@ -231,7 +295,7 @@ export default function FormularioDatosPersonales({
         });
       }
     }
-  }, [formData, bloque, validarFormulario, router, onComplete, esFormacion]);
+  }, [acceptedPolicy, formData, bloque, validarFormulario, router, onComplete, esFormacion, showPasswordFields]);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -486,71 +550,125 @@ export default function FormularioDatosPersonales({
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>Tipo de documento *</Text>
-        <View style={styles.documentoContainer}>
-          <TouchableOpacity 
-            style={[styles.input, {flex: 1, marginRight: 10, justifyContent: 'center'}]}
-            onPress={() => setShowDocTypeModal(true)}
-          >
-            <Text style={formData.tipoDocumento ? styles.inputText : styles.placeholderText}>
-              {formData.tipoDocumento ? formData.tipoDocumento : 'Selecciona tipo de documento'}
-            </Text>
-          </TouchableOpacity>
-          
-          <Modal
-            visible={showDocTypeModal}
-            transparent={true}
-            animationType="fade"
-            onRequestClose={() => setShowDocTypeModal(false)}
-          >
-            <TouchableWithoutFeedback onPress={() => setShowDocTypeModal(false)}>
+        <View style={styles.docTypeButtons}>
+          {(['NIE', 'DNI', 'PASAPORTE'] as TipoDocumento[]).map((tipo) => {
+            const currentType = formData.tipoDocumento === 'NIF' ? 'DNI' : formData.tipoDocumento;
+            const isSelected = currentType === tipo;
+            return (
+              <TouchableOpacity
+                key={tipo}
+                style={[styles.docTypeButton, isSelected && styles.docTypeButtonActive]}
+                onPress={() => handleDocTypeSelect(tipo)}
+              >
+                <Text style={[styles.docTypeButtonText, isSelected && styles.docTypeButtonTextActive]}>
+                  {tipo}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+        <TextInput
+          style={styles.input}
+          value={formData.documento}
+          onChangeText={(text: string) => handleInputChange('documento', text.toUpperCase())}
+          placeholder="Número de documento"
+          placeholderTextColor="#999"
+          editable={true}
+          autoCapitalize="characters"
+        />
+      </View>
+
+      {/* Campos de registro (solo si showPasswordFields es true) */}
+      {showPasswordFields && (
+        <>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Nivel de español</Text>
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setShowSpanishLevelModal(true)}
+            >
+              <Text style={selectedSpanishLevel ? styles.inputText : styles.placeholderText}>
+                {selectedSpanishLevel ? selectedSpanishLevel.label : 'Selecciona tu nivel de español'}
+              </Text>
+            </TouchableOpacity>
+            <Modal
+              visible={showSpanishLevelModal}
+              transparent={true}
+              animationType="slide"
+              onRequestClose={() => setShowSpanishLevelModal(false)}
+            >
               <View style={styles.modalOverlay}>
-                <View style={styles.docTypeModalContent}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Selecciona tu nivel de español</Text>
+                  <ScrollView style={styles.modalScroll}>
+                    {NIVELES_ESPANOL.map((nivel) => (
+                      <TouchableOpacity
+                        key={nivel.value}
+                        style={[
+                          styles.modalItem,
+                          formData.nivelEspanol === nivel.value && styles.selectedItem
+                        ]}
+                        onPress={() => handleSpanishLevelSelect(nivel.value)}
+                      >
+                        <Text style={styles.modalItemText}>{nivel.label}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
                   <TouchableOpacity
-                    style={[
-                      styles.modalItem,
-                      formData.tipoDocumento === 'PASAPORTE' && styles.selectedItem
-                    ]}
-                    onPress={() => handleDocTypeSelect('PASAPORTE' as TipoDocumento)}
+                    style={styles.cancelButton}
+                    onPress={() => setShowSpanishLevelModal(false)}
                   >
-                    <Text style={styles.modalItemText}>PASAPORTE</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.modalItem,
-                      formData.tipoDocumento === 'NIE' && styles.selectedItem
-                    ]}
-                    onPress={() => handleDocTypeSelect('NIE' as TipoDocumento)}
-                  >
-                    <Text style={styles.modalItemText}>NIE</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.modalItem,
-                      formData.tipoDocumento === 'NIF' && styles.selectedItem
-                    ]}
-                    onPress={() => handleDocTypeSelect('NIF' as TipoDocumento)}
-                  >
-                    <Text style={styles.modalItemText}>NIF</Text>
+                    <Text style={styles.buttonText}>Cancelar</Text>
                   </TouchableOpacity>
                 </View>
               </View>
-            </TouchableWithoutFeedback>
-          </Modal>
-          <TextInput
-            style={[styles.input, { flex: 2 }]}
-            value={formData.documento}
-            onChangeText={(text: string) => handleInputChange('documento', text.toUpperCase())}
-            placeholder="Número de documento"
-            placeholderTextColor="#999"
-            editable={true}
-            autoCapitalize="characters"
-          />
-        </View>
-      </View>
+            </Modal>
+          </View>
 
-      {/* Campos de contraseña (solo si showPasswordFields es true) */}
-      {showPasswordFields && (
-        <>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Nivel de estudios</Text>
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setShowEducationLevelModal(true)}
+            >
+              <Text style={selectedEducationLevel ? styles.inputText : styles.placeholderText}>
+                {selectedEducationLevel || 'Selecciona tu nivel de estudios'}
+              </Text>
+            </TouchableOpacity>
+            <Modal
+              visible={showEducationLevelModal}
+              transparent={true}
+              animationType="slide"
+              onRequestClose={() => setShowEducationLevelModal(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Selecciona tu nivel de estudios</Text>
+                  <ScrollView style={styles.modalScroll}>
+                    {NIVELES_ESTUDIOS.map((nivel) => (
+                      <TouchableOpacity
+                        key={nivel}
+                        style={[
+                          styles.modalItem,
+                          formData.nivelEstudios === nivel && styles.selectedItem
+                        ]}
+                        onPress={() => handleEducationLevelSelect(nivel)}
+                      >
+                        <Text style={styles.modalItemText}>{nivel}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => setShowEducationLevelModal(false)}
+                  >
+                    <Text style={styles.buttonText}>Cancelar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
+
           <View style={styles.formGroup}>
             <Text style={styles.label}>Contraseña *</Text>
             <View style={styles.passwordInputContainer}>
@@ -602,14 +720,59 @@ export default function FormularioDatosPersonales({
               </TouchableOpacity>
             </View>
           </View>
+          <View style={styles.policyContainer}>
+            <TouchableOpacity
+              style={styles.policyCheckbox}
+              onPress={() => setAcceptedPolicy((prev) => !prev)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: acceptedPolicy }}
+            >
+              <Ionicons
+                name={acceptedPolicy ? 'checkbox' : 'square-outline'}
+                size={22}
+                color={acceptedPolicy ? '#4CAF50' : '#666'}
+              />
+            </TouchableOpacity>
+            <Text style={styles.policyText}>
+              He leído y acepto la{' '}
+              <Text style={styles.policyLink} onPress={() => setShowPolicyModal(true)}>
+                Política de Protección de Datos
+              </Text>
+            </Text>
+          </View>
+          <Modal
+            visible={showPolicyModal}
+            animationType="slide"
+            onRequestClose={() => setShowPolicyModal(false)}
+          >
+            <View style={styles.policyModal}>
+              <TouchableOpacity
+                style={styles.policyClose}
+                onPress={() => setShowPolicyModal(false)}
+              >
+                <Ionicons name="close" size={22} color="#1976d2" />
+                <Text style={styles.policyCloseText}>Cerrar</Text>
+              </TouchableOpacity>
+              <PoliticaProteccionDatos />
+            </View>
+          </Modal>
         </>
       )}
 
       <TouchableOpacity
-        style={styles.botonSiguiente}
+        style={[
+          styles.botonSiguiente,
+          showPasswordFields && !acceptedPolicy && styles.botonSiguienteDisabled
+        ]}
         onPress={handleSiguiente}
+        disabled={showPasswordFields && !acceptedPolicy}
       >
-        <Text style={styles.textoBoton}>
+        <Text
+          style={[
+            styles.textoBoton,
+            showPasswordFields && !acceptedPolicy && styles.textoBotonDisabled
+          ]}
+        >
           {showPasswordFields ? 'Registrarme' : 'Siguiente'}
         </Text>
       </TouchableOpacity>
@@ -681,9 +844,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
   },
-  documentoContainer: {
+  docTypeButtons: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginBottom: 10,
+  },
+  docTypeButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  docTypeButtonActive: {
+    backgroundColor: '#e3f2fd',
+    borderColor: '#1976d2',
+  },
+  docTypeButtonText: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '600',
+  },
+  docTypeButtonTextActive: {
+    color: '#1976d2',
   },
   // Estilos para los modales
   modalOverlay: {
@@ -780,11 +966,54 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
   },
+  botonSiguienteDisabled: {
+    backgroundColor: '#bdbdbd',
+  },
   textoBoton: {
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16,
+  },
+  textoBotonDisabled: {
+    color: '#f5f5f5',
+  },
+  policyContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 4,
+  },
+  policyCheckbox: {
+    marginRight: 10,
+    marginTop: 2,
+  },
+  policyText: {
+    flex: 1,
+    color: '#333',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  policyLink: {
+    color: '#1976d2',
+    textDecorationLine: 'underline',
+    fontWeight: '600',
+  },
+  policyModal: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  policyClose: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 8,
+  },
+  policyCloseText: {
+    marginLeft: 6,
+    color: '#1976d2',
+    fontSize: 16,
+    fontWeight: '600',
   },
   // Estilos para el input de fecha
   datePickerButton: {

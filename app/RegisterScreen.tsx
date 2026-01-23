@@ -56,10 +56,12 @@ export default function RegisterScreen() {
         apellido2: data.apellido2 || '',
         telefono: data.telefono || '',
         provincia: data.provincia || '',
-      localidad: data.localidad || '',
+        localidad: data.localidad || '',
         documento: data.documento || '',
         tipoDocumento: data.tipoDocumento || 'NIE',
-        fechaNacimiento: data.fechaNacimiento || ''
+        fechaNacimiento: data.fechaNacimiento || '',
+        nivelEspanol: typeof data.nivelEspanol === 'number' ? data.nivelEspanol : null,
+        nivelEstudios: data.nivelEstudios || ''
       });
 
       if (error) {

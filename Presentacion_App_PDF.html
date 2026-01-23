@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presentación de la app</title>
+  <style>
+    @page { size: A4; margin: 1.6cm; }
+    body {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: #1f2937;
+      line-height: 1.45;
+      font-size: 12pt;
+    }
+    h1, h2, h3 { margin: 0 0 10px 0; }
+    h1 { font-size: 28pt; color: #0f172a; }
+    h2 { font-size: 18pt; color: #1d4ed8; margin-top: 18px; }
+    h3 { font-size: 14pt; color: #0f766e; margin-top: 12px; }
+    p { margin: 6px 0 10px 0; }
+    ul { margin: 6px 0 12px 18px; }
+    li { margin-bottom: 4px; }
+    .page { page-break-after: always; }
+    .page:last-child { page-break-after: auto; }
+    .cover {
+      text-align: center;
+      padding-top: 4.5cm;
+    }
+    .subtitle { color: #0f766e; font-size: 16pt; margin-top: 6px; }
+    .meta { color: #475569; margin-top: 12px; }
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #f8fafc;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    figure { margin: 0; }
+    img {
+      width: 100%;
+      height: auto;
+      max-height: 420px;
+      object-fit: contain;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #ffffff;
+    }
+    figcaption {
+      font-size: 10pt;
+      color: #334155;
+      margin-top: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #f1f5f9; }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <h1>Presentación de la app</h1>
+    <div class="subtitle">Academia de Inmigrantes</div>
+    <div class="meta">Fecha: 22/01/2026</div>
+  </section>
+
+  <section class="page">
+    <h2>Descripción general</h2>
+    <p>
+      Academia de Inmigrantes es una aplicación móvil orientada al aprendizaje del español y a la integración social
+      de personas inmigrantes en España. Reúne formación lingüística, recursos culturales, asesoría y herramientas
+      prácticas (empleo, CV, trámites) con contenido bilingüe español–árabe.
+    </p>
+
+    <h2>Tipo de aplicación</h2>
+    <ul>
+      <li>Aplicación móvil híbrida multiplataforma basada en React Native y Expo (Android e iOS).</li>
+      <li>Ejecución en entorno web mediante Expo (modo web).</li>
+      <li>Navegación con expo-router y pantallas organizadas por módulos.</li>
+    </ul>
+  </section>
+
+  <section class="page">
+    <h2>Funcionalidades principales</h2>
+    <ul>
+      <li>Escuela virtual de español con niveles A1, A2, B1 y B2, unidades y progreso.</li>
+      <li>Lecciones de gramática, vocabulario y comprensión con ejercicios interactivos.</li>
+      <li>Exámenes finales con evaluación de pruebas orales y escritas.</li>
+      <li>Alfabetización y práctica de pronunciación con apoyo de audio.</li>
+      <li>Reconocimiento oral en ejercicios y pruebas (beta).</li>
+      <li>Aprende a escribir con evaluación mediante OCR.</li>
+      <li>Foro de comunidad y chat entre usuarios.</li>
+      <li>Asesoría de inmigración con solicitud de citas y seguimiento.</li>
+      <li>Creador de CV con exportación.</li>
+      <li>Formación profesional con cursos temáticos.</li>
+      <li>Integración de la mujer con recursos, derechos y apoyo.</li>
+      <li>Noticias, cultura general, biblioteca y contenidos informativos.</li>
+    </ul>
+  </section>
+
+  <section class="page">
+    <h2>Capturas seleccionadas por funcionalidad (1)</h2>
+    <div class="grid">
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260120-130316.png" alt="Inicio y acceso a módulos" />
+        <figcaption>Inicio y accesos principales.</figcaption>
+      </figure>
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260119-103624.png" alt="Escuela virtual y matrícula" />
+        <figcaption>Escuela virtual y matrícula por niveles.</figcaption>
+      </figure>
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260122-100707.png" alt="Lección de componer frases" />
+        <figcaption>Lecciones A1: componer frases.</figcaption>
+      </figure>
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260122-100939.png" alt="Vocabulario visual" />
+        <figcaption>Vocabulario visual bilingüe.</figcaption>
+      </figure>
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260122-101734.png" alt="Examen final" />
+        <figcaption>Examen final y evaluación.</figcaption>
+      </figure>
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260122-100802.png" alt="Reconocimiento oral" />
+        <figcaption>Reconocimiento oral (beta).</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="page">
+    <h2>Capturas seleccionadas por funcionalidad (2)</h2>
+    <div class="grid">
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260122-103515.png" alt="Alfabetización" />
+        <figcaption>Alfabetización y práctica de letras.</figcaption>
+      </figure>
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260122-103331.png" alt="Asesoría de inmigración" />
+        <figcaption>Asesoría de inmigración.</figcaption>
+      </figure>
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260122-103408.png" alt="Creador de CV" />
+        <figcaption>Creador de CV.</figcaption>
+      </figure>
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260122-103700.png" alt="Integración de la mujer" />
+        <figcaption>Integración de la mujer: recursos y apoyo.</figcaption>
+      </figure>
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260119-103635.png" alt="Formación profesional" />
+        <figcaption>Formación profesional y cursos.</figcaption>
+      </figure>
+      <figure>
+        <img src="imagen-presentacion/Screenshot_20260122-103922.png" alt="Cultura general" />
+        <figcaption>Cultura general y contenidos educativos.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="page">
+    <h2>Tecnologías utilizadas</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Área</th>
+          <th>Tecnologías</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Frontend móvil</td>
+          <td>React Native 0.79, Expo SDK 53, React 19, TypeScript/JavaScript, expo-router.</td>
+        </tr>
+        <tr>
+          <td>UX/Media</td>
+          <td>expo-notifications, expo-image-picker, expo-image-manipulator, expo-av, expo-speech.</td>
+        </tr>
+        <tr>
+          <td>Backend</td>
+          <td>Node.js, Express, Firebase Admin SDK, Expo Server SDK.</td>
+        </tr>
+        <tr>
+          <td>Base de datos y storage</td>
+          <td>Firebase Authentication, Firestore, Firebase Storage.</td>
+        </tr>
+        <tr>
+          <td>Procesamiento y OCR</td>
+          <td>Google Cloud Vision y Tesseract.js.</td>
+        </tr>
+        <tr>
+          <td>Pagos</td>
+          <td>Stripe y Cecabank.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="page">
+    <h2>Infraestructura y alojamiento</h2>
+    <ul>
+      <li>Proveedor backend: Render (servicio gestionado con URL pública onrender.com).</li>
+      <li>Proveedor de datos: Firebase/Google Cloud (Auth, Firestore, Storage).</li>
+      <li>Compilación y distribución móvil: Expo y EAS Build (servicio gestionado).</li>
+      <li>Tipo de entorno: servicios gestionados (sin servidor dedicado ni VPS propio).</li>
+    </ul>
+
+    <h2>Servicios implicados e integraciones</h2>
+    <ul>
+      <li>Firebase Auth, Firestore y Storage.</li>
+      <li>Expo Push Notification Service y FCM para Android.</li>
+      <li>OCR con Google Cloud Vision y Tesseract.js.</li>
+      <li>Pagos con Stripe y Cecabank.</li>
+      <li>Integración con Odoo para sincronización de usuarios.</li>
+      <li>Envío de correos mediante SMTP (Nodemailer).</li>
+      <li>Fuentes RSS para noticias y contenidos informativos.</li>
+    </ul>
+  </section>
+
+  <section class="page">
+    <h2>Entornos disponibles</h2>
+    <ul>
+      <li>Desarrollo: perfil EAS <strong>development</strong> (dev client y APK interno).</li>
+      <li>Preproducción: perfil EAS <strong>preview</strong> (distribución interna).</li>
+      <li>Producción: perfil EAS <strong>production</strong> (Android App Bundle / iOS store).</li>
+      <li>Backend: ejecución local (nodemon) y despliegue en Render.</li>
+    </ul>
+
+    <h2>Sistema de control de versiones</h2>
+    <ul>
+      <li>Git como sistema de control de versiones.</li>
+    </ul>
+
+    <h2>Documentación técnica existente</h2>
+    <ul>
+      <li>Documentacion_App.md — descripción general y módulos.</li>
+      <li>MEMORIA_PROGRAMA_AcademiaInmigrantes.md — memoria del programa y especificaciones.</li>
+      <li>ODOO_INTEGRATION.md — integración con Odoo y configuración.</li>
+      <li>INFORMACION_PARA_ODOO.md — datos y requisitos para Odoo.</li>
+      <li>CECABANK_CONFIG_OK.md — datos de configuración de Cecabank.</li>
+      <li>docs/BIZUM_CONFIGURACION.md — configuración Bizum.</li>
+      <li>app.json y eas.json — configuración de Expo y entornos EAS.</li>
+      <li>package.json y academia-backend/package.json — dependencias y scripts.</li>
+    </ul>
+  </section>
+</body>
+</html>

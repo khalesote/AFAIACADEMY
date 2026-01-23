@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p><w:r><w:t>Presentación profesional de la app Academia de Inmigrantes</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Resumen funcional y técnico</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Versión de la app: 1.0.0</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Fecha: 22/01/2026</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>1. Visión general</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Academia de Inmigrantes es una plataforma móvil para la integración lingüística y social de personas inmigrantes en España, con contenidos en español y árabe y enfoque comunitario.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>El objetivo es facilitar el aprendizaje del idioma, la orientación legal y social, y el acceso a recursos útiles en un solo lugar.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>2. Tipo de aplicación</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Aplicación móvil híbrida construida con Expo y React Native. Se ejecuta en Android e iOS y usa expo-router para navegación.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Distribución mediante EAS Build con perfiles de desarrollo, preproducción y producción.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>3. Funcionalidades principales</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Escuela Virtual de español por niveles A1, A2, B1 y B2 con unidades y ejercicios.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Exámenes orales y escritos, exámenes finales por nivel y resultados con métricas.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Solicitud de examen presencial y certificado mediante formulario integrado.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Aprende a Escribir: ejercicios guiados con foto y OCR para evaluar escritura.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Alfabetización y juegos educativos (alfabeto, palabras, emparejar, ordenar, colores).</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Foro de la comunidad con publicaciones, comentarios e imágenes.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Chat privado entre usuarios y notificaciones internas.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Notificaciones push globales y panel de administración para avisos.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Asesoría y acompañamiento en inmigración con solicitud de citas.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Creador de CV profesional y acceso a portal de empleo.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Integración de la mujer: derechos, ayudas, actividades, recursos y revista.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Diccionario, vocabulario, gramática, situaciones comunicativas y cuentos.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Noticias y contenidos informativos integrados mediante RSS.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Perfil de usuario, agenda de estudio y seguimiento de matrícula.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>4. Arquitectura y frontend móvil</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Expo SDK 53, React 19, React Native 0.79.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Navegación con expo-router y React Navigation.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• UI con LinearGradient, Ionicons y componentes personalizados.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Almacenamiento local con AsyncStorage.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Multimedia: cámara y galería (expo-image-picker), manipulación de imagen (expo-image-manipulator), audio y speech (expo-speech).</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Notificaciones push con expo-notifications.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Firebase JS SDK para autenticación y datos.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>5. Backend y lógica de negocio</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Backend Node.js + Express (academia-backend/server.js).</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Endpoints para OCR Aprende a Escribir, registro de tokens push y envío de notificaciones.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Integraciones de pago (Cecabank y Stripe) para matrícula y servicios.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Envío de emails con SMTP2GO mediante Nodemailer.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• OCR con Google Cloud Vision o Tesseract como fallback.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>6. Base de datos y almacenamiento</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Firebase Authentication para registro e inicio de sesión.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Firebase Firestore como base de datos principal.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Firebase Storage para imágenes de perfil y capturas OCR.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Colecciones destacadas: users, notifications, forum_posts, privateChats, messages, aprende_escribir_submissions.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>7. Infraestructura y alojamiento</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Backend alojado en Render (servicio gestionado) con URL pública onrender.com.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Servicios de Firebase y Google Cloud para autenticación, Firestore y almacenamiento.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Expo y EAS para compilación y distribución.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• FCM para notificaciones Android mediante credenciales FCM v1 en Expo.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>8. Servicios e integraciones con terceros</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Firebase Auth, Firestore, Storage.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Google Cloud Vision API y Tesseract OCR.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Expo Push Notification Service y FCM.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Stripe y Cecabank para pagos.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• SMTP2GO para email transaccional.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Fuentes RSS para noticias e información.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>9. Entornos disponibles</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Desarrollo: EAS profile development, dev client, APK interno.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Preproducción: EAS profile preview, distribución interna.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Producción: EAS profile production, Android App Bundle y publicación en store.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Backend: desarrollo local con nodemon y producción en Render.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>10. Sistema de control de versiones</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Git como control de versiones.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Repositorio en GitHub: AFAIACADEMY.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>11. Documentación técnica existente</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• app.json y app.config.js: configuración de Expo y permisos.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• eas.json: perfiles de compilación y distribución.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• server.js: endpoints y servicios backend.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• package.json en app y backend: dependencias y scripts.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• No hay README principal consolidado en la raíz; se recomienda añadir guía técnica y de despliegue.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>12. Requisitos técnicos y permisos clave</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Permisos de cámara y micrófono para exámenes y OCR.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Permisos de notificaciones y almacenamiento temporal.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Variables de entorno backend: VISION_SERVICE_ACCOUNT_JSON, FIREBASE_STORAGE_BUCKET, OCR_PROVIDER, OCR_LANGUAGE, SMTP2GO, Stripe, Cecabank.</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>13. Estado actual y mantenimiento</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• El sistema está preparado para ampliaciones de contenido y nuevas funcionalidades.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>• Se recomienda monitoreo de logs en Render y actualización periódica de dependencias.</w:t></w:r></w:p>
+    <w:sectPr>
+      <w:pgSz w:w="12240" w:h="15840"/>
+      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/>
+    </w:sectPr>
+  </w:body>
+</w:document>

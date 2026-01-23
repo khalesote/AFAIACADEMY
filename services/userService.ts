@@ -4,8 +4,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
-  User as FirebaseUser
-} from 'firebase/auth';
+  type User as FirebaseUser
+} from '@firebase/auth';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, firestore, storage, isFirebaseInitialized } from '../config/firebase';
@@ -31,6 +31,8 @@ export interface User {
   documento?: string;
   tipoDocumento?: string;
   fechaNacimiento?: string;
+  nivelEspanol?: number | null;
+  nivelEstudios?: string;
   createdAt?: any;
   fechaMatricula?: string;
   pushToken?: string;
@@ -156,6 +158,8 @@ export class UserService {
     documento?: string;
     tipoDocumento?: string;
     fechaNacimiento?: string;
+    nivelEspanol?: number | null;
+    nivelEstudios?: string;
   }): Promise<{ user?: User; error?: string }> {
     try {
       if (!isFirebaseInitialized() || !auth || !firestore) {
@@ -188,6 +192,8 @@ export class UserService {
         documento: userData.documento || null,
         tipoDocumento: userData.tipoDocumento || null,
         fechaNacimiento: userData.fechaNacimiento || null,
+        nivelEspanol: typeof userData.nivelEspanol === 'number' ? userData.nivelEspanol : null,
+        nivelEstudios: userData.nivelEstudios || null,
         createdAt: new Date(),
         emailVerified: false
       };
@@ -210,7 +216,9 @@ export class UserService {
         localidad: userData.localidad,
         documento: userData.documento,
         tipoDocumento: userData.tipoDocumento,
-        fechaNacimiento: userData.fechaNacimiento
+        fechaNacimiento: userData.fechaNacimiento,
+        nivelEspanol: typeof userData.nivelEspanol === 'number' ? userData.nivelEspanol : null,
+        nivelEstudios: userData.nivelEstudios
       };
 
       // Store current user locally for quick access

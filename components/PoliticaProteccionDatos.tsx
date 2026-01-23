@@ -12,7 +12,7 @@ const PoliticaProteccionDatos = () => {
       
       <Text style={styles.sectionTitle}>1. Responsable del Tratamiento</Text>
       <Text style={styles.text}>
-        Afai academia de inmigrantes, con CIF [NÚMERO], con domicilio en Valcarreres, 7, 50004 Zaragoza, es el Responsable del Tratamiento de los datos personales del Usuario y le informa que estos datos serán tratados de conformidad con lo dispuesto en el Reglamento (UE) 2016/679, de 27 de abril (GDPR), y la Ley Orgánica 3/2018, de 5 de diciembre (LOPDGDD).
+        Afai academia de inmigrantes, con CIF [NÚMERO], con domicilio en Valcarreres, 7, 50004 Zaragoza, es el Responsable del Tratamiento de los datos personales del Usuario y le informa que estos datos serán tratados de conformidad con lo dispuesto en el Reglamento (UE) 2016/679, de 27 de abril (GDPR), y la Ley Orgánica 3/2018, de 5 de diciembre (LOPDGDD). Puede contactarnos en el correo <Text style={styles.link}>somos@afaiacademiadeinmigrantes.com</Text> o en el teléfono 662-744-837.
       </Text>
 
       <Text style={styles.sectionTitle}>2. Finalidad del Tratamiento</Text>
@@ -47,7 +47,7 @@ const PoliticaProteccionDatos = () => {
         {'\n'}- Solicitar la limitación de su tratamiento.
         {'\n'}- Oponerse al tratamiento de sus datos.
         {'\n'}- Solicitar la portabilidad de los datos.
-        Para ejercer estos derechos, puede enviar una solicitud a [CORREO ELECTRÓNICO] o a nuestra dirección postal (Valcarreres, 7, 50004 Zaragoza), acompañando copia de su DNI o documento identificativo equivalente.
+        Para ejercer estos derechos, puede enviar una solicitud a <Text style={styles.link}>somos@afaiacademiadeinmigrantes.com</Text> o a nuestra dirección postal (Valcarreres, 7, 50004 Zaragoza), acompañando copia de su DNI o documento identificativo equivalente. También puede comunicarse telefónicamente al 662-744-837.
       </Text>
 
       <Text style={styles.sectionTitle}>6. Plazo de Conservación de los Datos</Text>
@@ -63,9 +63,9 @@ const PoliticaProteccionDatos = () => {
       <Text style={styles.sectionTitle}>8. Contacto</Text>
       <Text style={styles.text}>
         Para cualquier cuestión relacionada con la presente política de privacidad o para ejercer sus derechos, puede contactar con nosotros a través de:
-        {'\n\n'}Email: [CORREO ELECTRÓNICO]
+        {'\n\n'}Email: <Text style={styles.link}>somos@afaiacademiadeinmigrantes.com</Text>
         {'\n'}Dirección: Valcarreres, 7, 50004 Zaragoza
-        {'\n'}Teléfono: [TELÉFONO]
+        {'\n'}Teléfono: 662-744-837
       </Text>
 
       <Text style={styles.lastUpdated}>
