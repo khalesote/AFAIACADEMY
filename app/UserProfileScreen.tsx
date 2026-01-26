@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+
 import {
   View,
   Text,
@@ -13,6 +14,8 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -62,6 +65,8 @@ const formatDate = (date: Date | string | undefined | null | any) => {
 
 export default function UserProfileScreen() {
   const navigation = useNavigation();
+  const router = useRouter();
+
   const { user, firebaseUser, loading: userLoading, refreshUser, logout, isAuthenticated, profileImage, updateProfileImage } = useUser();
   const [agenda, setAgenda] = useState<AgendaEntry[]>([]);
   const [unidad, setUnidad] = useState('');
@@ -151,11 +156,11 @@ export default function UserProfileScreen() {
   };
 
   const handleGoToSchool = () => {
-    navigation.navigate('SchoolScreen' as never);
+    router.push('/(tabs)/SchoolScreen');
   };
 
   const handleGoToFormacion = () => {
-    navigation.navigate('PreFormacionScreen' as never);
+    router.push('/(tabs)/PreFormacionScreen');
   };
 
   const pickImage = async () => {
