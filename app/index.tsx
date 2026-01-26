@@ -42,6 +42,7 @@ import Constants from 'expo-constants';
 import * as FileSystem from 'expo-file-system';
 import { WebView } from 'react-native-webview';
 import * as Notifications from 'expo-notifications';
+import { useAppUpdates } from '../hooks/useAppUpdates';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -88,6 +89,9 @@ export function HomeScreenContent() {
   const newsScrollPosition = useRef(0);
   const [newsContentWidth, setNewsContentWidth] = useState(0);
   const [registeredUsersCount, setRegisteredUsersCount] = useState<number>(0);
+  const { state: updateState } = useAppUpdates({ auto: true });
+  const isDownloadingUpdate = updateState.status === 'downloading';
+  const shouldShowUpdateBanner = updateState.status === 'downloading';
   
   // Scroll automático para horarios de oración
   const prayerTimesScrollRef = useRef<ScrollView>(null);
@@ -484,7 +488,6 @@ export function HomeScreenContent() {
         .map((item) => `${item.source}: ${item.title}`)
         .join('   •   ')
     : "¡Oferta especial! 50% descuento en todas las matrículas de la Escuela Virtual - عرض خاص! خصم 50% على جميع التسجيلات في المدرسة الافتراضية   •   La Academia ofrece servicios de asesoramiento y acompañamiento, consultas en temas administrativos y de extranjería. Solicita cita previa en la sección Asesoría y Acompañamiento - تقدم الأكاديمية خدمات الاستشارة والمرافقة، استشارات في المواضيع الإدارية والأجانب. اطلب موعدًا مسبقًا في قسم الاستشارة والمرافقة   •   Si tienes dudas sobre aprendizaje de español o trámites administrativos/extranjería, publica en Foro Comunidad para resolverlas - إذا كان لديك أسئلة حول تعلم الإسبانية أو الإجراءات الإدارية/الأجانب، انشر في منتدى المجتمع لحلها";
-
   return (
     <View style={styles.container}>
       {/* Header Dashboard */}
@@ -531,6 +534,37 @@ export function HomeScreenContent() {
             )}
           </View>
         </View>
+
+        {shouldShowUpdateBanner && (
+          <View
+            style={[
+              styles.updateBanner,
+            ]}
+          >
+            <Ionicons
+              name={
+                'cloud-download'
+              }
+              size={20}
+              color="#FFD700"
+              style={{ marginRight: 10 }}
+            />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.updateBannerTitle}>
+                Descargando actualización
+              </Text>
+              <Text style={styles.updateBannerSubtitle}>
+                Estamos aplicando los últimos cambios.
+              </Text>
+              {isDownloadingUpdate && (
+                <View style={styles.updateProgressBarContainer}>
+                  <View style={styles.updateProgressBar} />
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+
         {/* Ticker de frases (auto-scroll, compacto) */}
         <View style={styles.tickerSection}>
           <ScrollView
@@ -1854,6 +1888,44 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  updateBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    backgroundColor: '#101010',
+    borderWidth: 1,
+    borderColor: '#2d2d2d',
+  },
+  updateBannerError: {
+    borderColor: '#ff5252',
+    backgroundColor: '#290d0d',
+  },
+  updateBannerTitle: {
+    color: '#FFD700',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  updateBannerSubtitle: {
+    color: '#ddd',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  updateProgressBarContainer: {
+    marginTop: 8,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#333',
+    overflow: 'hidden',
+  },
+  updateProgressBar: {
+    width: '80%',
+    height: '100%',
+    borderRadius: 3,
+    backgroundColor: '#FFD700',
   },
 });
 
