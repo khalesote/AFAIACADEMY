@@ -89,9 +89,10 @@ export function HomeScreenContent() {
   const newsScrollPosition = useRef(0);
   const [newsContentWidth, setNewsContentWidth] = useState(0);
   const [registeredUsersCount, setRegisteredUsersCount] = useState<number>(0);
-  const { state: updateState } = useAppUpdates({ auto: true });
+  const { state: updateState, installDownloadedUpdate } = useAppUpdates({ auto: true });
   const isDownloadingUpdate = updateState.status === 'downloading';
   const shouldShowUpdateBanner = updateState.status === 'downloading';
+  const hasDownloadedUpdate = updateState.status === 'downloaded';
   
   // Scroll automático para horarios de oración
   const prayerTimesScrollRef = useRef<ScrollView>(null);
@@ -563,6 +564,18 @@ export function HomeScreenContent() {
               )}
             </View>
           </View>
+        )}
+
+        {hasDownloadedUpdate && (
+          <TouchableOpacity
+            style={styles.installUpdateButton}
+            onPress={() => {
+              installDownloadedUpdate();
+            }}
+          >
+            <Ionicons name="download" size={18} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.installUpdateButtonText}>Instalar actualización descargada</Text>
+          </TouchableOpacity>
         )}
 
         {/* Ticker de frases (auto-scroll, compacto) */}
@@ -1922,12 +1935,26 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   updateProgressBar: {
-    width: '80%',
+    width: '60%',
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 4,
     backgroundColor: '#FFD700',
+  },
+  installUpdateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 20,
+    marginTop: 10,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: '#1b5e20',
+  },
+  installUpdateButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 15,
   },
 });
 
 export default HomeScreenContent;
-
