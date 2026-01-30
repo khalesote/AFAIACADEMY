@@ -16,6 +16,7 @@ export interface User {
   name: string;
   firstName?: string;
   lastName?: string;
+  photoURL?: string | null;
   matriculado?: boolean;
   matriculado_escuela_virtual?: boolean;
   nivelMatricula?: string | null;
@@ -78,6 +79,7 @@ export class UserService {
         name: userData?.name || firebaseUser.displayName || '',
         firstName: userData?.firstName,
         lastName: userData?.lastName,
+        photoURL: userData?.photoURL,
         matriculado: userData?.matriculado,
         matriculado_escuela_virtual: userData?.matriculado_escuela_virtual,
         nivelMatricula: userData?.nivelMatricula ?? null,
@@ -183,6 +185,7 @@ export class UserService {
         name: fullName,
         firstName: userData.firstName.trim(),
         lastName: userData.lastName.trim(),
+        photoURL: null,
         matriculado: false,
         matriculado_escuela_virtual: false,
         nivelMatricula: null,
@@ -208,6 +211,7 @@ export class UserService {
         name: fullName,
         firstName: userData.firstName.trim(),
         lastName: userData.lastName.trim(),
+        photoURL: null,
         matriculado: false,
         matriculado_escuela_virtual: false,
         nivelMatricula: null,
@@ -270,6 +274,11 @@ export class UserService {
       const downloadURL = await getDownloadURL(uploadTask.ref);
       console.log('🔗 Download URL obtained:', downloadURL);
 
+      await setDoc(doc(firestore, 'users', uid), {
+        photoURL: downloadURL,
+        updatedAt: new Date(),
+      }, { merge: true });
+
       return downloadURL;
     } catch (error) {
       console.error('Upload profile image error:', error);
@@ -300,6 +309,7 @@ export class UserService {
         name: userData.name || '',
         firstName: userData.firstName,
         lastName: userData.lastName,
+        photoURL: userData.photoURL,
         matriculado: userData.matriculado,
         matriculado_escuela_virtual: userData.matriculado_escuela_virtual,
         nivelMatricula: userData.nivelMatricula,
@@ -340,6 +350,7 @@ export class UserService {
           name: userData?.name || firebaseUser.displayName || '',
           firstName: userData?.firstName,
           lastName: userData?.lastName,
+          photoURL: userData?.photoURL,
           matriculado: userData?.matriculado,
           matriculado_escuela_virtual: userData?.matriculado_escuela_virtual,
           nivelMatricula: userData?.nivelMatricula,

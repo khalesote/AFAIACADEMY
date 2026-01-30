@@ -135,6 +135,20 @@ export default function A2Plataforma() {
 
         <TouchableOpacity
           style={styles.unitButton}
+          onPress={() => router.push('/(tabs)/SituacionesScreen')}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={['#000', '#000']}
+            style={styles.unitButtonGradient}
+          >
+            <Text style={styles.unitButtonText}>Situaciones Cotidianas</Text>
+            <Text style={styles.unitButtonTextAr}>مواقف يومية</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.unitButton}
           onPress={() => router.push('/A2_Plataforma/clases/ExpresionOral')}
           activeOpacity={0.8}
         >

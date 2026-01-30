@@ -164,14 +164,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           }
 
           const savedImage = await AsyncStorage.getItem('@profile_image');
-          if (savedImage) {
+          if (userProfile?.photoURL) {
+            console.log('🖼️ Usando imagen de perfil desde Firestore');
+            setProfileImage(userProfile.photoURL);
+            await AsyncStorage.setItem('@profile_image', userProfile.photoURL);
+          } else if (savedImage) {
             console.log('🖼️ Imagen de perfil encontrada en almacenamiento local');
             setProfileImage(savedImage);
-          } else if (userProfile) {
-            console.log('🖼️ Usando imagen de perfil desde Firestore');
-            // Note: profileImage is stored separately in AsyncStorage, not on User object
           } else {
             console.log('🖼️ No hay imagen de perfil disponible');
+            setProfileImage(null);
           }
         } else {
           console.log('🚪 Usuario no autenticado, limpiando datos...');
@@ -209,6 +211,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const firebaseUrl = await UserService.uploadProfileImage(firebaseUser.uid, imageUri);
       if (firebaseUrl) {
         setProfileImage(firebaseUrl);
+        setUser((prev) => (prev ? { ...prev, photoURL: firebaseUrl } : prev));
+        await AsyncStorage.setItem('@profile_image', firebaseUrl);
       }
     } catch (error) {
       console.error('Error al actualizar la imagen de perfil:', error);

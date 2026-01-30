@@ -153,11 +153,12 @@ export default function SituacionesScreen() {
       <TouchableOpacity
         style={styles.volverBtn}
         onPress={() => router.push("/")}
+        activeOpacity={0.85}
       >
         <Text style={styles.volverBtnText}>⟵ Volver a la Pantalla de Inicio</Text>
       </TouchableOpacity>
-      <Text style={styles.titulo}>Situaciones Corrientes</Text>
-      {categorias.map((cat, idx) => (
+      <Text style={styles.titulo}>Situaciones Cotidianas</Text>
+      {categorias.map((cat) => (
         <TouchableOpacity
           key={cat.key}
           style={styles.boton}
@@ -167,22 +168,24 @@ export default function SituacionesScreen() {
               params: { categoria: cat.key },
             })
           }
+          activeOpacity={0.9}
         >
           <View style={styles.row}>
             {typeof cat.icon === "number" ? (
-              <Image source={cat.icon} style={{ width: 32, height: 32, marginRight: 10 }} />
+              <Image source={cat.icon} style={styles.imageIcon} />
             ) : (
               <Ionicons
                 name={cat.icon as any}
-                size={32}
-                color={cat.color}
-                style={{ marginRight: 10 }}
+                size={28}
+                color="#FFD700"
+                style={{ marginRight: 12 }}
               />
             )}
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={styles.textoEs}>{cat.es}</Text>
               <Text style={styles.textoAr}>{cat.ar}</Text>
             </View>
+            <Ionicons name="chevron-forward" size={20} color="#FFD700" />
           </View>
         </TouchableOpacity>
       ))}
@@ -192,62 +195,72 @@ export default function SituacionesScreen() {
 
 const styles = StyleSheet.create({
   volverBtn: {
-    backgroundColor: "#1976d2",
-    paddingVertical: 8,
-    paddingHorizontal: 22,
-    borderRadius: 20,
-    marginBottom: 16,
-    alignSelf: "flex-start",
-    shadowColor: "#0003",
-    shadowOffset: { width: 1, height: 2 },
-    shadowOpacity: 0.09,
-    shadowRadius: 4,
+    backgroundColor: '#000',
+    borderWidth: 1,
+    borderColor: '#FFD700',
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 24,
+    marginBottom: 18,
+    alignSelf: 'flex-start',
   },
   volverBtnText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#FFD700',
+    fontWeight: 'bold',
     fontSize: 16,
     letterSpacing: 1,
-    textAlign: "center",
+    textAlign: 'center',
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
   },
   container: {
     padding: 24,
-    alignItems: "center",
-    backgroundColor: "#fff",
+    alignItems: 'center',
+    backgroundColor: '#050505',
   },
   titulo: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 24,
-    color: "#1976d2",
+    fontSize: 28,
+    fontWeight: '800',
+    marginBottom: 18,
+    color: '#FFD700',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   boton: {
-    backgroundColor: "#e3e3e3",
-    borderRadius: 12,
-    padding: 18,
+    backgroundColor: '#0f0f0f',
+    borderRadius: 14,
+    paddingVertical: 18,
+    paddingHorizontal: 18,
     marginVertical: 8,
-    width: "100%",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#222',
+    shadowColor: '#000',
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 3,
   },
   textoEs: {
-    fontSize: 20,
-    color: "#333",
-    fontWeight: "bold",
-    marginBottom: 6,
+    fontSize: 18,
+    color: '#FFD700',
+    fontWeight: '700',
+    marginBottom: 4,
   },
   textoAr: {
-    fontSize: 20,
-    color: "#388e3c",
-    fontWeight: "bold",
-    fontFamily: "System", // Puedes cambiar la fuente si tienes una árabe
-    writingDirection: "rtl",
+    fontSize: 18,
+    color: '#E6C94C',
+    fontWeight: '600',
+    fontFamily: 'System',
+    writingDirection: 'rtl',
+  },
+  imageIcon: {
+    width: 32,
+    height: 32,
+    marginRight: 12,
+    tintColor: '#FFD700',
+    resizeMode: 'contain',
   },
 });

@@ -37,6 +37,13 @@ interface FormData {
 
 type EnrollmentLevel = 'A1' | 'A2' | 'B1' | 'B2';
 
+const LEVEL_DETAILS: Array<{ level: EnrollmentLevel; title: string; description: string }> = [
+  { level: 'A1', title: 'Nivel A1', description: 'Acceso al nivel A1: Acceso' },
+  { level: 'A2', title: 'Nivel A2', description: 'Acceso al nivel A2: Plataforma' },
+  { level: 'B1', title: 'Nivel B1', description: 'Acceso al nivel B1: Umbral' },
+  { level: 'B2', title: 'Nivel B2', description: 'Acceso al nivel B2: Avanzado' },
+];
+
 export default function MatriculaScreen() {
   const router = useRouter();
   const { progress, markUnitCompleted, unlockLevel, reloadProgress } = useUserProgress();
@@ -111,6 +118,7 @@ export default function MatriculaScreen() {
 
   const handleSelectLevel = (level: EnrollmentLevel) => {
     setSelectedLevel(level);
+    setPaymentMethod('payment');
   };
 
   const handlePaymentSuccess = async (paymentInfo: any) => {
@@ -319,188 +327,112 @@ export default function MatriculaScreen() {
         {/* Opciones de matrícula */}
         <View style={styles.enrollmentOptions}>
           <Text style={styles.sectionSubtitleBlack}>Niveles Individuales</Text>
-          
-          {/* Matrícula A1 */}
-          <TouchableOpacity 
-            style={[
-              styles.enrollmentOption, 
-              selectedLevel === 'A1' && styles.selectedOption
-            ]}
-            onPress={() => handleSelectLevel('A1')}
-          >
-            <View style={styles.optionHeader}>
-              <MaterialIcons 
-                name={selectedLevel === 'A1' ? 'lock-open' : 'lock-outline'} 
-                size={24} 
-                color={selectedLevel === 'A1' ? '#4CAF50' : '#666'} 
-              />
-              <Text style={styles.optionTitle}>Nivel A1</Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <View style={styles.priceRow}>
-                <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_A1}€</Text>
-                <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_A1 * 0.5).toFixed(2)}€</Text>
-                  <Text style={styles.ivaText}> (impuestos incluidos)</Text>
-                </View>
-              </View>
-              <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
-            </View>
-            <Text style={styles.optionDescription}>Acceso al nivel A1: Acceso</Text>
-          </TouchableOpacity>
 
-          {/* Matrícula A2 */}
-          <TouchableOpacity 
-            style={[
-              styles.enrollmentOption, 
-              selectedLevel === 'A2' && styles.selectedOption
-            ]}
-            onPress={() => handleSelectLevel('A2')}
-          >
-            <View style={styles.optionHeader}>
-              <MaterialIcons 
-                name={selectedLevel === 'A2' ? 'lock-open' : 'lock-outline'} 
-                size={24} 
-                color={selectedLevel === 'A2' ? '#4CAF50' : '#666'} 
-              />
-              <Text style={styles.optionTitle}>Nivel A2</Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <View style={styles.priceRow}>
-                <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_A2}€</Text>
-                <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_A2 * 0.5).toFixed(2)}€</Text>
-                  <Text style={styles.ivaText}> (impuestos incluidos)</Text>
-                </View>
-              </View>
-              <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
-            </View>
-            <Text style={styles.optionDescription}>Acceso al nivel A2: Plataforma</Text>
-          </TouchableOpacity>
+          {LEVEL_DETAILS.map(({ level, title, description }) => {
+            const isSelected = selectedLevel === level;
+            const priceKeyPerLevel = `MATRICULA_${level}` as keyof typeof ENROLLMENT_PRICES;
+            const originalPrice = ENROLLMENT_PRICES[priceKeyPerLevel] || 0;
+            const discountedPrice = (originalPrice * 0.5).toFixed(2);
 
-          {/* Matrícula B1 */}
-          <TouchableOpacity 
-            style={[
-              styles.enrollmentOption, 
-              selectedLevel === 'B1' && styles.selectedOption
-            ]}
-            onPress={() => handleSelectLevel('B1')}
-          >
-            <View style={styles.optionHeader}>
-              <MaterialIcons 
-                name={selectedLevel === 'B1' ? 'lock-open' : 'lock-outline'} 
-                size={24} 
-                color={selectedLevel === 'B1' ? '#4CAF50' : '#666'} 
-              />
-              <Text style={styles.optionTitle}>Nivel B1</Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <View style={styles.priceRow}>
-                <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_B1}€</Text>
-                <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_B1 * 0.5).toFixed(2)}€</Text>
-                  <Text style={styles.ivaText}> (impuestos incluidos)</Text>
+            return (
+              <TouchableOpacity
+                key={level}
+                style={[
+                  styles.enrollmentOption,
+                  isSelected && styles.selectedOption
+                ]}
+                onPress={() => handleSelectLevel(level)}
+                activeOpacity={0.9}
+              >
+                <View style={styles.optionHeader}>
+                  <MaterialIcons
+                    name={isSelected ? 'lock-open' : 'lock-outline'}
+                    size={24}
+                    color={isSelected ? '#4CAF50' : '#666'}
+                  />
+                  <Text style={styles.optionTitle}>{title}</Text>
                 </View>
-              </View>
-              <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
-            </View>
-            <Text style={styles.optionDescription}>Acceso al nivel B1: Umbral</Text>
-          </TouchableOpacity>
-
-          {/* Matrícula B2 */}
-          <TouchableOpacity 
-            style={[
-              styles.enrollmentOption, 
-              selectedLevel === 'B2' && styles.selectedOption
-            ]}
-            onPress={() => handleSelectLevel('B2')}
-          >
-            <View style={styles.optionHeader}>
-              <MaterialIcons 
-                name={selectedLevel === 'B2' ? 'lock-open' : 'lock-outline'} 
-                size={24} 
-                color={selectedLevel === 'B2' ? '#4CAF50' : '#666'} 
-              />
-              <Text style={styles.optionTitle}>Nivel B2</Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <View style={styles.priceRow}>
-                <Text style={styles.originalPrice}>{ENROLLMENT_PRICES.MATRICULA_B2}€</Text>
-                <View style={styles.discountedPriceContainer}>
-                  <Text style={styles.discountedPrice}>{(ENROLLMENT_PRICES.MATRICULA_B2 * 0.5).toFixed(2)}€</Text>
-                  <Text style={styles.ivaText}> (impuestos incluidos)</Text>
+                <View style={styles.priceContainer}>
+                  <View style={styles.priceRow}>
+                    <Text style={styles.originalPrice}>{originalPrice}€</Text>
+                    <View style={styles.discountedPriceContainer}>
+                      <Text style={styles.discountedPrice}>{discountedPrice}€</Text>
+                      <Text style={styles.ivaText}> (impuestos incluidos)</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
                 </View>
-              </View>
-              <Text style={styles.discountBadge}>🔥 Descuento tiempo limitado 50%</Text>
-            </View>
-            <Text style={styles.optionDescription}>Acceso al nivel B2: Avanzado</Text>
-          </TouchableOpacity>
+                <Text style={styles.optionDescription}>{description}</Text>
 
+                {isSelected && (
+                  <View style={styles.inlinePaymentArea}>
+                    <Text style={styles.inlinePaymentTitle}>Elige cómo matricularte</Text>
+
+                    <View style={styles.paymentMethodButtons}>
+                      <TouchableOpacity
+                        style={[
+                          styles.paymentMethodButton,
+                          paymentMethod === 'payment' && styles.paymentMethodButtonActive
+                        ]}
+                        onPress={() => setPaymentMethod('payment')}
+                      >
+                        <Text style={[
+                          styles.paymentMethodButtonText,
+                          paymentMethod === 'payment' && styles.paymentMethodButtonTextActive
+                        ]}>
+                          💳 Pago Online
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[
+                          styles.paymentMethodButton,
+                          paymentMethod === 'code' && styles.paymentMethodButtonActive
+                        ]}
+                        onPress={() => setPaymentMethod('code')}
+                      >
+                        <Text style={[
+                          styles.paymentMethodButtonText,
+                          paymentMethod === 'code' && styles.paymentMethodButtonTextActive
+                        ]}>
+                          🎫 Código de Acceso
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.inlinePaymentContent}>
+                      {paymentMethod === 'payment' ? (
+                        <>
+                          <CecabankPayment
+                            operationType={operationType}
+                            amount={amount}
+                            description={`Matrícula ${selectedLevel}`}
+                            customerEmail={safeFormData.email || undefined}
+                            customerName={customerName || undefined}
+                            onPaymentSuccess={handlePaymentSuccess}
+                            onPaymentCancel={() => setPaymentMethod('code')}
+                            onPaymentError={(error) => Alert.alert('Error de pago', error)}
+                          />
+                          {isLoading && (
+                            <ActivityIndicator size="small" color="#4CAF50" style={{ marginTop: 10 }} />
+                          )}
+                        </>
+                      ) : (
+                        <AccessCodeInput
+                          key={`access-code-${selectedLevel}`}
+                          documento={safeFormData.documento}
+                          level={selectedLevel}
+                          onCodeValid={handleCodeValid}
+                          onCancel={() => setPaymentMethod('payment')}
+                        />
+                      )}
+                    </View>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
-
-        {/* Método de pago */}
-        <View style={styles.paymentMethodContainer}>
-          <Text style={styles.sectionTitle}>Método de pago</Text>
-          
-          <View style={styles.paymentMethodButtons}>
-            <TouchableOpacity
-              style={[
-                styles.paymentMethodButton,
-                paymentMethod === 'payment' && styles.paymentMethodButtonActive
-              ]}
-              onPress={() => setPaymentMethod('payment')}
-            >
-              <Text style={[
-                styles.paymentMethodButtonText,
-                paymentMethod === 'payment' && styles.paymentMethodButtonTextActive
-              ]}>
-                💳 Pago Online
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[
-                styles.paymentMethodButton,
-                paymentMethod === 'code' && styles.paymentMethodButtonActive
-              ]}
-              onPress={() => setPaymentMethod('code')}
-            >
-              <Text style={[
-                styles.paymentMethodButtonText,
-                paymentMethod === 'code' && styles.paymentMethodButtonTextActive
-              ]}>
-                🎫 Código de Acceso
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Proceso de pago o código */}
-        {paymentMethod === 'payment' ? (
-          <View style={styles.paymentContainer}>
-            <CecabankPayment
-              operationType={operationType}
-              amount={amount}
-              description={`Matrícula ${selectedLevel}`}
-              customerEmail={safeFormData.email || undefined}
-              customerName={customerName || undefined}
-              onPaymentSuccess={handlePaymentSuccess}
-              onPaymentCancel={() => setPaymentMethod('code')}
-              onPaymentError={(error) => Alert.alert('Error de pago', error)}
-            />
-            {isLoading && (
-              <ActivityIndicator size="small" color="#4CAF50" style={{ marginTop: 10 }} />
-            )}
-          </View>
-        ) : (
-          <AccessCodeInput
-            key={`access-code-${selectedLevel}`}
-            documento={safeFormData.documento}
-            level={selectedLevel}
-            onCodeValid={handleCodeValid}
-            onCancel={() => setPaymentMethod('payment')}
-          />
-        )}
       </ScrollView>
     </View>
   );
@@ -634,6 +566,23 @@ const styles = StyleSheet.create({
     color: '#FFD700',
     fontWeight: '600',
     marginTop: 5,
+  },
+  inlinePaymentArea: {
+    marginTop: 15,
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#111',
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  inlinePaymentTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFD700',
+    marginBottom: 10,
+  },
+  inlinePaymentContent: {
+    marginTop: 15,
   },
   paymentMethodContainer: {
     marginBottom: 20,

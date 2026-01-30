@@ -8,7 +8,8 @@ import {
   TextInput,
   Alert,
   FlatList,
-  Modal
+  Modal,
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { collection, addDoc, getDocs, query, orderBy, where, Timestamp, onSnapshot, updateDoc, increment, doc } from 'firebase/firestore';
@@ -42,6 +43,7 @@ interface ForumComment {
   authorId: string;
   authorPhoto?: string;
   createdAt: Timestamp;
+  parentCommentId?: string | null;
 }
 
 const categories = [
@@ -52,6 +54,21 @@ const categories = [
   { key: 'culture', label: 'Cultura', icon: 'heart-outline', color: '#e91e63' },
 ];
 
+const getBlobFromUri = async (uri: string): Promise<Blob> => {
+  return await new Promise<Blob>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function () {
+      reject(new TypeError('Network request failed'));
+    };
+    xhr.responseType = 'blob';
+    xhr.open('GET', uri, true);
+    xhr.send(null);
+  });
+};
+
 export default function ForumScreen() {
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [comments, setComments] = useState<{ [postId: string]: ForumComment[] }>({});
@@ -59,13 +76,14 @@ export default function ForumScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
-  // const [newPostImageUri, setNewPostImageUri] = useState<string | null>(null);
-  // const [uploadingImage, setUploadingImage] = useState(false);
+  const [newPostImageUri, setNewPostImageUri] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('general');
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [newCommentContent, setNewCommentContent] = useState('');
+  const [replyingTo, setReplyingTo] = useState<ForumComment | null>(null);
   const { user, profileImage } = useUser();
   const [commentUnsubscribers, setCommentUnsubscribers] = useState<{ [postId: string]: () => void }>({});
   const [showNewPostsBanner, setShowNewPostsBanner] = useState(false);
@@ -186,89 +204,145 @@ export default function ForumScreen() {
       const authorName = user.name || user.email;
       const createdAt = Timestamp.now();
 
-      const postRef = await addDoc(collection(firestore, 'forum_posts'), {
-        title: trimmedTitle,
-        content: trimmedContent,
-        author: authorName,
-        authorId: user.id,
-        authorPhoto: profileImage || null,
-        imageUrl: null,
-        createdAt,
-        category: selectedCategory,
-        commentsCount: 0,
-      });
-
       try {
-        const usersSnapshot = await getDocs(collection(firestore, 'users'));
-        const notificationPromises: Promise<any>[] = [];
-        const tokens: string[] = [];
-        const title = 'Nueva publicación en el foro';
-        const message = `${authorName} publicó: ${trimmedTitle}`;
+        setUploadingImage(true);
 
-        usersSnapshot.forEach((docSnapshot) => {
-          if (docSnapshot.id === user.id) return;
-          const userData = docSnapshot.data();
-          notificationPromises.push(addDoc(collection(firestore, 'notifications'), {
-            title,
-            message,
-            sentBy: authorName,
-            sentByEmail: user.email,
-            sentById: user.id,
-            toUserId: docSnapshot.id,
-            read: false,
-            type: 'forum_post',
-            postId: postRef.id,
-            createdAt,
-          }));
-
-          if (userData.pushToken) {
-            tokens.push(userData.pushToken);
-          }
-        });
-
-        await Promise.all(notificationPromises);
-
-        if (tokens.length > 0) {
-          const messages = tokens.map((token) => ({
-            to: token,
-            title,
-            body: message,
-            data: { type: 'forum_post', postId: postRef.id },
-            sound: 'default',
-            channelId: 'default',
-            priority: 'high',
-          }));
-
-          const batchSize = 100;
-          for (let i = 0; i < messages.length; i += batchSize) {
-            const batch = messages.slice(i, i + batchSize);
-            const response = await fetch('https://exp.host/--/api/v2/push/send', {
-              method: 'POST',
-              headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(batch),
-            });
-
-            if (!response.ok) {
-              console.error('Error enviando push de foro, batch:', i / batchSize);
-            }
+        let uploadedImageUrl: string | null = null;
+        if (newPostImageUri) {
+          try {
+            const fileExtension = newPostImageUri.split('.').pop()?.split('?')[0] || 'jpg';
+            const imageBlob = await getBlobFromUri(newPostImageUri);
+            const storageRef = ref(storage, `forum_posts/${user.id}_${Date.now()}.${fileExtension}`);
+            await uploadBytes(storageRef, imageBlob);
+            uploadedImageUrl = await getDownloadURL(storageRef);
+            (imageBlob as any)?.close?.();
+          } catch (imageError) {
+            console.error('Error subiendo imagen del foro:', imageError);
+            Alert.alert('Error', 'No se pudo subir la imagen seleccionada');
+            setUploadingImage(false);
+            return;
           }
         }
-      } catch (notifyError) {
-        console.error('Error notificando publicación de foro:', notifyError);
-      }
 
-      setModalVisible(false);
-      setNewPostTitle('');
-      setNewPostContent('');
-      setSelectedCategory('general');
-      Alert.alert('Éxito', 'Publicación creada correctamente');
+        const postRef = await addDoc(collection(firestore, 'forum_posts'), {
+          title: trimmedTitle,
+          content: trimmedContent,
+          author: authorName,
+          authorId: user.id,
+          authorPhoto: profileImage || null,
+          imageUrl: uploadedImageUrl,
+          createdAt,
+          category: selectedCategory,
+          commentsCount: 0,
+        });
+
+        try {
+          const usersSnapshot = await getDocs(collection(firestore, 'users'));
+          const notificationPromises: Promise<any>[] = [];
+          const tokens: string[] = [];
+          const title = 'Nueva publicación en el foro';
+          const message = `${authorName} publicó: ${trimmedTitle}`;
+
+          usersSnapshot.forEach((docSnapshot) => {
+            if (docSnapshot.id === user.id) return;
+            const userData = docSnapshot.data();
+            notificationPromises.push(addDoc(collection(firestore, 'notifications'), {
+              title,
+              message,
+              sentBy: authorName,
+              sentByEmail: user.email,
+              sentById: user.id,
+              toUserId: docSnapshot.id,
+              read: false,
+              type: 'forum_post',
+              postId: postRef.id,
+              createdAt,
+            }));
+
+            if (userData.pushToken) {
+              tokens.push(userData.pushToken);
+            }
+          });
+
+          await Promise.all(notificationPromises);
+
+          if (tokens.length > 0) {
+            const messages = tokens.map((token) => ({
+              to: token,
+              title,
+              body: message,
+              data: { type: 'forum_post', postId: postRef.id },
+              sound: 'default',
+              channelId: 'default',
+              priority: 'high',
+            }));
+
+            const batchSize = 100;
+            for (let i = 0; i < messages.length; i += batchSize) {
+              const batch = messages.slice(i, i + batchSize);
+              const response = await fetch('https://exp.host/--/api/v2/push/send', {
+                method: 'POST',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(batch),
+              });
+
+              if (!response.ok) {
+                console.error('Error enviando push de foro, batch:', i / batchSize);
+              }
+            }
+          }
+        } catch (notifyError) {
+          console.error('Error notificando publicación de foro:', notifyError);
+        }
+
+        setModalVisible(false);
+        setNewPostTitle('');
+        setNewPostContent('');
+        setSelectedCategory('general');
+        setNewPostImageUri(null);
+        Alert.alert('Éxito', 'Publicación creada correctamente');
+      } catch (error) {
+        console.error('Error creating post:', error);
+        Alert.alert('Error', 'No se pudo crear la publicación');
+      } finally {
+        setUploadingImage(false);
+      }
     } catch (error) {
       console.error('Error creating post:', error);
       Alert.alert('Error', 'No se pudo crear la publicación');
     }
+  };
+
+  const handlePickImage = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Permiso requerido', 'Necesitamos acceso a tu galería para adjuntar imágenes');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: false,
+        allowsEditing: true,
+        aspect: [3, 4],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets?.length) {
+        setNewPostImageUri(result.assets[0].uri);
+      }
+    } catch (pickerError) {
+      console.error('Error seleccionando imagen:', pickerError);
+      Alert.alert('Error', 'No se pudo seleccionar la imagen');
+    }
+  };
+
+  const removeSelectedImage = () => {
+    setNewPostImageUri(null);
   };
 
   const createComment = async () => {
@@ -286,6 +360,7 @@ export default function ForumScreen() {
         authorId: user.id,
         authorPhoto: profileImage || null,
         createdAt: Timestamp.now(),
+        parentCommentId: replyingTo?.id || null,
       });
 
       // Update comments count in the post
@@ -298,6 +373,7 @@ export default function ForumScreen() {
       setCommentModalVisible(false);
       setNewCommentContent('');
       setSelectedPostId(null);
+      setReplyingTo(null);
 
       Alert.alert('Éxito', 'Comentario agregado correctamente');
     } catch (error) {
@@ -328,8 +404,10 @@ export default function ForumScreen() {
     setExpandedPosts(newExpandedPosts);
   };
 
-  const openCommentModal = (postId: string) => {
+  const openCommentModal = (postId: string, replyTo?: ForumComment) => {
     setSelectedPostId(postId);
+    setReplyingTo(replyTo || null);
+    setNewCommentContent(replyTo ? `@${replyTo.author} ` : '');
     setCommentModalVisible(true);
   };
 
@@ -377,40 +455,47 @@ export default function ForumScreen() {
         ) : null}
 
         <View style={styles.postFooter}>
-          {item.authorPhoto ? (
-            <View style={styles.authorInfo}>
+          <TouchableOpacity
+            style={styles.authorInfo}
+            onPress={() => router.push({ pathname: '/PublicProfileScreen', params: { userId: item.authorId, returnTo: '/(tabs)/ForumScreen' } })}
+            disabled={!item.authorId}
+            activeOpacity={0.7}
+          >
+            {item.authorPhoto ? (
               <Image source={{ uri: item.authorPhoto }} style={styles.authorPhoto} />
-              <Text style={styles.postAuthor}>Por: {item.author}</Text>
-            </View>
-          ) : (
-            <Text style={styles.postAuthor}>Por: {item.author}</Text>
-          )}
-
-          <View style={styles.postActions}>
-            <TouchableOpacity
-              style={styles.commentButton}
-              onPress={() => openCommentModal(item.id)}
-            >
-              <Ionicons name="chatbubble-outline" size={16} color="#666" />
-              <Text style={styles.commentButtonText}>Comentar</Text>
-            </TouchableOpacity>
-
-            {(commentsCount > 0) && (
-              <TouchableOpacity
-                style={styles.expandButton}
-                onPress={() => togglePostExpansion(item.id)}
-              >
-                <Ionicons
-                  name={isExpanded ? "chevron-up" : "chevron-down"}
-                  size={16}
-                  color="#666"
-                />
-                <Text style={styles.expandButtonText}>
-                  {commentsCount} {commentsCount === 1 ? 'comentario' : 'comentarios'}
-                </Text>
-              </TouchableOpacity>
+            ) : (
+              <View style={styles.authorFallbackAvatar}>
+                <Ionicons name="person" size={14} color="#fff" />
+              </View>
             )}
-          </View>
+            <Text style={styles.postAuthor}>Por: {item.author}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.postActions}>
+          <TouchableOpacity
+            style={styles.commentButton}
+            onPress={() => openCommentModal(item.id)}
+          >
+            <Ionicons name="chatbubble-outline" size={16} color="#1976d2" />
+            <Text style={styles.commentButtonText}>Comentar</Text>
+          </TouchableOpacity>
+
+          {(commentsCount > 0) && (
+            <TouchableOpacity
+              style={styles.expandButton}
+              onPress={() => togglePostExpansion(item.id)}
+            >
+              <Ionicons
+                name={isExpanded ? "chevron-up" : "chevron-down"}
+                size={16}
+                color="#666"
+              />
+              <Text style={styles.expandButtonText}>
+                {commentsCount} {commentsCount === 1 ? 'comentario' : 'comentarios'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {isExpanded && postComments.length > 0 && (
@@ -418,22 +503,32 @@ export default function ForumScreen() {
             <Text style={styles.commentsTitle}>Comentarios</Text>
             {postComments.map((comment) => (
               <View key={comment.id} style={styles.commentItem}>
-                {comment.authorPhoto ? (
-                  <View style={styles.commentAuthorInfo}>
+                <TouchableOpacity
+                  style={styles.commentAuthorInfo}
+                  onPress={() => router.push({ pathname: '/PublicProfileScreen', params: { userId: comment.authorId, returnTo: '/(tabs)/ForumScreen' } })}
+                  disabled={!comment.authorId}
+                  activeOpacity={0.75}
+                >
+                  {comment.authorPhoto ? (
                     <Image source={{ uri: comment.authorPhoto }} style={styles.commentAuthorPhoto} />
-                    <View style={styles.commentContent}>
-                      <Text style={styles.commentAuthor}>{comment.author}</Text>
-                      <Text style={styles.commentText}>{comment.content}</Text>
-                      <Text style={styles.commentDate}>{formatDate(comment.createdAt)}</Text>
+                  ) : (
+                    <View style={styles.commentFallbackAvatar}>
+                      <Ionicons name="person" size={16} color="#fff" />
                     </View>
-                  </View>
-                ) : (
+                  )}
                   <View style={styles.commentContent}>
                     <Text style={styles.commentAuthor}>{comment.author}</Text>
                     <Text style={styles.commentText}>{comment.content}</Text>
                     <Text style={styles.commentDate}>{formatDate(comment.createdAt)}</Text>
                   </View>
-                )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.replyButton}
+                  onPress={() => openCommentModal(comment.postId, comment)}
+                >
+                  <Ionicons name="return-down-forward" size={14} color="#1976d2" />
+                  <Text style={styles.replyButtonText}>Responder</Text>
+                </TouchableOpacity>
               </View>
             ))}
           </View>
@@ -550,6 +645,29 @@ export default function ForumScreen() {
                 numberOfLines={6}
                 maxLength={1000}
               />
+
+              <View style={{ marginTop: 20 }}>
+                <TouchableOpacity
+                  style={styles.imagePickerButton}
+                  onPress={handlePickImage}
+                >
+                  <Ionicons name="image" size={20} color="#1976d2" />
+                  <Text style={styles.imagePickerText}>
+                    {newPostImageUri ? 'Cambiar imagen (opcional)' : 'Añadir imagen (opcional)'}
+                  </Text>
+                </TouchableOpacity>
+                {newPostImageUri && (
+                  <View style={styles.imagePreviewContainer}>
+                    <Image source={{ uri: newPostImageUri }} style={styles.imagePreview} />
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={removeSelectedImage}
+                    >
+                      <Ionicons name="close" size={16} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
             </ScrollView>
 
             <View style={styles.modalFooter}>
@@ -560,12 +678,20 @@ export default function ForumScreen() {
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.submitButton}
+                style={[styles.submitButton, uploadingImage && styles.submitButtonDisabled]}
                 onPress={createPost}
+                disabled={uploadingImage}
               >
-                <Text style={styles.submitButtonText}>
-                  Publicar
-                </Text>
+                {uploadingImage ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <ActivityIndicator size="small" color="#fff" />
+                    <Text style={styles.submitButtonText}>Publicando...</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.submitButtonText}>
+                    Publicar
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -588,6 +714,15 @@ export default function ForumScreen() {
             </View>
 
             <View style={styles.commentModalBody}>
+              {replyingTo && (
+                <View style={styles.replyingToBanner}>
+                  <Ionicons name="chatbox" size={16} color="#1976d2" />
+                  <Text style={styles.replyingToText}>Respondiendo a {replyingTo.author}</Text>
+                  <TouchableOpacity onPress={() => { setReplyingTo(null); setNewCommentContent(''); }}>
+                    <Ionicons name="close" size={16} color="#999" />
+                  </TouchableOpacity>
+                </View>
+              )}
               <Text style={styles.inputLabel}>Tu comentario</Text>
               <TextInput
                 style={[styles.textInput, styles.commentInput]}
@@ -607,6 +742,7 @@ export default function ForumScreen() {
                   setCommentModalVisible(false);
                   setNewCommentContent('');
                   setSelectedPostId(null);
+                  setReplyingTo(null);
                 }}
               >
                 <Text style={styles.cancelButtonText}>Cancelar</Text>
@@ -739,9 +875,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   postFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
   authorInfo: {
     flexDirection: 'row',
@@ -753,26 +889,44 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: 8,
   },
+  authorFallbackAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginRight: 8,
+    backgroundColor: '#555',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   postAuthor: {
     fontSize: 12,
     color: '#999',
     fontStyle: 'italic',
   },
   postActions: {
-    flexDirection: 'row',
+    width: '100%',
     alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+    gap: 8,
   },
   commentButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    marginRight: 10,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#1976d2',
+    backgroundColor: '#eef4ff',
+    minWidth: '70%',
   },
   commentButtonText: {
-    fontSize: 12,
-    color: '#666',
-    marginLeft: 4,
+    fontSize: 14,
+    color: '#1976d2',
+    marginLeft: 6,
+    fontWeight: '600',
   },
   expandButton: {
     flexDirection: 'row',
@@ -815,6 +969,16 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginTop: 2,
   },
+  commentFallbackAvatar: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    marginRight: 8,
+    marginTop: 2,
+    backgroundColor: '#777',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   commentContent: {
     flex: 1,
   },
@@ -833,6 +997,18 @@ const styles = StyleSheet.create({
   commentDate: {
     fontSize: 10,
     color: '#999',
+  },
+  replyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+    marginTop: 6,
+    gap: 4,
+  },
+  replyButtonText: {
+    fontSize: 12,
+    color: '#1976d2',
+    fontWeight: '600',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -885,6 +1061,24 @@ const styles = StyleSheet.create({
   },
   commentModalBody: {
     padding: 20,
+  },
+  replyingToBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#eef4ff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 10,
+    gap: 10,
+  },
+  replyingToText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#1976d2',
+    fontWeight: '600',
+    marginLeft: 6,
   },
   inputLabel: {
     fontSize: 16,

@@ -61,6 +61,378 @@ function GramaticaScreen() {
           </View>
         </View>
 
+        {nivel === 'A2' && (
+          <>
+            <Text style={styles.seccion}>A2 · Pretérito perfecto compuesto</Text>
+            <Text style={{
+              marginBottom: 8,
+              color: '#79A890',
+              fontWeight: 'bold',
+              fontSize: 16,
+            }}>
+              ¿Cómo hablar de experiencias recientes?
+            </Text>
+            <Text style={{ marginBottom: 8 }}>
+              El pretérito perfecto se forma con <Text style={{ fontWeight: 'bold' }}>haber (presente)</Text> + participio pasado. Se usa para acciones que ocurren en un pasado cercano o con conexión al presente.
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              color: '#79A890',
+              fontWeight: 'bold',
+              fontSize: 16,
+            }}>
+              شرح بالعربية:
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              writingDirection: 'rtl',
+              textAlign: 'right',
+              color: '#333',
+            }}>
+              يُستخدم الماضي التام القريب للتحدث عن أحداث قريبة ما زال أثرها أو نتيجتها في الحاضر. الصيغة: فعل haber في المضارع + اسم المفعول.
+            </Text>
+            <Text style={styles.subtitulo}>Conjugación de HABER</Text>
+            {[['Yo', 'he'], ['Tú', 'has'], ['Él/Ella/Usted', 'ha'], ['Nosotros/as', 'hemos'], ['Vosotros/as', 'habéis'], ['Ellos/Ellas/Ustedes', 'han']].map(([pron, form]) => (
+              <View key={pron} style={styles.tablaRow}>
+                <Text style={styles.tablaCell}>{`${pron} ${form}`}</Text>
+                <Text style={styles.tablaCellAr}>{pron === 'Yo' ? 'أنا' : pron === 'Tú' ? 'أنت' : ''}</Text>
+              </View>
+            ))}
+            <Text style={styles.subtitulo}>Ejemplos / أمثلة</Text>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>He visitado Valencia</Text>
+              <Text style={styles.tablaCellAr}>لقد زرت فالنسيا</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>¿Has comido ya?</Text>
+              <Text style={styles.tablaCellAr}>هل أكلت بالفعل؟</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Aún no hemos terminado</Text>
+              <Text style={styles.tablaCellAr}>لم ننتهِ بعد</Text>
+            </View>
+
+            <Text style={styles.seccion}>A2 · Pronombres de objeto directo e indirecto</Text>
+            <Text style={{ marginBottom: 8 }}>
+              En A2 es fundamental combinar pronombres para evitar repetir información. Recuerda que los pronombres van antes del verbo conjugado o unidos al infinitivo/gerundio.
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              color: '#79A890',
+              fontWeight: 'bold',
+              fontSize: 16,
+            }}>
+              شرح بالعربية:
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              writingDirection: 'rtl',
+              textAlign: 'right',
+              color: '#333',
+            }}>
+              الضمائر المفعولية المباشرة وغير المباشرة تمنع التكرار وتسبق الفعل. عند اجتماع الضميرين، يأتي غير المباشر قبل المباشر ويتحوّل LE/LES إلى SE أمام LO/LA/LOS/LAS.
+            </Text>
+            <Text style={styles.subtitulo}>Objeto directo</Text>
+            {[
+              ['me', 'me'],
+              ['te', 'te'],
+              ['lo / la', 'إياه / إياها'],
+              ['nos', 'إيانا'],
+              ['os', 'إياكم'],
+              ['los / las', 'إياهم / إياهن'],
+            ].map(([es, ar]) => (
+              <View key={es} style={styles.tablaRow}>
+                <Text style={styles.tablaCell}>{es}</Text>
+                <Text style={styles.tablaCellAr}>{ar}</Text>
+              </View>
+            ))}
+            <Text style={styles.subtitulo}>Objeto indirecto</Text>
+            {[
+              ['me', 'لي'],
+              ['te', 'لك'],
+              ['le', 'له / لها'],
+              ['nos', 'لنا'],
+              ['os', 'لكم'],
+              ['les', 'لهم'],
+            ].map(([es, ar]) => (
+              <View key={es} style={styles.tablaRow}>
+                <Text style={styles.tablaCell}>{es}</Text>
+                <Text style={styles.tablaCellAr}>{ar}</Text>
+              </View>
+            ))}
+            <Text style={styles.subtitulo}>Combinación</Text>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Se lo explico</Text>
+              <Text style={styles.tablaCellAr}>أشرح الأمر له / لها</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>¿Me la puedes traer?</Text>
+              <Text style={styles.tablaCellAr}>هل يمكنك أن تحضرها لي؟</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Te las envío luego</Text>
+              <Text style={styles.tablaCellAr}>سأرسلها لك لاحقًا</Text>
+            </View>
+
+            <Text style={styles.seccion}>A2 · Expresar obligación y recomendación</Text>
+            <Text style={{ marginBottom: 8 }}>
+              Aprende a diferenciar entre obligación personal, consejo y norma general usando las perífrasis más comunes.
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              color: '#79A890',
+              fontWeight: 'bold',
+              fontSize: 16,
+            }}>
+              شرح بالعربية:
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              writingDirection: 'rtl',
+              textAlign: 'right',
+              color: '#333',
+            }}>
+              للتعبير عن الواجب أو النصيحة نستخدم: tener que + مصدر (واجب شخصي)، deber + مصدر (نصيحة قوية)، hay que + مصدر (قاعدة عامة للجميع).
+            </Text>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Tener que + inf.</Text>
+              <Text style={styles.tablaCellAr}>عليّ أن / عليك أن</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Deber + inf.</Text>
+              <Text style={styles.tablaCellAr}>يجب أن (نصيحة)</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Hay que + inf.</Text>
+              <Text style={styles.tablaCellAr}>يجب (على الجميع)</Text>
+            </View>
+            <Text style={styles.subtitulo}>Ejemplos / أمثلة</Text>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Tengo que estudiar para el examen</Text>
+              <Text style={styles.tablaCellAr}>يجب أن أدرس للامتحان</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Debes descansar más</Text>
+              <Text style={styles.tablaCellAr}>عليك أن ترتاح أكثر</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Hay que llegar puntual al trabajo</Text>
+              <Text style={styles.tablaCellAr}>يجب الوصول في الوقت المحدد إلى العمل</Text>
+            </View>
+          </>
+        )}
+
+        {nivel === 'B1' && (
+          <>
+            <Text style={styles.seccion}>B1 · Pretérito imperfecto vs. indefinido</Text>
+            <Text style={{ marginBottom: 8 }}>
+              Refinamos el pasado: el <Text style={{ fontWeight: 'bold' }}>pretérito imperfecto</Text> describe hábitos, descripciones o acciones en progreso; el <Text style={{ fontWeight: 'bold' }}>pretérito indefinido</Text> narra hechos puntuales y terminados.
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              color: '#79A890',
+              fontWeight: 'bold',
+              fontSize: 16,
+            }}>
+              شرح بالعربية:
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              writingDirection: 'rtl',
+              textAlign: 'right',
+              color: '#333',
+            }}>
+              نستخدم الماضي الناقص لوصف العادات أو الخلفية، والماضي البسيط للأحداث المنتهية والمحددة في الزمن.
+            </Text>
+            <Text style={styles.subtitulo}>Usos principales</Text>
+            {[['Imperfecto', 'Descripciones, edad, hora, hábitos'], ['Indefinido', 'Acciones puntuales, secuencias, interrupciones']].map(([tiempo, uso]) => (
+              <View key={tiempo} style={styles.tablaRow}>
+                <Text style={styles.tablaCell}>{tiempo}</Text>
+                <Text style={styles.tablaCellAr}>
+                  {tiempo === 'Imperfecto' ? 'لوصف الخلفية والروتين' : 'لأحداث منتهية'}
+                </Text>
+              </View>
+            ))}
+            <Text style={styles.subtitulo}>Ejemplos / أمثلة</Text>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Cuando era niño, jugaba en la calle.</Text>
+              <Text style={styles.tablaCellAr}>عندما كنت طفلاً، كنت ألعب في الشارع.</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Ayer conocí a mis vecinos.</Text>
+              <Text style={styles.tablaCellAr}>أمس تعرّفت إلى جيراني.</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Cocinaba cuando llegó mi madre.</Text>
+              <Text style={styles.tablaCellAr}>كنت أطبخ عندما وصلت أمي.</Text>
+            </View>
+
+            <Text style={styles.seccion}>B1 · Perífrasis verbales útiles</Text>
+            <Text style={{ marginBottom: 8 }}>
+              En B1 aparecen combinaciones como <Text style={{ fontWeight: 'bold' }}>estar + gerundio</Text> (acción en progreso), <Text style={{ fontWeight: 'bold' }}>seguir + gerundio</Text> (continuidad) o <Text style={{ fontWeight: 'bold' }}>acabar de + infinitivo</Text> (acción recién terminada).
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              color: '#79A890',
+              fontWeight: 'bold',
+              fontSize: 16,
+            }}>
+              شرح بالعربية:
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              writingDirection: 'rtl',
+              textAlign: 'right',
+              color: '#333',
+            }}>
+              التراكيب اللفظية (perífrasis) تجمع بين فعل مساعد وفعل آخر لتحديد الزمن أو الموقف: أكون + اسم فاعل، أواصل + اسم فاعل، أنهي للتو + مصدر.
+            </Text>
+            {[
+              ['Estar + gerundio', 'Estoy estudiando español', 'أدرس الإسبانية الآن'],
+              ['Seguir + gerundio', 'Seguimos trabajando aquí', 'ما زلنا نعمل هنا'],
+              ['Acabar de + inf.', 'Acabo de llegar', 'توني وصلت'],
+            ].map(([titulo, es, ar]) => (
+              <View key={titulo} style={styles.tablaRow}>
+                <Text style={styles.tablaCell}>{titulo}</Text>
+                <Text style={styles.tablaCellAr}>{es} · {ar}</Text>
+              </View>
+            ))}
+
+            <Text style={styles.seccion}>B1 · Condicionales tipo 1</Text>
+            <Text style={{ marginBottom: 8 }}>
+              Estructura: <Text style={{ fontWeight: 'bold' }}>Si + presente de indicativo</Text> → <Text style={{ fontWeight: 'bold' }}>futuro / imperativo / presente</Text>. Se usa para situaciones reales o muy probables.
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              color: '#79A890',
+              fontWeight: 'bold',
+              fontSize: 16,
+            }}>
+              شرح بالعربية:
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              writingDirection: 'rtl',
+              textAlign: 'right',
+              color: '#333',
+            }}>
+              الجملة الشرطية من النوع الأول تتحدث عن احتمال واقعي: إذا + مضارع → مستقبل أو أمر.
+            </Text>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Si estudias, aprobarás.</Text>
+              <Text style={styles.tablaCellAr}>إذا درست ستنجح.</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Si tienes dudas, llámame.</Text>
+              <Text style={styles.tablaCellAr}>إذا كان لديك شك، اتصل بي.</Text>
+            </View>
+          </>
+        )}
+
+        {nivel === 'B2' && (
+          <>
+            <Text style={styles.seccion}>B2 · Subjuntivo presente en oraciones nominales</Text>
+            <Text style={{ marginBottom: 8 }}>
+              El subjuntivo aparece después de verbos de emoción, deseo o valoración: <Text style={{ fontWeight: 'bold' }}>Espero que vengas</Text>, <Text style={{ fontWeight: 'bold' }}>Es importante que estudien</Text>.
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              color: '#79A890',
+              fontWeight: 'bold',
+              fontSize: 16,
+            }}>
+              شرح بالعربية:
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              writingDirection: 'rtl',
+              textAlign: 'right',
+              color: '#333',
+            }}>
+              صيغة المضارع في الإسبانية (subjuntivo) تُستخدم بعد أفعال التعبير عن الرغبة أو المشاعر أو الأحكام: أتمنى أن، مهم أن، أخاف أن...
+            </Text>
+            <Text style={styles.subtitulo}>Desencadenantes comunes</Text>
+            {[
+              'Querer que...',
+              'Es necesario que...',
+              'Me alegra que...',
+              'Ojalá que...'
+            ].map((frase) => (
+              <Text key={frase} style={styles.tablaCell}>{frase}</Text>
+            ))}
+            <Text style={styles.subtitulo}>Ejemplos / أمثلة</Text>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Quiero que descanses.</Text>
+              <Text style={styles.tablaCellAr}>أريدك أن ترتاح.</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Es probable que lleguen tarde.</Text>
+              <Text style={styles.tablaCellAr}>من المحتمل أن يصلوا متأخرين.</Text>
+            </View>
+
+            <Text style={styles.seccion}>B2 · Estilo indirecto (discurso reportado)</Text>
+            <Text style={{ marginBottom: 8 }}>
+              Cuando contamos lo que otra persona dijo, ajustamos tiempos y pronombres: <Text style={{ fontWeight: 'bold' }}>"Voy" → dijo que iba</Text>.
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              color: '#79A890',
+              fontWeight: 'bold',
+              fontSize: 16,
+            }}>
+              شرح بالعربية:
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              writingDirection: 'rtl',
+              textAlign: 'right',
+              color: '#333',
+            }}>
+              في الأسلوب غير المباشر نغيّر الأزمنة وفقًا لزمن الكلام الأصلي: الحاضر يصبح ماضياً، المستقبل يصبح شرطياً، إلى آخره.
+            </Text>
+            <Text style={styles.subtitulo}>Transformaciones frecuentes</Text>
+            {[
+              ['Presente → Pretérito imperfecto', '"Estoy cansado" → dijo que estaba cansado'],
+              ['Futuro → Condicional', '"Iré mañana" → comentó que iría al día siguiente'],
+              ['Imperativo → Subjuntivo', '"Haz la tarea" → pidió que hiciera la tarea'],
+            ].map(([regla, ejemplo]) => (
+              <View key={regla} style={styles.tablaRow}>
+                <Text style={styles.tablaCell}>{regla}</Text>
+                <Text style={styles.tablaCellAr}>{ejemplo}</Text>
+              </View>
+            ))}
+
+            <Text style={styles.seccion}>B2 · Voz pasiva perifrástica</Text>
+            <Text style={{ marginBottom: 8 }}>
+              Se forma con <Text style={{ fontWeight: 'bold' }}>ser + participio</Text> y se usa para enfatizar la acción o el resultado: <Text style={{ fontWeight: 'bold' }}>La carta fue enviada</Text>.
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              color: '#79A890',
+              fontWeight: 'bold',
+              fontSize: 16,
+            }}>
+              شرح بالعربية:
+            </Text>
+            <Text style={{
+              marginBottom: 8,
+              writingDirection: 'rtl',
+              textAlign: 'right',
+              color: '#333',
+            }}>
+              المبني للمجهول يتكوّن من فعل ser في الزمن المناسب + اسم المفعول، ويتفق الاسم المفعول مع الفاعل الجديد في الجنس والعدد.
+            </Text>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>El informe será revisado mañana.</Text>
+              <Text style={styles.tablaCellAr}>سيتم مراجعة التقرير غدًا.</Text>
+            </View>
+            <View style={styles.tablaRow}>
+              <Text style={styles.tablaCell}>Las casas fueron construidas en 1950.</Text>
+              <Text style={styles.tablaCellAr}>بُنيت المنازل سنة 1950.</Text>
+            </View>
+          </>
+        )}
+
         {/* Otros temas */}
 
         {/* Adverbios */}

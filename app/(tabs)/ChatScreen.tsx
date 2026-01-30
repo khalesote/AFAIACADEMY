@@ -11,6 +11,8 @@ import {
   Alert,
   Modal,
   Image,
+  Linking,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,6 +21,7 @@ import { firestore, auth } from '../../config/firebase';
 import { useUser } from '../../contexts/UserContext';
 import { useRouter } from 'expo-router';
 import { chatService } from '../../services/chatService';
+import PoliticaProteccionDatos from '../../components/PoliticaProteccionDatos';
 
 interface Message {
   id: string;
@@ -26,12 +29,14 @@ interface Message {
   user: string;
   timestamp: Date;
   userPhoto?: string;
+  userId?: string;
 }
 
 interface User {
   id: string;
   name: string;
   online: boolean;
+  photo?: string;
 }
 
 const db = firestore;
@@ -43,8 +48,12 @@ export default function ChatScreen() {
   const [connectedUsers, setConnectedUsers] = useState<User[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const flatListRef = useRef<FlatList>(null);
-  const { profileImage } = useUser();
+  const { profileImage, user: currentUser } = useUser();
   const router = useRouter();
+  const [showPolicyModal, setShowPolicyModal] = useState(false);
+  const reportIncident = () => {
+    Linking.openURL('mailto:admin@academiadeinmigrantes.es?subject=Reporte%20de%20incidente');
+  };
 
   const emojis = [
     '😊', '😂', '❤️', '👍', '👋', '🎉', '😢', '😍', '🤔', '🙌',
@@ -65,6 +74,7 @@ export default function ChatScreen() {
           user: data.user,
           timestamp: data.timestamp.toDate(),
           userPhoto: data.userPhoto,
+          userId: data.userId,
         });
       });
       setMessages(messagesData);
@@ -84,6 +94,7 @@ export default function ChatScreen() {
           id: doc.id,
           name: data.name || data.email || 'Usuario',
           online: data.online || false,
+          photo: data.photoURL || data.photo || null,
         });
       });
       // Add demo users if list is empty
@@ -147,6 +158,7 @@ export default function ChatScreen() {
           user: user.displayName || user.email || 'Usuario',
           timestamp: Timestamp.now(),
           userPhoto: profileImage,
+          userId: user.uid,
         });
         setInputText('');
         flatListRef.current?.scrollToEnd();
@@ -233,26 +245,59 @@ export default function ChatScreen() {
   };
 
   const renderMessage = ({ item }: { item: Message }) => (
-    <View style={[styles.messageContainer, item.user === 'Yo' ? styles.myMessage : styles.otherMessage]}>
-      <View style={styles.messageHeader}>
-        {item.userPhoto ? <Image source={{ uri: item.userPhoto }} style={styles.messageAvatar} /> : null}
+    <View style={[styles.messageContainer, item.userId === currentUser?.id ? styles.myMessage : styles.otherMessage]}>
+      <TouchableOpacity
+        style={styles.messageHeader}
+        onPress={() => item.userId && router.push({ pathname: '/PublicProfileScreen', params: { userId: item.userId, returnTo: '/(tabs)/ChatScreen' } })}
+        disabled={!item.userId}
+        activeOpacity={0.75}
+      >
+        {item.userPhoto ? (
+          <Image source={{ uri: item.userPhoto }} style={styles.messageAvatar} />
+        ) : (
+          <View style={styles.messageFallbackAvatar}>
+            <Ionicons name="person" size={16} color="#fff" />
+          </View>
+        )}
         <Text style={styles.userName}>{item.user}</Text>
-      </View>
+      </TouchableOpacity>
       <Text style={styles.messageText}>{item.text}</Text>
       <Text style={styles.timestamp}>{item.timestamp.toLocaleTimeString()}</Text>
     </View>
   );
 
   const renderUser = ({ item }: { item: User }) => (
-    <View style={styles.userContainer}>
-      <View style={[styles.onlineIndicator, item.online ? styles.online : styles.offline]} />
-      <Text style={styles.userName}>{item.name}</Text>
+    <View style={styles.userCard}>
       <TouchableOpacity
-        style={styles.privateChatButton}
-        onPress={() => requestPrivateChat(item.id)}
+        style={styles.userTopRow}
+        onPress={() => item.id && router.push({ pathname: '/PublicProfileScreen', params: { userId: item.id, returnTo: '/(tabs)/ChatScreen' } })}
+        disabled={!item.id}
+        activeOpacity={0.8}
       >
-        <Ionicons name="chatbubble-outline" size={20} color="#007AFF" />
+        {item.photo ? (
+          <Image source={{ uri: item.photo }} style={styles.userAvatar} />
+        ) : (
+          <View style={styles.userAvatarPlaceholder}>
+            <Ionicons name="person" size={18} color="#fff" />
+          </View>
+        )}
+        <Text style={styles.userNamePrimary} numberOfLines={1}>
+          {item.name || 'Usuario'}
+        </Text>
       </TouchableOpacity>
+      <View style={styles.userBottomRow}>
+        <View style={styles.statusBadge}>
+          <View style={[styles.onlineIndicator, item.online ? styles.online : styles.offline]} />
+          <Text style={styles.userStatusText}>{item.online ? 'En línea' : 'Desconectado'}</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.privateChatButton}
+          onPress={() => requestPrivateChat(item.id)}
+        >
+          <Ionicons name="chatbubble-outline" size={18} color="#007AFF" />
+          <Text style={styles.privateChatText}>Chat</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -277,6 +322,12 @@ export default function ChatScreen() {
               </View>
             )}
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.policyBox}>
+          <Text style={styles.policyText}>
+            <Text style={styles.policyLink} onPress={() => setShowPolicyModal(true)}>Política y reportes</Text>
+          </Text>
         </View>
 
         <View style={styles.content}>
@@ -349,6 +400,44 @@ export default function ChatScreen() {
             </View>
           </View>
         </Modal>
+
+        <Modal
+          visible={showPolicyModal}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowPolicyModal(false)}
+        >
+          <View style={styles.policyModalOverlay}>
+            <View style={styles.policyModalContent}>
+              <View style={styles.policyModalHeader}>
+                <Text style={styles.policyModalTitle}>Políticas y Reportes</Text>
+                <TouchableOpacity onPress={() => setShowPolicyModal(false)}>
+                  <Ionicons name="close" size={22} color="#333" />
+                </TouchableOpacity>
+              </View>
+              <ScrollView style={styles.policyModalBody}>
+                <Text style={styles.policySectionTitle}>Política y reportes</Text>
+                <Text style={styles.policyBodyText}>
+                  • No se permite contenido ilegal, violento, sexual, discriminatorio o spam.
+                  {'\n'}• Se prohíbe el acoso, suplantación de identidad o difusión de datos personales sin permiso.
+                  {'\n'}• La administración puede borrar mensajes o bloquear cuentas ante abusos.
+                  {'\n'}• Reporta cualquier incidente para mantener la comunidad segura.
+                </Text>
+
+                <TouchableOpacity style={styles.reportButton} onPress={reportIncident}>
+                  <Ionicons name="alert-circle" size={18} color="#fff" />
+                  <Text style={styles.reportButtonText}>Reportar a admin@academiadeinmigrantes.es</Text>
+                </TouchableOpacity>
+
+                <View style={styles.policyDivider} />
+
+                <Text style={styles.policyBodyText}>
+                  Para una consulta completa de la Política de Privacidad, visita "Mi Perfil &gt; Politica" dentro de la app o escribe a somos@afaiacademiadeinmigrantes.com.
+                </Text>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
@@ -400,6 +489,84 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
   },
+  policyBox: {
+    marginHorizontal: 20,
+    marginBottom: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    padding: 12,
+  },
+  policyText: {
+    color: '#f0f0f0',
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  policyLink: {
+    color: '#FFD700',
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+  },
+  policyModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  policyModalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    maxHeight: '85%',
+    overflow: 'hidden',
+  },
+  policyModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  policyModalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#333',
+  },
+  policyModalBody: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  policySectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1b1b1b',
+    marginBottom: 8,
+  },
+  policyBodyText: {
+    fontSize: 13,
+    color: '#444',
+    lineHeight: 18,
+    marginBottom: 16,
+  },
+  reportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#d84315',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  reportButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  policyDivider: {
+    height: 1,
+    backgroundColor: '#eee',
+    marginBottom: 20,
+  },
   content: {
     flex: 1,
     flexDirection: 'row',
@@ -439,6 +606,15 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     marginRight: 8,
+  },
+  messageFallbackAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginRight: 8,
+    backgroundColor: '#555',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   userName: {
     fontSize: 12,
@@ -499,13 +675,57 @@ const styles = StyleSheet.create({
   usersList: {
     flex: 1,
   },
-  userContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
+  userCard: {
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5EA',
-    paddingRight: 50, // Space for the button
+  },
+  userTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  userAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+  },
+  userAvatarPlaceholder: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#1976d2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userBottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexShrink: 1,
+  },
+  userNamePrimary: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1c1c1c',
+  },
+  userStatusText: {
+    fontSize: 12,
+    color: '#555',
+  },
+  privateChatText: {
+    marginLeft: 4,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#007AFF',
   },
   onlineIndicator: {
     width: 10,
@@ -520,10 +740,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF3B30',
   },
   privateChatButton: {
-    marginLeft: 'auto',
-    padding: 5,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#e6f0ff',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#c2ddff',
+    flexShrink: 0,
   },
   emojiModalOverlay: {
     flex: 1,

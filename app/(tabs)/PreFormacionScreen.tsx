@@ -288,6 +288,31 @@ export default function PreFormacionScreen() {
     }
   ]), []);
 
+  const itinerariosDestacados = useMemo(() => ([
+    {
+      title: 'Ruta Cuidados y Salud',
+      items: ['Cuidado de Personas Mayores', 'Cuidado de Niños', 'Auxiliar de Enfermería'],
+      icon: 'heart',
+    },
+    {
+      title: 'Ruta Hostelería y Turismo',
+      items: ['Ayudante de Cocina', 'Recepcionista Hotelera', 'Camarero'],
+      icon: 'wine',
+    },
+    {
+      title: 'Ruta Construcción y Oficios',
+      items: ['Albañilería', 'Electricidad', 'Soldadura'],
+      icon: 'construct',
+    },
+  ]), []);
+
+  const beneficios = useMemo(() => ([
+    { icon: 'medal', text: 'Microcertificados descargables por cada curso aprobado.' },
+    { icon: 'briefcase', text: 'Recursos para entrevistas y vocabulario laboral especializado.' },
+    { icon: 'people-circle', text: 'Sesiones en vivo con mentores y profesionales invitados.' },
+    { icon: 'notifications', text: 'Alertas de ofertas de empleo relacionadas con tus cursos.' },
+  ]), []);
+
   const loadCourseAccess = useCallback(async () => {
     try {
       const entries = await Promise.all(
@@ -384,6 +409,37 @@ export default function PreFormacionScreen() {
               Estos cursos están diseñados para ayudarte a prepararte para el mercado laboral español. 
               Cada curso incluye vocabulario específico y conocimientos prácticos.
             </Text>
+          </View>
+
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="star" size={22} color="#FFD700" />
+              <Text style={styles.sectionTitle}>Itinerarios recomendados</Text>
+            </View>
+            {itinerariosDestacados.map((ruta) => (
+              <View key={ruta.title} style={styles.trackRow}>
+                <View style={styles.trackIcon}>
+                  <Ionicons name={ruta.icon as any} size={22} color="#FFD700" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.trackTitle}>{ruta.title}</Text>
+                  <Text style={styles.trackText}>{ruta.items.join(' · ')}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="gift" size={22} color="#FFD700" />
+              <Text style={styles.sectionTitle}>¿Por qué vale la pena?</Text>
+            </View>
+            {beneficios.map((beneficio, idx) => (
+              <View key={`${beneficio.icon}-${idx}`} style={styles.benefitRow}>
+                <Ionicons name={beneficio.icon as any} size={20} color="#FFD700" style={{ marginRight: 12 }} />
+                <Text style={styles.benefitText}>{beneficio.text}</Text>
+              </View>
+            ))}
           </View>
         </View>
       </ScrollView>
@@ -584,5 +640,60 @@ const styles = StyleSheet.create({
     color: '#555',
     lineHeight: 20,
   },
-  
+  sectionCard: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 14,
+    marginHorizontal: 16,
+    marginBottom: 18,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#222',
+  },
+  trackRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+    gap: 12,
+  },
+  trackIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  trackTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 4,
+  },
+  trackText: {
+    fontSize: 14,
+    color: '#555',
+  },
+  benefitRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  benefitText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#444',
+  },
 });

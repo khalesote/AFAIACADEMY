@@ -169,24 +169,33 @@ export function HomeScreenContent() {
     });
     
     // Verificar si el usuario está autenticado
-    if (!isAuthenticated && !userLoading) {
+    const isUserAuthenticated = !!firebaseUser && isAuthenticated;
+    if (!isUserAuthenticated) {
+      if (userLoading) {
+        Alert.alert(
+          '⏳ Verificando sesión\n⏳ جارٍ التحقق من الجلسة',
+          'Espera un momento mientras validamos tu cuenta.\nيرجى الانتظار بينما نتحقق من حسابك.'
+        );
+        return;
+      }
+
       console.log('❌ Usuario no autenticado, mostrando alerta');
       Alert.alert(
-        '🔐 Autenticación Requerida',
-        'Debes registrarte o iniciar sesión para acceder a esta función.',
+        '🔐 Autenticación Requerida\n🔐 المصادقة مطلوبة',
+        'Debes registrarte o iniciar sesión para acceder a esta función.\nالرجاء التسجيل أو تسجيل الدخول للوصول إلى هذه الميزة.',
         [
           {
-            text: 'Registrarse',
+            text: 'Registrarse / سجّل',
             onPress: () => router.push('/RegisterScreen'),
             style: 'default',
           },
           {
-            text: 'Iniciar Sesión',
+            text: 'Iniciar Sesión / تسجيل الدخول',
             onPress: () => router.push('/LoginScreen'),
             style: 'default',
           },
           {
-            text: 'Cancelar',
+            text: 'Cancelar / إلغاء',
             style: 'cancel',
           },
         ]
@@ -524,14 +533,16 @@ export function HomeScreenContent() {
                 </TouchableOpacity>
               </View>
             ) : (
-              // Usuario NO autenticado: mostrar botón de registro
-              <TouchableOpacity
-                style={styles.registerButtonHeader}
-                onPress={() => router.push('/RegisterScreen')}
-              >
-                <Ionicons name="person-add" size={18} color="#FFD700" />
-                <Text style={styles.registerButtonText}>Regístrate</Text>
-              </TouchableOpacity>
+              // Usuario NO autenticado: mostrar solo botón de inicio de sesión
+              <View style={styles.authButtonsWrapper}>
+                <TouchableOpacity
+                  style={styles.registerButtonHeader}
+                  onPress={() => router.push('/LoginScreen')}
+                >
+                  <Ionicons name="log-in" size={18} color="#FFD700" />
+                  <Text style={styles.registerButtonText}>Iniciar sesión</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
         </View>
@@ -1053,46 +1064,14 @@ export function HomeScreenContent() {
           <View style={styles.quickAccessGrid}>
             <TouchableOpacity
               style={styles.quickAccessItem}
-              onPress={() => handleMenuPress(() => router.push("/(tabs)/ForumScreen"))}
-            >
-              <View style={styles.quickAccessIcon}>
-                <Ionicons name="chatbubbles" size={24} color="#FFD700" />
-              </View>
-              <Text style={styles.quickAccessText}>Foro Comunidad</Text>
-              <Text style={styles.quickAccessTextAr}>منتدى المجتمع</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.quickAccessItem}
-              onPress={() => handleMenuPress(() => router.push("/(tabs)/AprendeEscribirScreen"))}
-            >
-              <View style={styles.quickAccessIcon}>
-                <Ionicons name="create" size={24} color="#FFD700" />
-              </View>
-              <Text style={styles.quickAccessText}>Aprende a Escribir</Text>
-              <Text style={styles.quickAccessTextAr}>تعلّم الكتابة</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.quickAccessItem}
               onPress={() => handleMenuPress(() => router.push("/CafeLiterarioScreen"))}
             >
               <View style={styles.quickAccessIcon}>
                 <FontAwesome5 name="coffee" size={24} color="#FFD700" />
               </View>
-                             <Text style={styles.quickAccessText}>Café Literario</Text>
-               <Text style={styles.quickAccessTextAr}>مقهى أدبي</Text>
+              <Text style={styles.quickAccessText}>Café Literario</Text>
+              <Text style={styles.quickAccessTextAr}>مقهى أدبي</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.quickAccessItem}
-              onPress={() => handleMenuPress(() => router.push("/NoticiasInmigracionScreen"))}
-            >
-              <View style={styles.quickAccessIcon}>
-                <Ionicons name="newspaper" size={24} color="#FFD700" />
-              </View>
-                             <Text style={styles.quickAccessText}>Noticias</Text>
-               <Text style={styles.quickAccessTextAr}>أخبار</Text>
-            </TouchableOpacity>
-
             <TouchableOpacity
               style={styles.quickAccessItem}
               onPress={() => handleMenuPress(() => router.push("/CuentosPopularesScreen"))}
@@ -1105,25 +1084,14 @@ export function HomeScreenContent() {
             </TouchableOpacity>
 
             <TouchableOpacity
-  style={styles.quickAccessItem}
-  onPress={() => handleMenuPress(() => router.push("/AgendaScreen"))}
->
-  <View style={styles.quickAccessIcon}>
-    <Ionicons name="calendar" size={24} color="#FFD700" />
-  </View>
-  <Text style={styles.quickAccessText}>Agenda del Inmigrante</Text>
-  <Text style={styles.quickAccessTextAr}>دليل المهاجر</Text>
-</TouchableOpacity>
-
-            <TouchableOpacity
               style={styles.quickAccessItem}
               onPress={() => handleMenuPress(() => router.push("/(tabs)/JuegosDeTareasScreen"))}
             >
               <View style={styles.quickAccessIcon}>
                 <Ionicons name="game-controller" size={24} color="#FFD700" />
               </View>
-                             <Text style={styles.quickAccessText}>Juegos</Text>
-               <Text style={styles.quickAccessTextAr}>ألعاب</Text>
+              <Text style={styles.quickAccessText}>Juegos</Text>
+              <Text style={styles.quickAccessTextAr}>ألعاب</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -1135,17 +1103,6 @@ export function HomeScreenContent() {
               </View>
               <Text style={styles.quickAccessText}>Preformación para el empleo</Text>
               <Text style={styles.quickAccessTextAr}>تدريب مهني</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.quickAccessItem}
-              onPress={() => handleMenuPress(() => router.push("/(tabs)/CreadorCVProScreen"))}
-            >
-              <View style={styles.quickAccessIcon}>
-                <Ionicons name="document-text" size={24} color="#FFD700" />
-              </View>
-              <Text style={styles.quickAccessText}>Creador CV</Text>
-              <Text style={styles.quickAccessTextAr}>منشئ السيرة الذاتية</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1210,6 +1167,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  authButtonsWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   profileDisplay: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1237,6 +1199,23 @@ const styles = StyleSheet.create({
     borderColor: '#FFD700',
   },
   registerButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFD700',
+    marginLeft: 6,
+  },
+  loginButtonHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#FFD700',
+    marginLeft: 8,
+  },
+  loginButtonText: {
     fontSize: 14,
     fontWeight: '600',
     color: '#FFD700',
