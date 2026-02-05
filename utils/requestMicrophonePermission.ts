@@ -1,18 +1,23 @@
 import { Platform } from 'react-native';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { check, request, PERMISSIONS, RESULTS, type Permission } from 'react-native-permissions';
 
-export async function requestMicrophonePermission(): Promise<boolean> {
-
-  let permission;
-  if (Platform.OS === 'android') {
-    permission = PERMISSIONS.ANDROID.RECORD_AUDIO;
-  } else if (Platform.OS === 'ios') {
-    permission = PERMISSIONS.IOS.MICROPHONE;
-  } else {
-    return false;
-  }
+const ensureGranted = async (permission: Permission): Promise<boolean> => {
   const result = await check(permission);
   if (result === RESULTS.GRANTED) return true;
   const req = await request(permission);
   return req === RESULTS.GRANTED;
+};
+
+export async function requestMicrophonePermission(): Promise<boolean> {
+  if (Platform.OS === 'android') {
+    return ensureGranted(PERMISSIONS.ANDROID.RECORD_AUDIO);
+  }
+
+  if (Platform.OS === 'ios') {
+    const micGranted = await ensureGranted(PERMISSIONS.IOS.MICROPHONE);
+    const speechGranted = await ensureGranted(PERMISSIONS.IOS.SPEECH_RECOGNITION);
+    return micGranted && speechGranted;
+  }
+
+  return false;
 }

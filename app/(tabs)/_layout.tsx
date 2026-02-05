@@ -170,6 +170,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="ArraigosScreen"
+        options={{
+          title: "Arraigos",
+          tabBarIcon: ({ color }) => <Ionicons name="document" size={28} color={color} />,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+      <Tabs.Screen
         name="JuegosDeTareasScreen"
         options={{
           title: "Juegos",

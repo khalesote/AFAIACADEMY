@@ -429,6 +429,7 @@ export default function ForumScreen() {
   const renderPost = ({ item }: { item: ForumPost }) => {
     const category = getCategoryInfo(item.category);
     const isExpanded = expandedPosts.has(item.id);
+    const shouldShowReadMore = item.content?.length > 250 || item.content?.includes('\n');
     const postComments = comments[item.id] || [];
     const commentsCount = postComments.length;
 
@@ -449,6 +450,22 @@ export default function ForumScreen() {
         <Text style={styles.postContent} numberOfLines={isExpanded ? undefined : 3}>
           {item.content}
         </Text>
+
+        {shouldShowReadMore && (
+          <TouchableOpacity
+            style={styles.readMoreButton}
+            onPress={() => togglePostExpansion(item.id)}
+          >
+            <Ionicons
+              name={isExpanded ? 'chevron-up' : 'chevron-down'}
+              size={14}
+              color="#1976d2"
+            />
+            <Text style={styles.readMoreText}>
+              {isExpanded ? 'Ver menos' : 'Leer texto completo'}
+            </Text>
+          </TouchableOpacity>
+        )}
 
         {item.imageUrl ? (
           <Image source={{ uri: item.imageUrl }} style={styles.postImage} />
@@ -481,13 +498,13 @@ export default function ForumScreen() {
             <Text style={styles.commentButtonText}>Comentar</Text>
           </TouchableOpacity>
 
-          {(commentsCount > 0) && (
+          {commentsCount > 0 && (
             <TouchableOpacity
               style={styles.expandButton}
               onPress={() => togglePostExpansion(item.id)}
             >
               <Ionicons
-                name={isExpanded ? "chevron-up" : "chevron-down"}
+                name={isExpanded ? 'chevron-up' : 'chevron-down'}
                 size={16}
                 color="#666"
               />
@@ -854,7 +871,19 @@ const styles = StyleSheet.create({
   },
   postDate: {
     fontSize: 12,
-    color: '#666',
+    color: '#999',
+  },
+  readMoreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    marginTop: 6,
+  },
+  readMoreText: {
+    fontSize: 12,
+    color: '#1976d2',
+    fontWeight: '600',
   },
   postTitle: {
     fontSize: 18,
@@ -900,7 +929,7 @@ const styles = StyleSheet.create({
   },
   postAuthor: {
     fontSize: 12,
-    color: '#999',
+    color: '#666',
     fontStyle: 'italic',
   },
   postActions: {

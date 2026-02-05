@@ -26,7 +26,7 @@ export const CECABANK_CONFIG = {
 } as const;
 
 export const CECABANK_PRICES = {
-  MATRICULA_A1: 36,
+  MATRICULA_A1: 10,
   MATRICULA_A2: 48,
   MATRICULA_B1: 60,
   MATRICULA_B2: 90,

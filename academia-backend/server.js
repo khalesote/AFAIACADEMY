@@ -13,6 +13,10 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 const NODE_ENV = process.env.NODE_ENV || 'production';
 const FORMACION_PRICE_EUR = parseFloat(process.env.FORMACION_PRICE_EUR || '10');
+const DAILY_API_KEY = process.env.DAILY_API_KEY || '';
+const DAILY_ROOM_DOMAIN = process.env.DAILY_ROOM_DOMAIN || '';
+const DAILY_API_BASE = process.env.DAILY_API_BASE || 'https://api.daily.co/v1';
+const DAILY_TOKEN_TTL_SECONDS = parseInt(process.env.DAILY_TOKEN_TTL_SECONDS || '3600', 10);
 
 // Configurar SMTP2GO con nodemailer
 let transporter;
@@ -190,6 +194,94 @@ const startNotificationListener = () => {
       notificationListenerActive = false;
     });
 };
+
+const dailyHeaders = () => ({
+  Authorization: `Bearer ${DAILY_API_KEY}`,
+  'Content-Type': 'application/json',
+});
+
+const ensureDailyRoomExists = async (roomName) => {
+  const roomResponse = await fetch(`${DAILY_API_BASE}/rooms/${encodeURIComponent(roomName)}`, {
+    headers: dailyHeaders(),
+  });
+
+  if (roomResponse.ok) {
+    return;
+  }
+
+  if (roomResponse.status !== 404) {
+    const errorText = await roomResponse.text();
+    throw new Error(`Daily room lookup failed: ${roomResponse.status} ${errorText}`);
+  }
+
+  const createResponse = await fetch(`${DAILY_API_BASE}/rooms`, {
+    method: 'POST',
+    headers: dailyHeaders(),
+    body: JSON.stringify({
+      name: roomName,
+      privacy: 'public',
+      properties: {
+        enable_chat: false,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+      },
+    }),
+  });
+
+  if (!createResponse.ok && createResponse.status !== 409) {
+    const errorText = await createResponse.text();
+    throw new Error(`Daily room create failed: ${createResponse.status} ${errorText}`);
+  }
+};
+
+// ============================================
+// ENDPOINTS DAILY VOICE CHAT
+// ============================================
+app.post('/api/voice/token', async (req, res) => {
+  const { roomName, userName, userId } = req.body || {};
+
+  if (!DAILY_API_KEY) {
+    return res.status(500).json({ error: 'Daily API key no configurada' });
+  }
+
+  if (!roomName || !userName || !userId) {
+    return res.status(400).json({ error: 'roomName, userName y userId son obligatorios' });
+  }
+
+  try {
+    await ensureDailyRoomExists(roomName);
+
+    const tokenResponse = await fetch(`${DAILY_API_BASE}/meeting-tokens`, {
+      method: 'POST',
+      headers: dailyHeaders(),
+      body: JSON.stringify({
+        properties: {
+          room_name: roomName,
+          user_name: userName,
+          user_id: userId,
+          exp: Math.floor(Date.now() / 1000) + DAILY_TOKEN_TTL_SECONDS,
+        },
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      const errorText = await tokenResponse.text();
+      console.error('Daily token error:', tokenResponse.status, errorText);
+      return res.status(500).json({ error: 'No se pudo generar el token de Daily' });
+    }
+
+    const tokenData = await tokenResponse.json();
+    const roomUrl = DAILY_ROOM_DOMAIN ? `https://${DAILY_ROOM_DOMAIN}/${roomName}` : undefined;
+
+    return res.json({
+      token: tokenData.token,
+      expiresAt: tokenData.exp,
+      roomUrl,
+    });
+  } catch (error) {
+    console.error('Daily token endpoint error:', error);
+    return res.status(500).json({ error: 'Error generando el token de voz' });
+  }
+});
 
 const normalizeText = (text = '') => text
   .toLowerCase()
@@ -954,6 +1046,82 @@ app.post('/api/create-payment-intent', async (req, res) => {
   } catch (error) {
     console.error('❌ Error creating payment intent:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Endpoint para enviar documentación de Arraigos
+app.post('/api/arraigos/enviar', async (req, res) => {
+  try {
+    console.log('📁 Recibida solicitud de arraigo');
+    const {
+      name,
+      email,
+      phone,
+      message,
+      arraigoTypeId,
+      arraigoTypeTitle,
+      attachments = [],
+      missingMandatory = [],
+    } = req.body || {};
+
+    if (!name || !email || !phone || !arraigoTypeId || !arraigoTypeTitle) {
+      return res.status(400).json({
+        error: 'Faltan campos obligatorios (name, email, phone, arraigoTypeId, arraigoTypeTitle)'
+      });
+    }
+
+    if (!Array.isArray(attachments) || attachments.length === 0) {
+      return res.status(400).json({
+        error: 'Adjunta al menos un documento en PDF'
+      });
+    }
+
+    if (!process.env.SMTP2GO_USERNAME || !process.env.SMTP2GO_PASSWORD || !transporter) {
+      console.error('❌ SMTP no configurado');
+      return res.status(500).json({ error: 'Servicio de correo no disponible' });
+    }
+
+    const normalizedAttachments = attachments
+      .filter((att) => att?.pdfBase64)
+      .map((att, index) => ({
+        filename: `${att.requirementTitle || 'documento'}-${index + 1}.pdf`,
+        content: att.pdfBase64,
+        encoding: 'base64',
+      }));
+
+    if (normalizedAttachments.length === 0) {
+      return res.status(400).json({ error: 'No se recibió ningún PDF válido' });
+    }
+
+    const pendingList = Array.isArray(missingMandatory) && missingMandatory.length
+      ? `<h4>Documentos pendientes:</h4><ul>${missingMandatory.map((item) => `<li>${item}</li>`).join('')}</ul>`
+      : '';
+
+    const mailOptions = {
+      from: 'admin@academiadeinmigrantes.es',
+      to: 'admin@academiadeinmigrantes.es',
+      replyTo: email,
+      subject: `Arraigo ${arraigoTypeTitle} - Documentación de ${name}`,
+      html: `
+        <h2>Nueva solicitud de Arraigo (${arraigoTypeTitle})</h2>
+        <p><strong>Nombre:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Teléfono:</strong> ${phone}</p>
+        <p><strong>Tipo:</strong> ${arraigoTypeTitle} (${arraigoTypeId})</p>
+        <p><strong>Notas:</strong> ${message || 'Sin notas adicionales'}</p>
+        <p>Se adjuntan ${normalizedAttachments.length} documentos en PDF generados desde la app.</p>
+        ${pendingList}
+      `,
+      attachments: normalizedAttachments,
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('✅ Arraigo enviado, messageId:', result.messageId);
+
+    res.json({ success: true, message: 'Documentos enviados correctamente', messageId: result.messageId });
+  } catch (error) {
+    console.error('❌ Error enviando arraigo:', error);
+    res.status(500).json({ error: error.message || 'Error interno al enviar arraigo' });
   }
 });
 

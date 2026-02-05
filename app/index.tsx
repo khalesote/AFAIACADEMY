@@ -803,6 +803,31 @@ export function HomeScreenContent() {
           </TouchableOpacity>
         </View>
 
+        {/* Arraigos - Nuevo módulo */}
+        <View style={[styles.mainSchoolSection, {marginTop: 10}]}> 
+          <TouchableOpacity
+            style={styles.mainSchoolButton}
+            onPress={() => handleMenuPress(() => router.push("/(tabs)/ArraigosScreen"))}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={['#0b1829', '#0f2744']}
+              style={styles.mainSchoolButtonGradient}
+            >
+              <View style={styles.mainSchoolContent}>
+                <View style={styles.mainSchoolIconContainer}>
+                  <Ionicons name="document-text" size={42} color="#7ddfff" />
+                </View>
+                <View style={styles.mainSchoolTextContainer}>
+                  <Text style={[styles.mainSchoolTitle, {marginTop: 30, color: '#7ddfff'}]}>Arraigos & Requisitos 2025</Text>
+                  <Text style={[styles.mainSchoolTitleAr, {color: '#7ddfff'}]}>تسوية الوضع القانوني</Text>
+                  <Text style={[styles.mainSchoolSubtitle, {color: '#7ddfff'}]}>Sube tus documentos y envíalos para revisión</Text>
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
         {/* Asesoría y Acompañamiento - Botón Principal */}
         <View style={[styles.mainSchoolSection, {marginTop: 10}]}>
           <TouchableOpacity
@@ -932,6 +957,23 @@ export function HomeScreenContent() {
                 <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>دردشة المجتمع</Text>
                 <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Conversaciones</Text>
                 <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>محادثات</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Vamos a Hablar Español */}
+            <TouchableOpacity
+              style={styles.categoryCard}
+              onPress={() => handleMenuPress(() => router.push("/(tabs)/HablarEspanolScreen"))}
+            >
+              <LinearGradient
+                colors={['#1a1a1a', '#000000']}
+                style={styles.categoryGradient}
+              >
+                <Ionicons name="mic" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Vamos a Hablar Español</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>هيا نتحدث الإسبانية</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Diálogos con el bot</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>حوارات تفاعلية</Text>
               </LinearGradient>
             </TouchableOpacity>
 

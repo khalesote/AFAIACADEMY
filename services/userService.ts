@@ -5,7 +5,7 @@ import {
   signOut,
   sendPasswordResetEmail,
   type User as FirebaseUser
-} from '@firebase/auth';
+} from 'firebase/auth';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, firestore, storage, isFirebaseInitialized } from '../config/firebase';

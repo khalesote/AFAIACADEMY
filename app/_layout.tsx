@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { UserProgressProvider, useUserProgress } from '@/contexts/UserProgressContext';
+import { UserProgressProvider } from '@/contexts/UserProgressContext';
 import { UserProvider } from '@/contexts/UserContext';
 import * as Font from 'expo-font';
 
