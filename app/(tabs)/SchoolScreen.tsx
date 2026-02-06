@@ -143,6 +143,27 @@ export default function SchoolScreen() {
           </LinearGradient>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.standardButton}
+          onPress={() => router.push('/(tabs)/MatriculaPresencialScreen')}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={['#000', '#000']}
+            style={styles.standardButtonGradient}
+          >
+            <Ionicons name="clipboard" color="#FFD700" size={24} style={{ marginRight: 12 }} />
+            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+              <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>
+                Matrícula presencial
+              </Text>
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500', textAlign: 'center' }}>
+                التسجيل الحضوري
+              </Text>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
+
         {(matriculadoA1 || matriculadoA2 || matriculadoB1 || matriculadoB2) && (
           <View style={{ marginTop: 10, alignItems: 'center' }}>
             <Text style={{ color: '#79A890', fontWeight: '500' }}>

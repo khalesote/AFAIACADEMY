@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -974,7 +974,7 @@ export default function HablarEspanolScreen() {
         </Text>
       </LinearGradient>
 
-      <View style={styles.body}>
+      <ScrollView style={styles.bodyScroll} contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>¿Cómo funciona?</Text>
           <Text style={styles.sectionTitleArabic}>كيف يعمل؟</Text>
@@ -998,7 +998,7 @@ export default function HablarEspanolScreen() {
             التقدم الحالي: الحوار {dialogIndex + 1} من {TOTAL_DIALOGS}.
           </Text>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -1050,9 +1050,13 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     writingDirection: 'rtl',
   },
-  body: {
+  bodyScroll: {
     flex: 1,
+  },
+  body: {
     padding: 24,
+    paddingBottom: 40,
+    flexGrow: 1,
   },
   card: {
     backgroundColor: '#0b1224',

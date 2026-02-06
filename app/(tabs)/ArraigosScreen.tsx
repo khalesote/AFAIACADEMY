@@ -24,6 +24,7 @@ import {
   ArraigoRequirement,
   ArraigoType,
   ArraigoTypeId,
+  REGULARIZACION_INFO,
 } from '../../constants/arraigosRequirements';
 
 type RequirementAttachment = {
@@ -44,6 +45,10 @@ const AD_COPY = {
   body:
     'Colaboramos con la abogada Kassandra Ekay, especialista en extranjería en Zaragoza. Te acompañamos en todo el proceso para conseguir tu autorización de residencia por arraigo.',
   cta: 'Solicita tu revisión legal',
+  titleAr: 'استشارة قانونية موثوقة',
+  bodyAr:
+    'نتعاون مع المحامية كاساندرا إيكاي المتخصصة في شؤون الهجرة في سرقسطة. نرافقك في كل خطوة للحصول على تصريح الإقامة بسبب الجذور.',
+  ctaAr: 'اطلب مراجعتك القانونية',
 };
 
 export default function ArraigosScreen() {
@@ -293,9 +298,15 @@ export default function ArraigosScreen() {
       <View key={requirement.id} style={styles.requirementCard}>
         <View style={styles.requirementHeader}>
           <Text style={styles.requirementTitle}>{requirement.title}</Text>
+          {requirement.titleAr ? (
+            <Text style={styles.requirementTitleAr}>{requirement.titleAr}</Text>
+          ) : null}
           {requirement.mandatory && <Text style={styles.badge}>Obligatorio</Text>}
         </View>
         <Text style={styles.requirementDescription}>{requirement.description}</Text>
+        {requirement.descriptionAr ? (
+          <Text style={styles.requirementDescriptionAr}>{requirement.descriptionAr}</Text>
+        ) : null}
 
         {currentAttachment ? (
           <View style={styles.attachmentInfo}>
@@ -325,6 +336,7 @@ export default function ArraigosScreen() {
               <>
                 <Ionicons name="cloud-upload" size={18} color="#fff" />
                 <Text style={styles.uploadButtonText}>Adjuntar foto / PDF</Text>
+                <Text style={styles.uploadButtonTextAr}>إرفاق صورة / PDF</Text>
               </>
             )}
           </TouchableOpacity>
@@ -335,12 +347,39 @@ export default function ArraigosScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <View style={styles.topBar}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={22} color="#111" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.heroCard}>
-        <Text style={styles.heroOverline}>Arraigos 2025</Text>
+        <Text style={styles.heroOverline}>Arraigos 2026</Text>
+        <Text style={styles.heroOverlineAr}>أرّايغو 2026</Text>
         <Text style={styles.heroTitle}>Regulariza tu situación con acompañamiento experto</Text>
+        <Text style={styles.heroTitleAr}>سوِّ وضعك القانوني بمرافقة خبيرة</Text>
         <Text style={styles.heroSubtitle}>
           Selecciona tu tipo de arraigo, adjunta los requisitos y envíanos tus documentos en PDF para verificación profesional.
         </Text>
+        <Text style={styles.heroSubtitleAr}>
+          اختر نوع الإقامة، وأرفق المتطلبات وأرسل ملفاتك PDF للتحقق المهني.
+        </Text>
+      </View>
+
+      <View style={styles.regularizacionCard}>
+        <Text style={styles.regularizacionTitle}>{REGULARIZACION_INFO.title}</Text>
+        <Text style={styles.regularizacionTitleAr}>{REGULARIZACION_INFO.titleAr}</Text>
+        <Text style={styles.regularizacionSummary}>{REGULARIZACION_INFO.summary}</Text>
+        <Text style={styles.regularizacionSummaryAr}>{REGULARIZACION_INFO.summaryAr}</Text>
+        {REGULARIZACION_INFO.bullets.map((bullet, index) => (
+          <View key={`${bullet}-${index}`} style={styles.regularizacionBulletRow}>
+            <Text style={styles.regularizacionBullet}>• {bullet}</Text>
+            {REGULARIZACION_INFO.bulletsAr?.[index] ? (
+              <Text style={styles.regularizacionBulletAr}>• {REGULARIZACION_INFO.bulletsAr[index]}</Text>
+            ) : null}
+          </View>
+        ))}
+        <Text style={styles.regularizacionNote}>{REGULARIZACION_INFO.note}</Text>
+        <Text style={styles.regularizacionNoteAr}>{REGULARIZACION_INFO.noteAr}</Text>
       </View>
 
       <ScrollView
@@ -359,6 +398,11 @@ export default function ArraigosScreen() {
               <Text style={[styles.typePillText, isSelected && styles.typePillTextSelected]}>
                 {type.title}
               </Text>
+              {type.titleAr ? (
+                <Text style={[styles.typePillTextAr, isSelected && styles.typePillTextArSelected]}>
+                  {type.titleAr}
+                </Text>
+              ) : null}
             </TouchableOpacity>
           );
         })}
@@ -366,9 +410,18 @@ export default function ArraigosScreen() {
 
       <View style={styles.typeCard}>
         <Text style={styles.typeSubtitle}>{selectedType.subtitle}</Text>
+        {selectedType.subtitleAr ? (
+          <Text style={styles.typeSubtitleAr}>{selectedType.subtitleAr}</Text>
+        ) : null}
         <Text style={styles.typeSummary}>{selectedType.summary}</Text>
+        {selectedType.summaryAr ? (
+          <Text style={styles.typeSummaryAr}>{selectedType.summaryAr}</Text>
+        ) : null}
         <Text style={styles.requirementCount}>
           {attachmentCount}/{selectedType.requirements.length} documentos preparados
+        </Text>
+        <Text style={styles.requirementCountAr}>
+          {attachmentCount}/{selectedType.requirements.length} وثائق مُجهزة
         </Text>
       </View>
 
@@ -380,7 +433,9 @@ export default function ArraigosScreen() {
           style={styles.adGradient}
         >
           <Text style={styles.adTitle}>{AD_COPY.title}</Text>
+          <Text style={styles.adTitleAr}>{AD_COPY.titleAr}</Text>
           <Text style={styles.adBody}>{AD_COPY.body}</Text>
+          <Text style={styles.adBodyAr}>{AD_COPY.bodyAr}</Text>
           <View style={styles.adFooter}>
             <View>
               <Text style={styles.lawyerName}>Kassandra Ekay</Text>
@@ -388,26 +443,35 @@ export default function ArraigosScreen() {
             </View>
             <Ionicons name="shield-checkmark" size={26} color="#7ddfff" />
           </View>
-          <TouchableOpacity style={styles.adButton}>
+          <TouchableOpacity
+            style={styles.adButton}
+            onPress={() => router.push('/(tabs)/AsesoriaScreen')}
+          >
             <Text style={styles.adButtonText}>{AD_COPY.cta}</Text>
+            <Text style={styles.adButtonTextAr}>{AD_COPY.ctaAr}</Text>
           </TouchableOpacity>
         </LinearGradient>
       </View>
 
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Requisitos</Text>
+        <Text style={styles.sectionTitleAr}>المتطلبات</Text>
         <Text style={styles.sectionSubtitle}>Adjunta fotos o PDFs para cada documento</Text>
+        <Text style={styles.sectionSubtitleAr}>أرفق صورًا أو ملفات PDF لكل وثيقة</Text>
       </View>
 
       {selectedType.requirements.map(renderRequirement)}
 
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Tus datos de contacto</Text>
+        <Text style={styles.sectionTitleAr}>بيانات التواصل</Text>
         <Text style={styles.sectionSubtitle}>Necesarios para enviarte confirmación</Text>
+        <Text style={styles.sectionSubtitleAr}>مطلوبة لإرسال التأكيد</Text>
       </View>
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>Nombre completo *</Text>
+        <Text style={styles.labelAr}>الاسم الكامل *</Text>
         <TextInput
           value={form.name}
           onChangeText={(value) => setForm((prev) => ({ ...prev, name: value }))}
@@ -416,6 +480,7 @@ export default function ArraigosScreen() {
         />
 
         <Text style={styles.label}>Email *</Text>
+        <Text style={styles.labelAr}>البريد الإلكتروني *</Text>
         <TextInput
           value={form.email}
           onChangeText={(value) => setForm((prev) => ({ ...prev, email: value }))}
@@ -426,6 +491,7 @@ export default function ArraigosScreen() {
         />
 
         <Text style={styles.label}>Teléfono *</Text>
+        <Text style={styles.labelAr}>الهاتف *</Text>
         <TextInput
           value={form.phone}
           onChangeText={(value) => setForm((prev) => ({ ...prev, phone: value }))}
@@ -435,6 +501,7 @@ export default function ArraigosScreen() {
         />
 
         <Text style={styles.label}>Notas adicionales</Text>
+        <Text style={styles.labelAr}>ملاحظات إضافية</Text>
         <TextInput
           value={form.message}
           onChangeText={(value) => setForm((prev) => ({ ...prev, message: value }))}
@@ -456,11 +523,15 @@ export default function ArraigosScreen() {
           <>
             <Ionicons name="send" size={18} color="#fff" />
             <Text style={styles.submitButtonText}>Enviar para verificación</Text>
+            <Text style={styles.submitButtonTextAr}>إرسال للتحقق</Text>
           </>
         )}
       </TouchableOpacity>
       <Text style={styles.disclaimer}>
         Al enviar aceptas que revisemos tus documentos y te contactemos por email para continuar con el proceso.
+      </Text>
+      <Text style={styles.disclaimerAr}>
+        بإرسالك توافق على مراجعة مستنداتك والتواصل معك عبر البريد الإلكتروني لمتابعة العملية.
       </Text>
     </ScrollView>
   );
@@ -474,6 +545,21 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 20,
     paddingBottom: 60,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#e6eaf6',
   },
   heroCard: {
     backgroundColor: '#fff',
@@ -491,15 +577,92 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 6,
   },
+  heroOverlineAr: {
+    color: '#4c6ef5',
+    fontWeight: '600',
+    marginBottom: 6,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   heroTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: '#111',
     marginBottom: 8,
   },
+  heroTitleAr: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111',
+    marginBottom: 8,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   heroSubtitle: {
     color: '#555',
     lineHeight: 20,
+  },
+  heroSubtitleAr: {
+    color: '#555',
+    lineHeight: 20,
+    marginTop: 6,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
+  regularizacionCard: {
+    backgroundColor: '#111936',
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 18,
+  },
+  regularizacionTitle: {
+    color: '#f8f9ff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  regularizacionTitleAr: {
+    color: '#f8f9ff',
+    fontSize: 15,
+    fontWeight: '600',
+    marginTop: 4,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
+  regularizacionSummary: {
+    color: '#cfd6ff',
+    marginTop: 8,
+  },
+  regularizacionSummaryAr: {
+    color: '#cfd6ff',
+    marginTop: 6,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
+  regularizacionBulletRow: {
+    marginTop: 8,
+  },
+  regularizacionBullet: {
+    color: '#e9ecff',
+    lineHeight: 20,
+  },
+  regularizacionBulletAr: {
+    color: '#e9ecff',
+    lineHeight: 20,
+    marginTop: 4,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
+  regularizacionNote: {
+    color: '#aeb6e9',
+    marginTop: 10,
+    fontSize: 12,
+  },
+  regularizacionNoteAr: {
+    color: '#aeb6e9',
+    marginTop: 6,
+    fontSize: 12,
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
   typePills: {
     paddingVertical: 10,
@@ -521,7 +684,17 @@ const styles = StyleSheet.create({
     color: '#1b2a49',
     fontWeight: '600',
   },
+  typePillTextAr: {
+    color: '#1b2a49',
+    fontSize: 12,
+    marginTop: 4,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   typePillTextSelected: {
+    color: '#fff',
+  },
+  typePillTextArSelected: {
     color: '#fff',
   },
   typeCard: {
@@ -538,14 +711,36 @@ const styles = StyleSheet.create({
     color: '#111',
     marginBottom: 6,
   },
+  typeSubtitleAr: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111',
+    marginBottom: 6,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   typeSummary: {
     color: '#444',
     lineHeight: 20,
     marginBottom: 10,
   },
+  typeSummaryAr: {
+    color: '#444',
+    lineHeight: 20,
+    marginBottom: 10,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   requirementCount: {
     color: '#1f8a70',
     fontWeight: '600',
+  },
+  requirementCountAr: {
+    color: '#1f8a70',
+    fontWeight: '600',
+    marginTop: 4,
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
   adCard: {
     borderRadius: 20,
@@ -562,11 +757,26 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginBottom: 8,
   },
+  adTitleAr: {
+    color: '#9fd3ff',
+    fontSize: 13,
+    marginBottom: 8,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   adBody: {
     color: '#f4fbff',
     fontSize: 16,
     lineHeight: 22,
     marginBottom: 14,
+  },
+  adBodyAr: {
+    color: '#f4fbff',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 14,
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
   adFooter: {
     flexDirection: 'row',
@@ -592,6 +802,13 @@ const styles = StyleSheet.create({
     color: '#082037',
     fontWeight: '700',
   },
+  adButtonTextAr: {
+    color: '#082037',
+    fontWeight: '700',
+    marginTop: 4,
+    writingDirection: 'rtl',
+    textAlign: 'center',
+  },
   sectionHeader: {
     marginBottom: 12,
     marginTop: 8,
@@ -601,9 +818,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#111',
   },
+  sectionTitleAr: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111',
+    marginTop: 4,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   sectionSubtitle: {
     color: '#666',
     marginTop: 4,
+  },
+  sectionSubtitleAr: {
+    color: '#666',
+    marginTop: 4,
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
   requirementCard: {
     backgroundColor: '#fff',
@@ -626,10 +857,25 @@ const styles = StyleSheet.create({
     marginRight: 10,
     color: '#11233a',
   },
+  requirementTitleAr: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#11233a',
+    marginTop: 4,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   requirementDescription: {
     color: '#555',
     marginBottom: 12,
     lineHeight: 20,
+  },
+  requirementDescriptionAr: {
+    color: '#555',
+    marginBottom: 12,
+    lineHeight: 20,
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
   badge: {
     backgroundColor: '#ffe8cc',
@@ -652,6 +898,12 @@ const styles = StyleSheet.create({
   uploadButtonText: {
     color: '#fff',
     fontWeight: '600',
+  },
+  uploadButtonTextAr: {
+    color: '#fff',
+    fontWeight: '600',
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
   attachmentInfo: {
     flexDirection: 'row',
@@ -692,6 +944,14 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 6,
   },
+  labelAr: {
+    fontWeight: '600',
+    color: '#111',
+    marginTop: 6,
+    marginBottom: 6,
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   input: {
     borderWidth: 1,
     borderColor: '#d9def0',
@@ -719,10 +979,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  submitButtonTextAr: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    writingDirection: 'rtl',
+    textAlign: 'right',
+  },
   disclaimer: {
     color: '#5c6c8f',
     fontSize: 12,
     textAlign: 'center',
     lineHeight: 18,
+  },
+  disclaimerAr: {
+    color: '#5c6c8f',
+    fontSize: 12,
+    textAlign: 'center',
+    lineHeight: 18,
+    marginTop: 6,
+    writingDirection: 'rtl',
   },
 });

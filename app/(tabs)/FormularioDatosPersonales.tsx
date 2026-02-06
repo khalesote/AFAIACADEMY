@@ -308,19 +308,26 @@ export default function FormularioDatosPersonales({
         </TouchableOpacity>
       )}
       <Text style={styles.titulo}>Datos Personales</Text>
+      <Text style={styles.tituloAr}>البيانات الشخصية</Text>
       <Text style={styles.subtitulo}>
         {esFormacion
           ? 'Completa tus datos para acceder con código de formación profesional'
           : 'Completa tus datos para continuar con la matrícula'}
       </Text>
+      <Text style={styles.subtituloAr}>
+        {esFormacion
+          ? 'أكمل بياناتك للوصول عبر كود التكوين المهني'
+          : 'أكمل بياناتك للمتابعة في التسجيل'}
+      </Text>
       
       <View style={styles.formGroup}>
         <Text style={styles.label}>Nombre *</Text>
+        <Text style={styles.labelAr}>الاسم *</Text>
         <TextInput
           style={styles.input}
           value={formData.nombre}
           onChangeText={(text: string) => handleInputChange('nombre', text)}
-          placeholder="Tu nombre"
+          placeholder="Tu nombre / الاسم"
           placeholderTextColor="#999"
           editable={true}
           autoCapitalize="words"
@@ -329,11 +336,12 @@ export default function FormularioDatosPersonales({
       
       <View style={styles.formGroup}>
         <Text style={styles.label}>Primer apellido *</Text>
+        <Text style={styles.labelAr}>اللقب الأول *</Text>
         <TextInput
           style={styles.input}
           value={formData.apellido1}
           onChangeText={(text: string) => handleInputChange('apellido1', text)}
-          placeholder="Primer apellido"
+          placeholder="Primer apellido / اللقب الأول"
           placeholderTextColor="#999"
           editable={true}
           autoCapitalize="words"
@@ -342,11 +350,12 @@ export default function FormularioDatosPersonales({
       
       <View style={styles.formGroup}>
         <Text style={styles.label}>Segundo apellido</Text>
+        <Text style={styles.labelAr}>اللقب الثاني</Text>
         <TextInput
           style={styles.input}
           value={formData.apellido2}
           onChangeText={(text: string) => handleInputChange('apellido2', text)}
-          placeholder="Segundo apellido (opcional)"
+          placeholder="Segundo apellido (opcional) / اللقب الثاني (اختياري)"
           placeholderTextColor="#999"
           editable={true}
           autoCapitalize="words"
@@ -355,6 +364,7 @@ export default function FormularioDatosPersonales({
       
       <View style={styles.formGroup}>
         <Text style={styles.label}>Fecha de nacimiento (dd/mm/aaaa) *</Text>
+        <Text style={styles.labelAr}>تاريخ الميلاد (يوم/شهر/سنة) *</Text>
         <TextInput
           style={styles.input}
           value={formData.fechaNacimiento || ''}
@@ -383,7 +393,7 @@ export default function FormularioDatosPersonales({
               fechaNacimiento: formatted
             }));
           }}
-          placeholder="dd/mm/aaaa"
+          placeholder="dd/mm/aaaa / يوم/شهر/سنة"
           placeholderTextColor="#999"
           keyboardType="number-pad"
           maxLength={10}
@@ -399,6 +409,7 @@ export default function FormularioDatosPersonales({
             <View style={styles.modalContent}>
               <View style={styles.datePickerContainer}>
                 <Text style={styles.modalTitle}>Selecciona tu fecha de nacimiento</Text>
+                <Text style={styles.modalTitleAr}>اختر تاريخ ميلادك</Text>
                 <View style={styles.dateInputContainer}>
                   <TextInput
                     style={styles.dateInput}
@@ -444,13 +455,13 @@ export default function FormularioDatosPersonales({
                     style={[styles.modalButton, styles.cancelButton]}
                     onPress={() => setShowDateModal(false)}
                   >
-                    <Text style={styles.buttonText}>Cancelar</Text>
+                    <Text style={styles.buttonText}>Cancelar / إلغاء</Text>
                   </TouchableOpacity>
                   <TouchableOpacity 
                     style={[styles.modalButton, styles.confirmButton]}
                     onPress={handleDateConfirm}
                   >
-                    <Text style={[styles.buttonText, {color: '#fff'}]}>Aceptar</Text>
+                    <Text style={[styles.buttonText, {color: '#fff'}]}>Aceptar / موافق</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -461,11 +472,12 @@ export default function FormularioDatosPersonales({
       
       <View style={styles.formGroup}>
         <Text style={styles.label}>Correo electrónico *</Text>
+        <Text style={styles.labelAr}>البريد الإلكتروني *</Text>
         <TextInput
           style={styles.input}
           value={formData.email}
           onChangeText={(text: string) => handleInputChange('email', text)}
-          placeholder="tu-correo@ejemplo.com"
+          placeholder="tu-correo@ejemplo.com / بريدك الإلكتروني"
           placeholderTextColor="#999"
           keyboardType="email-address"
           autoCapitalize="none"
@@ -475,6 +487,7 @@ export default function FormularioDatosPersonales({
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>Provincia *</Text>
+        <Text style={styles.labelAr}>المقاطعة *</Text>
         <TouchableOpacity 
           style={styles.input}
           onPress={() => {
@@ -483,7 +496,7 @@ export default function FormularioDatosPersonales({
           }}
         >
           <Text style={styles.inputText}>
-            {formData.provincia || 'Selecciona una provincia'}
+            {formData.provincia || 'Selecciona una provincia / اختر المقاطعة'}
           </Text>
         </TouchableOpacity>
         
@@ -496,6 +509,7 @@ export default function FormularioDatosPersonales({
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Selecciona tu provincia</Text>
+              <Text style={styles.modalTitleAr}>اختر المقاطعة</Text>
               <ScrollView style={styles.modalScroll}>
                 {PROVINCIAS.map((provincia, index) => (
                   <TouchableOpacity
@@ -514,7 +528,7 @@ export default function FormularioDatosPersonales({
                 style={styles.cancelButton}
                 onPress={() => setShowProvinceModal(false)}
               >
-                <Text style={styles.buttonText}>Cancelar</Text>
+                <Text style={styles.buttonText}>Cancelar / إلغاء</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -523,11 +537,12 @@ export default function FormularioDatosPersonales({
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>Localidad *</Text>
+        <Text style={styles.labelAr}>المدينة / الحي *</Text>
         <TextInput
           style={styles.input}
           value={formData.localidad || ''}
           onChangeText={(text: string) => handleInputChange('localidad', text)}
-          placeholder="Tu localidad"
+          placeholder="Tu localidad / المدينة"
           placeholderTextColor="#999"
           editable={true}
           autoCapitalize="words"
@@ -536,11 +551,12 @@ export default function FormularioDatosPersonales({
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>Teléfono *</Text>
+        <Text style={styles.labelAr}>الهاتف *</Text>
         <TextInput
           style={styles.input}
           value={formData.telefono}
           onChangeText={(text: string) => handleInputChange('telefono', text.replace(/[^0-9]/g, ''))}
-          placeholder="Número de teléfono"
+          placeholder="Número de teléfono / رقم الهاتف"
           placeholderTextColor="#999"
           keyboardType="phone-pad"
           editable={true}
@@ -550,6 +566,7 @@ export default function FormularioDatosPersonales({
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>Tipo de documento *</Text>
+        <Text style={styles.labelAr}>نوع الوثيقة *</Text>
         <View style={styles.docTypeButtons}>
           {(['NIE', 'DNI', 'PASAPORTE'] as TipoDocumento[]).map((tipo) => {
             const currentType = formData.tipoDocumento === 'NIF' ? 'DNI' : formData.tipoDocumento;
@@ -571,7 +588,7 @@ export default function FormularioDatosPersonales({
           style={styles.input}
           value={formData.documento}
           onChangeText={(text: string) => handleInputChange('documento', text.toUpperCase())}
-          placeholder="Número de documento"
+          placeholder="Número de documento / رقم الوثيقة"
           placeholderTextColor="#999"
           editable={true}
           autoCapitalize="characters"
@@ -583,12 +600,13 @@ export default function FormularioDatosPersonales({
         <>
           <View style={styles.formGroup}>
             <Text style={styles.label}>Nivel de español</Text>
+            <Text style={styles.labelAr}>مستوى اللغة الإسبانية</Text>
             <TouchableOpacity
               style={styles.input}
               onPress={() => setShowSpanishLevelModal(true)}
             >
               <Text style={selectedSpanishLevel ? styles.inputText : styles.placeholderText}>
-                {selectedSpanishLevel ? selectedSpanishLevel.label : 'Selecciona tu nivel de español'}
+                {selectedSpanishLevel ? selectedSpanishLevel.label : 'Selecciona tu nivel de español / اختر مستواك'}
               </Text>
             </TouchableOpacity>
             <Modal
@@ -600,6 +618,7 @@ export default function FormularioDatosPersonales({
               <View style={styles.modalOverlay}>
                 <View style={styles.modalContent}>
                   <Text style={styles.modalTitle}>Selecciona tu nivel de español</Text>
+                  <Text style={styles.modalTitleAr}>اختر مستوى اللغة الإسبانية</Text>
                   <ScrollView style={styles.modalScroll}>
                     {NIVELES_ESPANOL.map((nivel) => (
                       <TouchableOpacity
@@ -618,7 +637,7 @@ export default function FormularioDatosPersonales({
                     style={styles.cancelButton}
                     onPress={() => setShowSpanishLevelModal(false)}
                   >
-                    <Text style={styles.buttonText}>Cancelar</Text>
+                    <Text style={styles.buttonText}>Cancelar / إلغاء</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -627,12 +646,13 @@ export default function FormularioDatosPersonales({
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Nivel de estudios</Text>
+            <Text style={styles.labelAr}>المستوى الدراسي</Text>
             <TouchableOpacity
               style={styles.input}
               onPress={() => setShowEducationLevelModal(true)}
             >
               <Text style={selectedEducationLevel ? styles.inputText : styles.placeholderText}>
-                {selectedEducationLevel || 'Selecciona tu nivel de estudios'}
+                {selectedEducationLevel || 'Selecciona tu nivel de estudios / اختر مستواك الدراسي'}
               </Text>
             </TouchableOpacity>
             <Modal
@@ -644,6 +664,7 @@ export default function FormularioDatosPersonales({
               <View style={styles.modalOverlay}>
                 <View style={styles.modalContent}>
                   <Text style={styles.modalTitle}>Selecciona tu nivel de estudios</Text>
+                  <Text style={styles.modalTitleAr}>اختر مستواك الدراسي</Text>
                   <ScrollView style={styles.modalScroll}>
                     {NIVELES_ESTUDIOS.map((nivel) => (
                       <TouchableOpacity
@@ -662,7 +683,7 @@ export default function FormularioDatosPersonales({
                     style={styles.cancelButton}
                     onPress={() => setShowEducationLevelModal(false)}
                   >
-                    <Text style={styles.buttonText}>Cancelar</Text>
+                    <Text style={styles.buttonText}>Cancelar / إلغاء</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -671,10 +692,11 @@ export default function FormularioDatosPersonales({
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Contraseña *</Text>
+            <Text style={styles.labelAr}>كلمة المرور *</Text>
             <View style={styles.passwordInputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="Contraseña (mínimo 6 caracteres)"
+                placeholder="Contraseña (mínimo 6 caracteres) / كلمة المرور (٦ أحرف على الأقل)"
                 placeholderTextColor="#999"
                 value={password}
                 onChangeText={onPasswordChange}
@@ -697,10 +719,11 @@ export default function FormularioDatosPersonales({
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Confirmar Contraseña *</Text>
+            <Text style={styles.labelAr}>تأكيد كلمة المرور *</Text>
             <View style={styles.passwordInputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="Confirma tu contraseña"
+                placeholder="Confirma tu contraseña / أكد كلمة المرور"
                 placeholderTextColor="#999"
                 value={confirmPassword}
                 onChangeText={onConfirmPasswordChange}
@@ -739,6 +762,12 @@ export default function FormularioDatosPersonales({
                 Política de Protección de Datos
               </Text>
             </Text>
+            <Text style={styles.policyTextAr}>
+              لقد قرأت ووافقت على{' '}
+              <Text style={styles.policyLink} onPress={() => setShowPolicyModal(true)}>
+                سياسة حماية البيانات
+              </Text>
+            </Text>
           </View>
           <Modal
             visible={showPolicyModal}
@@ -751,7 +780,7 @@ export default function FormularioDatosPersonales({
                 onPress={() => setShowPolicyModal(false)}
               >
                 <Ionicons name="close" size={22} color="#1976d2" />
-                <Text style={styles.policyCloseText}>Cerrar</Text>
+                <Text style={styles.policyCloseText}>Cerrar / إغلاق</Text>
               </TouchableOpacity>
               <PoliticaProteccionDatos />
             </View>
@@ -773,7 +802,7 @@ export default function FormularioDatosPersonales({
             showPasswordFields && !acceptedPolicy && styles.textoBotonDisabled
           ]}
         >
-          {showPasswordFields ? 'Registrarme' : 'Siguiente'}
+          {showPasswordFields ? 'Registrarme / تسجيل' : 'Siguiente / التالي'}
         </Text>
       </TouchableOpacity>
     </ScrollView>
@@ -796,11 +825,26 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
   },
+  tituloAr: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#333',
+    textAlign: 'center',
+    writingDirection: 'rtl',
+  },
   subtitulo: {
     fontSize: 16,
     color: '#666',
     marginBottom: 20,
     textAlign: 'center',
+  },
+  subtituloAr: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+    writingDirection: 'rtl',
   },
   formGroup: {
     marginBottom: 20,
@@ -810,6 +854,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: '#333',
     fontWeight: '500',
+  },
+  labelAr: {
+    fontSize: 14,
+    marginBottom: 8,
+    color: '#333',
+    fontWeight: '500',
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
   input: {
     backgroundColor: '#fff',
@@ -899,6 +951,14 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
     color: '#333',
+  },
+  modalTitleAr: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 15,
+    textAlign: 'center',
+    color: '#333',
+    writingDirection: 'rtl',
   },
   modalScroll: {
     maxHeight: 300,
@@ -992,6 +1052,14 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 14,
     lineHeight: 20,
+  },
+  policyTextAr: {
+    flex: 1,
+    color: '#333',
+    fontSize: 14,
+    lineHeight: 20,
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
   policyLink: {
     color: '#1976d2',

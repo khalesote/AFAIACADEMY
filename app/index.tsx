@@ -811,17 +811,42 @@ export function HomeScreenContent() {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={['#0b1829', '#0f2744']}
+              colors={['#1a1a1a', '#000000']}
               style={styles.mainSchoolButtonGradient}
             >
               <View style={styles.mainSchoolContent}>
                 <View style={styles.mainSchoolIconContainer}>
-                  <Ionicons name="document-text" size={42} color="#7ddfff" />
+                  <Ionicons name="document-text" size={42} color="#FFD700" />
                 </View>
                 <View style={styles.mainSchoolTextContainer}>
-                  <Text style={[styles.mainSchoolTitle, {marginTop: 30, color: '#7ddfff'}]}>Arraigos & Requisitos 2025</Text>
-                  <Text style={[styles.mainSchoolTitleAr, {color: '#7ddfff'}]}>تسوية الوضع القانوني</Text>
-                  <Text style={[styles.mainSchoolSubtitle, {color: '#7ddfff'}]}>Sube tus documentos y envíalos para revisión</Text>
+                  <Text style={[styles.mainSchoolTitle, {marginTop: 30, color: '#FFD700'}]}>Arraigos & Requisitos 2026</Text>
+                  <Text style={[styles.mainSchoolTitleAr, {color: '#FFD700'}]}>تسوية الوضع القانوني</Text>
+                  <Text style={[styles.mainSchoolSubtitle, {color: '#FFD700'}]}>Sube tus documentos y envíalos para revisión</Text>
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {/* Matrícula Presencial */}
+        <View style={[styles.mainSchoolSection, {marginTop: 10}]}> 
+          <TouchableOpacity
+            style={styles.mainSchoolButton}
+            onPress={() => handleMenuPress(() => router.push("/(tabs)/MatriculaPresencialScreen"))}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={['#1a1a1a', '#000000']}
+              style={styles.mainSchoolButtonGradient}
+            >
+              <View style={styles.mainSchoolContent}>
+                <View style={styles.mainSchoolIconContainer}>
+                  <Ionicons name="clipboard" size={42} color="#FFD700" />
+                </View>
+                <View style={styles.mainSchoolTextContainer}>
+                  <Text style={[styles.mainSchoolTitle, {marginTop: 30, color: '#FFD700'}]}>Matrícula presencial en escuela virtual</Text>
+                  <Text style={[styles.mainSchoolTitleAr, {color: '#FFD700'}]}>التسجيل الحضوري</Text>
+                  <Text style={[styles.mainSchoolSubtitle, {color: '#FFD700'}]}>Solicita tu plaza en Zaragoza</Text>
                 </View>
               </View>
             </LinearGradient>

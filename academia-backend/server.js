@@ -283,6 +283,68 @@ app.post('/api/voice/token', async (req, res) => {
   }
 });
 
+// Endpoint para solicitar matrícula presencial
+app.post('/api/solicitar-matricula-presencial', async (req, res) => {
+  try {
+    console.log('📧 Iniciando solicitud de matrícula presencial...');
+    const { nombre, email, telefono, nivel, mensaje, direccion } = req.body;
+    console.log('📝 Datos recibidos:', { nombre, email, telefono, nivel, mensaje, direccion });
+
+    if (!nombre || !email || !telefono || !nivel) {
+      console.log('❌ Validación fallida: faltan campos obligatorios');
+      return res.status(400).json({
+        error: 'Faltan campos obligatorios',
+        required: ['nombre', 'email', 'telefono', 'nivel']
+      });
+    }
+
+    if (!process.env.SMTP2GO_USERNAME || !process.env.SMTP2GO_PASSWORD || !transporter) {
+      console.error('❌ Credenciales de SMTP2GO no configuradas');
+      return res.status(500).json({ error: 'Servicio de correo no disponible' });
+    }
+
+    const mailOptions = {
+      from: 'admin@academiadeinmigrantes.es',
+      to: 'admin@academiadeinmigrantes.es',
+      replyTo: email,
+      subject: `Solicitud de matrícula presencial - Nivel ${nivel} - ${nombre}`,
+      html: `
+        <h2>Solicitud de Matrícula Presencial</h2>
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3>Datos del Estudiante:</h3>
+          <p><strong>Nombre:</strong> ${nombre}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Teléfono:</strong> ${telefono}</p>
+          <p><strong>Nivel:</strong> ${nivel}</p>
+          ${direccion ? `<p><strong>Dirección del centro:</strong> ${direccion}</p>` : ''}
+          <p><strong>Fecha de solicitud:</strong> ${new Date().toLocaleString('es-ES')}</p>
+        </div>
+        <div style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4caf50;">
+          <h3 style="color: #2e7d32; margin-top: 0;">Mensaje del Estudiante:</h3>
+          <p style="font-size: 16px; font-weight: bold; color: #1b5e20;">${mensaje || 'Solicitud de matrícula presencial'}</p>
+        </div>
+        <p style="color: #666;">Este email fue enviado desde la app Academia de Inmigrantes.</p>
+      `,
+    };
+
+    console.log('📤 Enviando email a:', mailOptions.to);
+    console.log('📤 Desde:', mailOptions.from);
+    console.log('📤 Asunto:', mailOptions.subject);
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('✅ Email matrícula presencial enviado:', result.messageId);
+
+    res.json({
+      success: true,
+      message: 'Solicitud de matrícula presencial enviada correctamente',
+      messageId: result.messageId,
+    });
+  } catch (error) {
+    console.error('❌ Error enviando solicitud de matrícula presencial:', error);
+    res.status(500).json({ error: error.message || 'Error interno al enviar la solicitud' });
+  }
+});
+
 const normalizeText = (text = '') => text
   .toLowerCase()
   .normalize('NFD')

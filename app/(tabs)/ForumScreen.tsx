@@ -429,7 +429,7 @@ export default function ForumScreen() {
   const renderPost = ({ item }: { item: ForumPost }) => {
     const category = getCategoryInfo(item.category);
     const isExpanded = expandedPosts.has(item.id);
-    const shouldShowReadMore = item.content?.length > 250 || item.content?.includes('\n');
+    const shouldShowReadMore = item.content?.length > 140 || item.content?.includes('\n');
     const postComments = comments[item.id] || [];
     const commentsCount = postComments.length;
 
@@ -447,9 +447,15 @@ export default function ForumScreen() {
 
         <Text style={styles.postTitle}>{item.title}</Text>
 
-        <Text style={styles.postContent} numberOfLines={isExpanded ? undefined : 3}>
-          {item.content}
-        </Text>
+        <TouchableOpacity
+          activeOpacity={shouldShowReadMore ? 0.75 : 1}
+          disabled={!shouldShowReadMore}
+          onPress={() => togglePostExpansion(item.id)}
+        >
+          <Text style={styles.postContent} numberOfLines={isExpanded ? undefined : 3}>
+            {item.content}
+          </Text>
+        </TouchableOpacity>
 
         {shouldShowReadMore && (
           <TouchableOpacity

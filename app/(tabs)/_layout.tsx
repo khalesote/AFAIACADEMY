@@ -178,6 +178,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="MatriculaPresencialScreen"
+        options={{
+          title: "Matrícula Presencial",
+          tabBarIcon: ({ color }) => <Ionicons name="clipboard" size={28} color={color} />,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+      <Tabs.Screen
         name="JuegosDeTareasScreen"
         options={{
           title: "Juegos",
