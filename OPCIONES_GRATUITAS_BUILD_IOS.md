@@ -14,7 +14,7 @@
 ### ¿Qué significa "build privado"?
 - El código se mantiene privado
 - Solo tú puedes verlo
-- Requiere plan de pago
+- Requiere plan de pago    
 
 ---
 
