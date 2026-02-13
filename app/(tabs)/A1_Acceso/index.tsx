@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useUserProgress } from '@/contexts/UserProgressContext';
+import { useUser } from '@/contexts/UserContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -12,8 +13,21 @@ const A1_ACCESO_LEVEL = 'A1';
 export default function A1Acceso() {
   const router = useRouter();
   const { progress, isLoading, reloadProgress, resetLevel } = useUserProgress();
+  const { firebaseUser } = useUser();
+  const [matriculadoA1, setMatriculadoA1] = useState(false);
   const levelProgress = progress[A1_ACCESO_LEVEL];
   const unitsDone = levelProgress?.unitsCompleted ?? Array(7).fill(false);
+  const userId = firebaseUser?.uid || null;
+
+  const getA1MatriculaKeys = useCallback((): string[] => {
+    const keys = [
+      userId ? `matricula_A1_completada_${userId}` : null,
+      'matricula_A1_completada_guest',
+      'matricula_A1_completada',
+      'matricula_A1A2_completada',
+    ].filter(Boolean) as string[];
+    return Array.from(new Set(keys));
+  }, [userId]);
   
   // Función para resetear el progreso de A1
   const resetA1Progress = useCallback(async () => {
@@ -85,6 +99,33 @@ export default function A1Acceso() {
   useEffect(() => {
     reloadProgress();
   }, [reloadProgress]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let mounted = true;
+
+      const loadMatriculaA1 = async () => {
+        try {
+          const entries = await AsyncStorage.multiGet(getA1MatriculaKeys());
+          const hasA1Matricula = entries.some(([, value]) => value === 'true');
+          if (mounted) {
+            setMatriculadoA1(hasA1Matricula);
+          }
+        } catch (error) {
+          console.error('Error cargando matrícula A1 en A1_Acceso:', error);
+          if (mounted) {
+            setMatriculadoA1(false);
+          }
+        }
+      };
+
+      loadMatriculaA1();
+
+      return () => {
+        mounted = false;
+      };
+    }, [getA1MatriculaKeys])
+  );
   
   // Log cuando cambia el progreso
   useEffect(() => {
@@ -196,6 +237,28 @@ export default function A1Acceso() {
               <Ionicons name="library" size={24} color="#FFD700" style={{ marginRight: 8 }} />
               <Text style={styles.specialButtonText}>Gramática</Text>
               <Text style={styles.specialButtonTextAr}>القواعد</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.specialButton}
+            onPress={() =>
+              router.push({
+                pathname: '/(tabs)/HablarEspanolScreen',
+                params: { fullAccess: '1' },
+              } as any)
+            }
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={['#000', '#000']}
+              style={styles.specialButtonGradient}
+            >
+              <Ionicons name="chatbubbles" size={24} color="#FFD700" style={{ marginRight: 8 }} />
+              <View style={{ alignItems: 'center' }}>
+                <Text style={styles.specialButtonText}>Practica con el profesor robótico</Text>
+                <Text style={styles.specialButtonTextAr}>تدرّب مع الأستاذ الروبوتي</Text>
+              </View>
             </LinearGradient>
           </TouchableOpacity>
         </View>

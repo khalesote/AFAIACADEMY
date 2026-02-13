@@ -985,7 +985,7 @@ export function HomeScreenContent() {
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Vamos a Hablar Español */}
+            {/* Profesor Robótico */}
             <TouchableOpacity
               style={styles.categoryCard}
               onPress={() => handleMenuPress(() => router.push("/(tabs)/HablarEspanolScreen"))}
@@ -994,11 +994,11 @@ export function HomeScreenContent() {
                 colors={['#1a1a1a', '#000000']}
                 style={styles.categoryGradient}
               >
-                <Ionicons name="mic" size={32} color="#FFD700" />
-                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Vamos a Hablar Español</Text>
-                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>هيا نتحدث الإسبانية</Text>
-                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Diálogos con el bot</Text>
-                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>حوارات تفاعلية</Text>
+                <Ionicons name="hardware-chip" size={32} color="#FFD700" />
+                <Text style={[styles.categoryTitle, {color: '#FFD700'}]}>Practica con el profesor robótico</Text>
+                <Text style={[styles.categoryTitleAr, {color: '#FFD700'}]}>تدرّب مع الأستاذ الروبوتي</Text>
+                <Text style={[styles.categorySubtitle, {color: '#FFD700'}]}>Conversación + gramática guiada</Text>
+                <Text style={[styles.categorySubtitleAr, {color: '#FFD700'}]}>محادثة + قواعد موجّهة</Text>
               </LinearGradient>
             </TouchableOpacity>
 
