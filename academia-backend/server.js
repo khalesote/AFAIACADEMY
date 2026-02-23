@@ -1064,9 +1064,110 @@ app.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       health: '/api/health',
-      createPaymentIntent: '/api/create-payment-intent'
+      createPaymentIntent: '/api/create-payment-intent',
+      accountDeletion: '/account-deletion'
     }
   });
+});
+
+// Página pública para Google Play (eliminación de cuenta y datos)
+app.get('/account-deletion', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.status(200).send(`<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Eliminación de cuenta - AFAI Academia de Inmigrantes</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f7fb;
+      color: #111827;
+    }
+    .wrap {
+      max-width: 860px;
+      margin: 24px auto;
+      padding: 24px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+    h1, h2 {
+      margin: 0 0 12px 0;
+      line-height: 1.3;
+    }
+    h1 { font-size: 28px; }
+    h2 { font-size: 20px; margin-top: 24px; }
+    p, li {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .cta {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: #111827;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .muted {
+      color: #4b5563;
+      font-size: 14px;
+    }
+    .box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Solicitud de eliminación de cuenta</h1>
+    <p>
+      Si eres usuario de <strong>AFAI Academia de Inmigrantes</strong>, puedes solicitar la eliminación de tu cuenta y de los datos asociados.
+    </p>
+
+    <h2>Cómo solicitar la eliminación</h2>
+    <ol>
+      <li>Envía un correo a <strong>somos@afaiacademiadeinmigrantes.com</strong>.</li>
+      <li>Asunto recomendado: <strong>Eliminar mi cuenta</strong>.</li>
+      <li>Incluye el email con el que te registraste en la app.</li>
+    </ol>
+    <a class="cta" href="mailto:somos@afaiacademiadeinmigrantes.com?subject=Eliminar%20mi%20cuenta">
+      Solicitar eliminación por email
+    </a>
+
+    <h2>Qué datos se eliminan</h2>
+    <div class="box">
+      <ul>
+        <li>Datos de perfil de usuario.</li>
+        <li>Progreso y datos de uso asociados a la cuenta.</li>
+        <li>Contenido generado por el usuario dentro de la app (salvo obligación legal).</li>
+      </ul>
+    </div>
+
+    <h2>Datos que pueden conservarse temporalmente</h2>
+    <div class="box">
+      <ul>
+        <li>Registros mínimos de seguridad y prevención de fraude durante el plazo estrictamente necesario.</li>
+        <li>Si aplica, información de facturación/pago que deba conservarse por obligación legal.</li>
+      </ul>
+    </div>
+
+    <h2>Plazo de respuesta</h2>
+    <p>Las solicitudes se atienden en un máximo de 30 días.</p>
+
+    <p class="muted">Última actualización: ${new Date().toISOString().slice(0, 10)}</p>
+  </main>
+</body>
+</html>`);
 });
 
 // Health check
